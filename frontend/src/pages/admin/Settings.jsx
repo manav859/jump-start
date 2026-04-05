@@ -77,27 +77,6 @@ export default function Settings() {
     hydrateDraft(packages.find((p) => p.id === id) || null);
   };
 
-  const createPackage = () => {
-    setError("");
-    setSuccess("");
-    const id = `pkg-${Date.now()}`;
-    const pkg = {
-      ...blankPackage,
-      id,
-      title: "New Package",
-      sortOrder: packages.length + 1,
-      sections: [1, 2, 3, 4, 5].map((n) => blankSection(n)),
-    };
-    api
-      .post("/v1/admin/packages", pkg)
-      .then(() => {
-        setSuccess("Package created.");
-        load();
-        setSelectedId(id);
-      })
-      .catch((err) => setError(err?.response?.data?.msg || "Failed to create package"));
-  };
-
   const savePackage = () => {
     if (!draft.id) return;
     setSaving(true);
@@ -123,20 +102,6 @@ export default function Settings() {
       })
       .catch((err) => setError(err?.response?.data?.msg || "Failed to save package"))
       .finally(() => setSaving(false));
-  };
-
-  const deletePackage = () => {
-    if (!draft.id) return;
-    if (!window.confirm(`Delete package "${draft.title}"?`)) return;
-    setError("");
-    setSuccess("");
-    api
-      .delete(`/v1/admin/packages/${draft.id}`)
-      .then(() => {
-        setSuccess("Package deleted.");
-        load();
-      })
-      .catch((err) => setError(err?.response?.data?.msg || "Failed to delete package"));
   };
 
   const updateSection = (index, patch) => {
@@ -186,36 +151,35 @@ export default function Settings() {
     <div className="p-6 md:p-8 max-w-[1280px] mx-auto w-full flex flex-col gap-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Admin Package Manager</h1>
-          <p className="text-gray-500 mt-1">Create multiple packages with different sections/questions.</p>
+          <h1 className="text-3xl font-bold text-gray-900">Assessment Manager</h1>
+          <p className="text-gray-500 mt-1">Manage the dummy test and the comprehensive 500-question assessment package.</p>
         </div>
-        <button onClick={createPackage} className="px-4 py-2 rounded-lg bg-[#188B8B] text-white text-sm font-semibold">
-          + Add Package
-        </button>
       </div>
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {success ? <p className="text-sm text-emerald-700">{success}</p> : null}
 
-      <div className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-wrap gap-2">
-        {packages.map((p) => (
-          <button
-            key={p.id}
-            onClick={() => pick(p.id)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${
-              selectedId === p.id ? "bg-[#188B8B] text-white border-[#188B8B]" : "bg-white text-gray-700 border-gray-200"
-            }`}
-          >
-            {p.title}
-          </button>
-        ))}
-      </div>
+      {packages.length > 1 ? (
+        <div className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-wrap gap-2">
+          {packages.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => pick(p.id)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${
+                selectedId === p.id ? "bg-[#188B8B] text-white border-[#188B8B]" : "bg-white text-gray-700 border-gray-200"
+              }`}
+            >
+              {p.title}
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       {selectedPackage ? (
         <>
           <section className="bg-white rounded-2xl border border-gray-100 p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input value={draft.id} onChange={(e) => setDraft((d) => ({ ...d, id: e.target.value }))} className="border rounded-lg px-3 py-2" placeholder="Package ID" />
+              <input value={draft.id} readOnly className="border rounded-lg px-3 py-2 bg-gray-100 text-gray-500" placeholder="Package ID" />
               <input value={draft.title} onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))} className="border rounded-lg px-3 py-2" placeholder="Title" />
               <input value={draft.badge} onChange={(e) => setDraft((d) => ({ ...d, badge: e.target.value }))} className="border rounded-lg px-3 py-2" placeholder="Badge" />
               <input type="number" value={draft.amount} onChange={(e) => setDraft((d) => ({ ...d, amount: e.target.value }))} className="border rounded-lg px-3 py-2" placeholder="Amount" />
@@ -226,9 +190,6 @@ export default function Settings() {
             <div className="mt-4 flex items-center gap-3">
               <button onClick={savePackage} disabled={saving} className="px-4 py-2 rounded-lg bg-[#F59F0A] text-[#0F1729] text-sm font-semibold disabled:opacity-60">
                 {saving ? "Saving..." : "Save Package"}
-              </button>
-              <button onClick={deletePackage} className="px-4 py-2 rounded-lg border border-red-300 text-red-600 text-sm font-semibold">
-                Delete Package
               </button>
             </div>
           </section>

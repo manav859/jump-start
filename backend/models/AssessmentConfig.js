@@ -1,9 +1,5 @@
 import mongoose from "mongoose";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import COMPREHENSIVE_500_PACKAGE from "../config/comprehensive500Package.generated.js";
-import { applyPersonalityMetadataToQuestions } from "../utils/personalityQuestionMetadata.js";
 
 const packageSchema = new mongoose.Schema(
   {
@@ -51,28 +47,11 @@ const assessmentConfigSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+export const PRIMARY_PACKAGE_ID = COMPREHENSIVE_500_PACKAGE.id;
+export const DUMMY_TEST_PACKAGE_ID = "dummy-test";
 
-const FALLBACK_STARTER_PACKAGE = {
-  id: "starter",
-  title: "Starter Package",
-  badge: "Recommended",
-  amount: 1499,
-  strikeAmount: null,
-  features: [
-    "Complete 5-section assessment",
-    "Personalized report",
-    "Dashboard access",
-  ],
-  durationText: "Total duration based on selected sections",
-  active: true,
-  sortOrder: 1,
-  sections: [],
-};
-
-const DUMMY_TEST_PACKAGE = {
-  id: "dummy-test",
+const createDummyPackage = () => ({
+  id: DUMMY_TEST_PACKAGE_ID,
   title: "Dummy Test",
   badge: "Quick Test",
   amount: 0,
@@ -102,6 +81,8 @@ const DUMMY_TEST_PACKAGE = {
           correctOption: "",
           reverseScored: false,
           weight: 1,
+          subscale: "",
+          notes: "",
         },
       ],
     },
@@ -126,6 +107,8 @@ const DUMMY_TEST_PACKAGE = {
           correctOption: "",
           reverseScored: false,
           weight: 1,
+          subscale: "",
+          notes: "",
         },
       ],
     },
@@ -145,11 +128,21 @@ const DUMMY_TEST_PACKAGE = {
           correctOption: "C",
           reverseScored: false,
           weight: 1,
+          subscale: "",
+          notes: "",
         },
       ],
     },
   ],
-};
+});
+
+const createPrimaryPackage = () => ({
+  ...JSON.parse(JSON.stringify(COMPREHENSIVE_500_PACKAGE)),
+  active: true,
+  sortOrder: 1,
+});
+
+const createDefaultPackages = () => [createPrimaryPackage(), createDummyPackage()];
 
 let cachedDefaultConfig = null;
 
@@ -195,90 +188,10 @@ const loadDefaultConfig = () => {
     return cachedDefaultConfig;
   }
 
-  try {
-    const filePath = path.resolve(__dirname, "../config/assessment-seed.json");
-    const raw = fs.readFileSync(filePath, "utf-8");
-    const payload = JSON.parse(raw);
-
-    const mappedSections = Array.isArray(payload.sections)
-      ? payload.sections.map((section, index) => ({
-          sectionId: Number(section.sectionId || index + 1),
-          title: String(section.title || `Section ${index + 1}`),
-          durationMinutes: Number(section.durationMinutes || 20),
-          enabled: section.enabled !== false,
-          scoringType: section.scoringType || "mixed",
-          sheetCsvUrl: section.sheetCsvUrl || "",
-          questions: Array.isArray(section.questions)
-            ? section.questions
-                .map((question, questionIndex) => ({
-                  questionId:
-                    question.questionId ||
-                    question.question_id ||
-                    `${questionIndex + 1}`,
-                  text: question.text || question.question || "",
-                  type: question.type || "likert",
-                  options:
-                    question.options ||
-                    [
-                      question.option_a,
-                      question.option_b,
-                      question.option_c,
-                      question.option_d,
-                      question.option_e,
-                    ].filter(Boolean),
-                  correctOption:
-                    question.correctOption || question.correct_option || "",
-                  reverseScored:
-                    question.reverseScored === true ||
-                    String(question.reverse_scored || "").toLowerCase() ===
-                      "true",
-                  weight: Number(question.weight || 1),
-                  subscale: question.subscale || "",
-                  notes: question.notes || "",
-                }))
-                .filter((question) => question.text)
-            : [],
-        }))
-          .map((section) =>
-            Number(section.sectionId) === 1
-              ? {
-                  ...section,
-                  questions: applyPersonalityMetadataToQuestions(
-                    section.questions || []
-                  ),
-                }
-              : section
-          )
-      : [];
-
-    cachedDefaultConfig = {
-      key: "default",
-      packages: [
-        {
-          ...FALLBACK_STARTER_PACKAGE,
-          features: [
-            "Complete assessment",
-            "Personalized report",
-            "Dashboard access",
-          ],
-          durationText: "Duration based on selected sections",
-          sections: mappedSections,
-        },
-        { ...DUMMY_TEST_PACKAGE },
-        { ...COMPREHENSIVE_500_PACKAGE },
-      ],
-    };
-  } catch (error) {
-    console.error("Failed to load bundled assessment seed:", error.message);
-    cachedDefaultConfig = {
-      key: "default",
-      packages: [
-        { ...FALLBACK_STARTER_PACKAGE },
-        { ...DUMMY_TEST_PACKAGE },
-        { ...COMPREHENSIVE_500_PACKAGE },
-      ],
-    };
-  }
+  cachedDefaultConfig = {
+    key: "default",
+    packages: createDefaultPackages(),
+  };
 
   return cachedDefaultConfig;
 };
@@ -298,23 +211,40 @@ assessmentConfigSchema.statics.getOrCreateDefault = async function getOrCreateDe
   }
 
   let changed = false;
+  const packageSeeds = createDefaultPackages();
 
   if (!Array.isArray(cfg.packages) || cfg.packages.length === 0) {
-    cfg.packages = defaultConfig.packages;
+    cfg.packages = packageSeeds;
     changed = true;
   } else {
-    for (const seededPackage of defaultConfig.packages || []) {
-      const existingPackage = (cfg.packages || []).find(
-        (pkg) => pkg.id === seededPackage.id
-      );
+    const nextPackages = packageSeeds.map((seed) => {
+      const existing = (cfg.packages || []).find((pkg) => pkg.id === seed.id);
 
-      if (existingPackage) {
-        changed = mergeSeededPackage(existingPackage, seededPackage) || changed;
-        continue;
+      if (!existing) {
+        changed = true;
+        return seed;
       }
 
-      cfg.packages = [...(cfg.packages || []), seededPackage];
+      changed = mergeSeededPackage(existing, seed) || changed;
+      if (existing.active === false) {
+        existing.active = true;
+        changed = true;
+      }
+      if (Number(existing.sortOrder || 0) !== Number(seed.sortOrder || 0)) {
+        existing.sortOrder = seed.sortOrder;
+        changed = true;
+      }
+      return existing;
+    });
+
+    if (
+      (cfg.packages || []).length !== nextPackages.length ||
+      nextPackages.some((pkg, index) => cfg.packages[index]?.id !== pkg.id)
+    ) {
+      cfg.packages = nextPackages;
       changed = true;
+    } else {
+      cfg.packages = nextPackages;
     }
   }
 

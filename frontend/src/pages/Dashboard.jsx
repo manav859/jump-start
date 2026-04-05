@@ -57,6 +57,56 @@ const getPackageStatusMeta = (status) => {
   };
 };
 
+const getPackageActionMeta = (status, publicationStatus) => {
+  if (status === "completed") {
+    if (publicationStatus === "pending_approval") {
+      return {
+        label: "View Submission Status",
+        mode: "pending",
+      };
+    }
+
+    return {
+      label: "Retake Assessment",
+      mode: "retake",
+    };
+  }
+
+  if (status === "in_progress") {
+    return {
+      label: "Resume Assessment",
+      mode: "open",
+    };
+  }
+
+  return {
+    label: "Open Assessment",
+    mode: "open",
+  };
+};
+
+const getPackagePublicationMeta = (publicationStatus) => {
+  if (publicationStatus === "pending_approval") {
+    return {
+      label: "Result Pending",
+      badgeClass: "bg-amber-50 text-amber-700",
+      note: "Latest attempt submitted. Result is awaiting admin approval.",
+      noteClass: "text-amber-700",
+    };
+  }
+
+  if (publicationStatus === "approved") {
+    return {
+      label: "Report Ready",
+      badgeClass: "bg-blue-50 text-blue-700",
+      note: "Published report is available in your results.",
+      noteClass: "text-blue-700",
+    };
+  }
+
+  return null;
+};
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -159,13 +209,19 @@ export default function Dashboard() {
 
   const handleOpenPackage = async (pkg) => {
     const statusMeta = getPackageStatusMeta(pkg.status);
+    const actionMeta = getPackageActionMeta(pkg.status, pkg.publicationStatus);
     if (!statusMeta.clickable) return;
+
+    if (actionMeta.mode === "pending") {
+      navigate("/test-completed");
+      return;
+    }
 
     setPackageError("");
     setOpeningPackageId(pkg.id);
 
     try {
-      const shouldResetProgress = pkg.status === "completed";
+      const shouldResetProgress = actionMeta.mode === "retake";
       if (stats.selected_package_id !== pkg.id || shouldResetProgress) {
         await api.patch("/v1/user/package/select", {
           packageId: pkg.id,
@@ -294,6 +350,13 @@ export default function Dashboard() {
               {stats.purchased_packages.length ? (
                 stats.purchased_packages.map((pkg) => {
                   const statusMeta = getPackageStatusMeta(pkg.status);
+                  const actionMeta = getPackageActionMeta(
+                    pkg.status,
+                    pkg.publicationStatus
+                  );
+                  const publicationMeta = getPackagePublicationMeta(
+                    pkg.publicationStatus
+                  );
                   return (
                     <button
                       key={pkg.id}
@@ -314,19 +377,35 @@ export default function Dashboard() {
                               Total Duration: {pkg.totalDurationMinutes ?? 0} Minutes
                             </span>
                           </div>
+                          {publicationMeta ? (
+                            <p
+                              className={`mt-3 text-sm font-medium ${publicationMeta.noteClass}`}
+                            >
+                              {publicationMeta.note}
+                            </p>
+                          ) : null}
                         </div>
-                        <span
-                          className={`rounded-full px-4 py-2 text-xs font-semibold ${statusMeta.badgeClass}`}
-                        >
-                          {statusMeta.label}
-                        </span>
+                        <div className="flex flex-col items-end gap-2">
+                          <span
+                            className={`rounded-full px-4 py-2 text-xs font-semibold ${statusMeta.badgeClass}`}
+                          >
+                            {statusMeta.label}
+                          </span>
+                          {publicationMeta ? (
+                            <span
+                              className={`rounded-full px-4 py-2 text-xs font-semibold ${publicationMeta.badgeClass}`}
+                            >
+                              {publicationMeta.label}
+                            </span>
+                          ) : null}
+                        </div>
                       </div>
 
                       <div className="mt-6 flex items-center justify-between gap-4">
                         <p className="text-sm font-semibold text-[#188B8B]">
                           {openingPackageId === pkg.id
                             ? "Opening..."
-                            : statusMeta.actionLabel}
+                            : actionMeta.label}
                         </p>
                         {statusMeta.clickable ? (
                           <ArrowRight className="h-5 w-5 text-[#188B8B]" />

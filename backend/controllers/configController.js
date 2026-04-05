@@ -1,4 +1,12 @@
-import AssessmentConfig from "../models/AssessmentConfig.js";
+import AssessmentConfig, {
+  DUMMY_TEST_PACKAGE_ID,
+  PRIMARY_PACKAGE_ID,
+} from "../models/AssessmentConfig.js";
+
+const SUPPORTED_PACKAGE_IDS = new Set([
+  PRIMARY_PACKAGE_ID,
+  DUMMY_TEST_PACKAGE_ID,
+]);
 
 const parseCsv = (raw = "") => {
   const rows = [];
@@ -208,28 +216,26 @@ export const getAdminConfig = async (req, res) => {
 
 // POST /api/v1/admin/packages
 export const postAdminPackage = async (req, res) => {
-  try {
-    const cfg = await getCfg();
-    const next = normalizePackage(req.body || {}, (cfg.packages || []).length + 1);
-    if ((cfg.packages || []).some((p) => p.id === next.id)) {
-      return res.status(400).json({ success: false, msg: "Package id already exists" });
-    }
-    cfg.packages = [...(cfg.packages || []), next];
-    await cfg.save();
-    return res.status(201).json({ success: true, data: { package: next } });
-  } catch (err) {
-    return res.status(500).json({ success: false, msg: err.message || "Failed to create package" });
-  }
+  return res.status(403).json({
+    success: false,
+    msg: "Only the dummy test and comprehensive 500-question package are supported.",
+  });
 };
 
 // PUT /api/v1/admin/packages/:packageId
 export const putAdminPackage = async (req, res) => {
   try {
     const cfg = await getCfg();
+    if (!SUPPORTED_PACKAGE_IDS.has(req.params.packageId)) {
+      return res.status(404).json({ success: false, msg: "Package not found" });
+    }
     const idx = (cfg.packages || []).findIndex((p) => p.id === req.params.packageId);
     if (idx < 0) return res.status(404).json({ success: false, msg: "Package not found" });
     const existing = cfg.packages[idx];
     const next = normalizePackage({ ...existing.toObject(), ...req.body, sections: existing.sections }, existing.sortOrder);
+    next.id = req.params.packageId;
+    next.active = true;
+    next.sortOrder = req.params.packageId === PRIMARY_PACKAGE_ID ? 1 : 2;
     cfg.packages[idx] = next;
     await cfg.save();
     return res.status(200).json({ success: true, data: { package: next } });
@@ -240,16 +246,10 @@ export const putAdminPackage = async (req, res) => {
 
 // DELETE /api/v1/admin/packages/:packageId
 export const deleteAdminPackage = async (req, res) => {
-  try {
-    const cfg = await getCfg();
-    const before = (cfg.packages || []).length;
-    cfg.packages = (cfg.packages || []).filter((p) => p.id !== req.params.packageId);
-    if (cfg.packages.length === before) return res.status(404).json({ success: false, msg: "Package not found" });
-    await cfg.save();
-    return res.status(200).json({ success: true, data: { ok: true } });
-  } catch (err) {
-    return res.status(500).json({ success: false, msg: err.message || "Failed to delete package" });
-  }
+  return res.status(403).json({
+    success: false,
+    msg: "The dummy test and comprehensive 500-question package cannot be deleted.",
+  });
 };
 
 // PUT /api/v1/admin/packages/:packageId/sections

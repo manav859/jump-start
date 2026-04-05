@@ -221,14 +221,25 @@ const buildAdminReviewPayload = (user, cfg, reportOverride = null) => {
   const overallScore = roundScoreValue(
     profile.overallScore != null ? Number(profile.overallScore) : scoreTotals.score
   );
+  const hasSectionPercentages = sectionBreakdown.some((section) =>
+    Number.isFinite(toFiniteNumber(section.percentage, NaN))
+  );
+  const inferredPercentStyleSummary =
+    profile?.metadata?.overallMaxScore == null &&
+    Number.isFinite(toFiniteNumber(profile?.overallScore, NaN)) &&
+    hasSectionPercentages;
   const maxScore = roundScoreValue(
-    profile?.metadata?.overallMaxScore ??
-      scoreTotals.maxScore ??
-      Number(profile.totalTestsCount || 0) ??
-      100
+    inferredPercentStyleSummary
+      ? 100
+      : profile?.metadata?.overallMaxScore ??
+          scoreTotals.maxScore ??
+          Number(profile.totalTestsCount || 0) ??
+          100
   );
   const percentage =
-    maxScore > 0
+    inferredPercentStyleSummary
+      ? roundScoreValue(overallScore)
+      : maxScore > 0
       ? roundScoreValue((overallScore / maxScore) * 100)
       : roundScoreValue(Number(profile.overallScore || 0));
   const strongestSignals = Array.isArray(profile.reviewSummary?.strongestSignals)

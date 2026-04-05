@@ -44,6 +44,17 @@ const formatPrice = (amount) => `Rs ${Number(amount || 0).toLocaleString("en-IN"
 
 const getPlanActionMeta = (plan) => {
   if (plan.ownershipStatus === "completed") {
+    if (plan.publicationStatus === "pending_approval") {
+      return {
+        badgeLabel: "Result Pending",
+        badgeClass: "bg-amber-50 text-amber-700",
+        helperText:
+          "Your latest submission is awaiting admin approval. Retake will unlock after approval.",
+        actionLabel: "View Submission Status",
+        mode: "pending",
+      };
+    }
+
     return {
       badgeLabel: "Purchased",
       badgeClass: "bg-emerald-50 text-emerald-700",
@@ -99,6 +110,10 @@ export default function Test() {
   const [loading, setLoading] = useState(true);
   const [openingPlanId, setOpeningPlanId] = useState("");
   const [loadError, setLoadError] = useState("");
+  const hasSinglePlan = plans.length === 1;
+  const planContainerClassName = hasSinglePlan
+    ? "mx-auto mt-12 max-w-xl"
+    : "mt-12 grid gap-6 lg:grid-cols-3";
 
   useEffect(() => {
     const configRequest = api.get("/v1/public/config");
@@ -133,6 +148,8 @@ export default function Test() {
               ...plan,
               owned: Boolean(ownedPackage),
               ownershipStatus: ownedPackage?.status || "available",
+              publicationStatus:
+                ownedPackage?.publicationStatus || "not_submitted",
             };
           })
         );
@@ -150,6 +167,11 @@ export default function Test() {
 
     if (action.mode === "purchase") {
       navigate("/payment", { state: { plan } });
+      return;
+    }
+
+    if (action.mode === "pending") {
+      navigate("/test-completed");
       return;
     }
 
@@ -190,14 +212,14 @@ export default function Test() {
         <div className="text-center">
           <div className="inline-flex items-center gap-2 rounded-full bg-[#E8F9F8] px-4 py-2 text-sm font-semibold text-[#188B8B]">
             <BadgeCheck className="h-4 w-4" />
-            Choose Your Package
+            Assessment Packages
           </div>
           <h1 className="mt-6 text-4xl font-bold text-[#0F1729] sm:text-5xl">
-            Career Aptitude Test Packages
+            Career Aptitude Tests
           </h1>
           <p className="mx-auto mt-4 max-w-3xl text-base leading-8 text-[#65758B]">
-            Scientifically-designed assessments to discover your strengths,
-            interests, and ideal career paths with a clear next-step plan.
+            Start with the quick dummy test for a fast dry run, or take the
+            comprehensive 500-question assessment for full career-fit analysis.
           </p>
         </div>
 
@@ -214,7 +236,7 @@ export default function Test() {
         ) : null}
 
         {plans.length ? (
-          <div className="mt-12 grid gap-6 lg:grid-cols-3">
+          <div className={planContainerClassName}>
             {plans.map((plan, index) => {
               const accent = accentStyles[index % accentStyles.length];
               const action = getPlanActionMeta(plan);
@@ -246,7 +268,7 @@ export default function Test() {
                     {plan.title}
                   </h2>
                   <p className="mt-2 text-sm text-[#65758B]">
-                    {plan.description || "Comprehensive career assessment package."}
+                    {plan.description || "Career assessment package."}
                   </p>
 
                   <div className="mt-8">

@@ -1468,5 +1468,12 @@ export const computeResultFromAnswers = (answers, sections) => {
         }
       : null,
     reviewSummary,
+    metadata: {
+      algorithmKey: "generic-profile",
+      overallMaxScore: 100,
+      packageId: "",
+      scoringGuideSources: [],
+      ambiguityNotes: [],
+    },
   };
 };

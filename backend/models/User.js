@@ -2,8 +2,10 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import { cloneResultProfile } from "../utils/assessmentReports.js";
 
-const toPlainObject = (value) =>
-  value?.toObject ? value.toObject() : value || {};
+const toPlainObject = (value) => {
+  const plain = value?.toObject ? value.toObject() : value;
+  return plain && typeof plain === "object" ? plain : {};
+};
 
 const toNullableNumber = (value) => {
   if (value == null || value === "") return null;
@@ -316,10 +318,22 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const shouldSanitizePath = (doc, path) =>
+  typeof doc.isSelected === "function" ? doc.isSelected(path) !== false : true;
+
 userSchema.pre("validate", function (next) {
-  this.resultProfile = cloneResultProfile(this.resultProfile);
-  this.assessmentReports = sanitizeAssessmentReports(this.assessmentReports);
-  this.testProgress = sanitizeTestProgress(this.testProgress);
+  if (shouldSanitizePath(this, "resultProfile")) {
+    this.resultProfile = cloneResultProfile(this.resultProfile);
+  }
+
+  if (shouldSanitizePath(this, "assessmentReports")) {
+    this.assessmentReports = sanitizeAssessmentReports(this.assessmentReports);
+  }
+
+  if (shouldSanitizePath(this, "testProgress")) {
+    this.testProgress = sanitizeTestProgress(this.testProgress);
+  }
+
   next();
 });
 

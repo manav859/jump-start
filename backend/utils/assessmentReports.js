@@ -1,5 +1,6 @@
 import {
   RESULT_PUBLICATION_STATUS,
+  hasResultProfileData,
   getProfilePublicationState,
   getResultPublicationState,
 } from "./resultApproval.js";
@@ -238,6 +239,10 @@ export const normalizeAssessmentReport = (report = {}, packageLookup) => {
   );
   const state = getProfilePublicationState(profile, publication, report);
 
+  if (!hasResultProfileData(profile)) {
+    return null;
+  }
+
   return {
     _id: String(report?._id || ""),
     packageId: String(report?.packageId || ""),
@@ -277,6 +282,7 @@ export const getStoredAssessmentReports = (user = {}, packageLookup) => {
   if (reports.length) {
     return reports
       .map((report) => normalizeAssessmentReport(report, packageLookup))
+      .filter(Boolean)
       .sort((a, b) => getReportTimestamp(b) - getReportTimestamp(a));
   }
 

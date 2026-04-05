@@ -10,7 +10,10 @@ export const hasResultProfileData = (profile = {}) =>
   (Array.isArray(profile?.careerRecommendations) &&
     profile.careerRecommendations.length > 0) ||
   Boolean(profile?.personalityType?.code) ||
-  Number.isFinite(Number(profile?.overallScore));
+  (profile?.overallScore !== null &&
+    profile?.overallScore !== undefined &&
+    profile?.overallScore !== "" &&
+    Number.isFinite(Number(profile?.overallScore)));
 
 export const getProfilePublicationState = (
   profile = {},
@@ -21,8 +24,9 @@ export const getProfilePublicationState = (
   const profileExists = hasResultProfileData(profile);
 
   if (
-    explicitStatus === RESULT_PUBLICATION_STATUS.PENDING_APPROVAL ||
-    explicitStatus === RESULT_PUBLICATION_STATUS.APPROVED
+    profileExists &&
+    (explicitStatus === RESULT_PUBLICATION_STATUS.PENDING_APPROVAL ||
+      explicitStatus === RESULT_PUBLICATION_STATUS.APPROVED)
   ) {
     return {
       status: explicitStatus,

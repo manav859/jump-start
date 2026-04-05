@@ -78,6 +78,11 @@ const groupReportsByPackage = (reports = []) =>
     return map;
   }, new Map());
 
+const getLatestPackageReport = (user, packageId, packageLookup) => {
+  const reports = groupReportsByPackage(getStoredAssessmentReports(user, packageLookup));
+  return (reports.get(String(packageId || "")) || [])[0] || null;
+};
+
 const countCompletedSectionsFromReport = (report = {}) =>
   Array.isArray(report?.profile?.sectionBreakdown)
     ? report.profile.sectionBreakdown.filter(
@@ -475,6 +480,21 @@ export const selectPackage = async (req, res) => {
       : false;
     if (!alreadyPurchased) {
       return res.status(403).json({ success: false, msg: "Purchase this package before starting it" });
+    }
+
+    const latestPackageReport = getLatestPackageReport(
+      user,
+      pkg.id,
+      getPackageLookup(cfg)
+    );
+    if (
+      latestPackageReport?.publication?.status ===
+      RESULT_PUBLICATION_STATUS.PENDING_APPROVAL
+    ) {
+      return res.status(409).json({
+        success: false,
+        msg: "Your latest result for this package is still pending approval. Retakes unlock after admin approval.",
+      });
     }
 
     const shouldResetProgress =
