@@ -1,0 +1,90 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=Poppins:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
+
+:root {
+  color: #0f1729;
+  background: #f8fafc;
+  font-family: "Inter", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #0f1729;
+  font-family: "Inter", sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Poppins", sans-serif;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.font-inter {
+  font-family: "Inter", sans-serif;
+}
+
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: #f59f0a;
+  padding: 0.85rem 1.35rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f1729;
+  box-shadow: 0 14px 32px rgba(245, 159, 10, 0.22);
+}
+
+.primary-btn:hover {
+  transform: translateY(-1px);
+  background: #e89206;
+}
+
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  border: 2px solid #188b8b;
+  padding: 0.85rem 1.35rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #188b8b;
+}
+
+.secondary-btn:hover {
+  background: rgba(24, 139, 139, 0.06);
+}
+
+.surface-card {
+  border: 1px solid #e2e8f0;
+  background: white;
+  box-shadow: 0 16px 40px rgba(15, 23, 41, 0.06);
+}

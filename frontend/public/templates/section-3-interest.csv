@@ -1,0 +1,37 @@
+question_id,question,type,option_a,option_b,option_c,option_d,option_e,correct_option,reverse_scored,weight,subscale,notes
+201,I would most enjoy,single,Designing a website or mobile app,Organizing a charity fundraising event,Conducting a chemistry experiment,,,,false,1,,preference question from PDF
+202,"For a weekend activity, I would choose",single,Visiting a science museum,Attending a concert or art exhibition,Participating in a sports competition,,,,false,1,,preference question from PDF
+203,I would rather,single,Write a research paper on a topic I'm passionate about,Create a presentation for a business proposal,Build a model or prototype of an invention,,,,false,1,,preference question from PDF
+204,"Given these options, I would select",single,Tutoring younger students in mathematics,Performing in a school play or musical,Leading a student government campaign,,,,false,1,,preference question from PDF
+205,I would be most interested in,single,Analyzing survey data for market research,Designing costumes for a theater production,Coaching a youth sports team,,,,false,1,,preference question from PDF
+206,My preferred summer activity would be,single,Interning at a technology company,Volunteering at a hospital or clinic,Working at an art gallery or museum,,,,false,1,,preference question from PDF
+207,I would enjoy,single,Debating current events and political issues,Creating digital artwork or animations,Planning and organizing a major event,,,,false,1,,preference question from PDF
+208,"For a group project, I would want to",single,Research and gather information,Present findings to the class,Design visual materials and displays,,,,false,1,,preference question from PDF
+209,I would rather spend time,single,Reading about scientific discoveries,Visiting historical sites and landmarks,Exploring nature and outdoor environments,,,,false,1,,preference question from PDF
+210,"Given these choices, I would pick",single,Learning a new programming language,Taking a creative writing workshop,Participating in a debate tournament,,,,false,1,,preference question from PDF
+211,I would be most excited about,single,Shadowing a doctor or nurse for a day,Attending a business entrepreneur workshop,Joining an environmental conservation project,,,,false,1,,preference question from PDF
+212,My ideal extracurricular activity would be,single,Science olympiad or math competition,Drama club or school newspaper,Student council or community service club,,,,false,1,,preference question from PDF
+213,I would prefer to,single,Solve puzzles and brain teasers,Create music playlists and mixes,Organize social events and parties,,,,false,1,,preference question from PDF
+214,"For a career exploration opportunity, I would choose",single,Job shadowing an engineer or architect,Volunteering at a social services agency,Interning at a marketing or advertising firm,,,,false,1,,preference question from PDF
+215,I would most enjoy,single,Building and programming robots,Writing and editing for a publication,Planning and managing a budget,,,,false,1,,preference question from PDF
+216,"Given these activities, I would select",single,Participating in a science fair,Joining a cultural exchange program,Starting a small business or entrepreneurial venture,,,,false,1,,preference question from PDF
+217,I would rather,single,Study foreign cultures and languages,Experiment with new technologies,Coordinate volunteer activities,,,,false,1,,preference question from PDF
+218,My preferred learning experience would be,single,Hands-on laboratory work,Group discussions and seminars,Individual research projects,,,,false,1,,preference question from PDF
+219,My ideal work setting would be,single,A laboratory or research facility,An office with regular business hours,Outdoors or frequently traveling,,,,false,1,,preference question from PDF
+220,I would prefer to work,single,"In a quiet, focused environment","In a collaborative, social atmosphere","In a fast-paced, dynamic setting",,,,false,1,,preference question from PDF
+221,I would rather work for,single,"A large, established corporation","A small, close-knit organization",Myself as an entrepreneur,,,,false,1,,preference question from PDF
+222,My preferred work schedule would be,single,Standard 95 weekday hours,Flexible hours with some remote work,Variable schedule based on projects,,,,false,1,,preference question from PDF
+223,I would enjoy working,single,With cutting-edge technology and equipment,Directly with clients and customers,With creative materials and tools,,,,false,1,,preference question from PDF
+224,I prefer workplaces that are,single,Highly structured and organized,Balanced between structure and flexibility,Creative and innovative,,,,false,1,,preference question from PDF
+225,I would rather work,single,Independently on specialized projects,As part of a diverse team,In leadership roles directing others,,,,false,1,,preference question from PDF
+226,My ideal work location would be,single,In a major city with many opportunities,In a suburban area with good work-life balance,In a rural or natural setting,,,,false,1,,preference question from PDF
+227,I would prefer a job that,single,Provides stability and security,Offers opportunities for advancement,Allows for creativity and self-expression,,,,false,1,,preference question from PDF
+228,I would enjoy working in,single,A hospital or healthcare facility,A school or educational institution,A business or corporate environment,,,,false,1,,preference question from PDF
+229,I prefer work that,single,Follows established procedures and protocols,Allows me to develop new methods and approaches,Involves helping and serving others,,,,false,1,,preference question from PDF
+230,My ideal work atmosphere would be,single,Calm and peaceful,Energetic and stimulating,Supportive and collaborative,,,,false,1,,preference question from PDF
+231,"Organizing files, records, and databases",likert,,,,,,,false,1,,
+232,Working with numbers and financial data,likert,,,,,,,false,1,,
+233,Following established procedures and systems,likert,,,,,,,false,1,,
+234,Managing schedules and administrative tasks,likert,,,,,,,false,1,,
+235,Ensuring accuracy and attention to detail,likert,,,,,,,false,1,,
+236,"Working in structured, organized environments",likert,,,,,,,false,1,,

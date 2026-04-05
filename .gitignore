@@ -1,0 +1,23 @@
+# Dependencies
+**/node_modules/
+
+# Environment files
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Build output
+**/dist/
+**/dist-ssr/
+**/coverage/
+
+# Logs and temporary files
+*.log
+*.pid
+tmp-*.txt
+backend-server*.log
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+.idea/

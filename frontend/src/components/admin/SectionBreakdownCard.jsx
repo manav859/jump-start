@@ -1,0 +1,54 @@
+import { useState } from "react";
+import { ChevronDown, ClipboardList } from "lucide-react";
+import { formatScoreValue } from "../../data/adminReview";
+import SubsectionBreakdownList from "./SubsectionBreakdownList";
+
+const getSectionScoreLine = (section) => {
+  if (section.score == null) return "Section score: Review required";
+  return `Section score: ${formatScoreValue(section.score)} / ${formatScoreValue(
+    section.maxScore ?? 100
+  )}`;
+};
+
+export default function SectionBreakdownCard({ section, defaultOpen = true }) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  return (
+    <div className="rounded-[18px] border border-[#DCE9EE] bg-white shadow-sm sm:rounded-[26px]">
+      <button
+        type="button"
+        onClick={() => setIsOpen((value) => !value)}
+        className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-2.5 px-3 py-3 text-left sm:gap-4 sm:px-5 sm:py-5"
+      >
+        <div className="rounded-[14px] bg-[#EAFBFB] p-2 text-[#188B8B] sm:rounded-2xl sm:p-3">
+          <ClipboardList className="h-4 w-4 sm:h-5 sm:w-5" />
+        </div>
+        <div className="min-w-0">
+          <h3 className="text-[15px] font-bold leading-6 text-[#0F1729] sm:text-lg sm:leading-7">
+            {section.title}
+          </h3>
+          <p className="mt-1 text-[13px] font-medium leading-5 text-[#4E5D72] sm:mt-1.5 sm:text-sm sm:leading-6">
+            {getSectionScoreLine(section)}
+          </p>
+        </div>
+
+        <ChevronDown
+          className={`mt-1 h-5 w-5 shrink-0 text-[#65758B] transition-transform ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {isOpen ? (
+        <div className="border-t border-[#E8EEF3] px-3 py-3 sm:px-5 sm:py-5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8A94A6] sm:text-xs sm:tracking-[0.16em]">
+            Subsection Breakdown
+          </p>
+          <div className="mt-3 sm:mt-4">
+            <SubsectionBreakdownList subsections={section.subsections || []} />
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}

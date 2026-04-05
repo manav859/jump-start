@@ -1,0 +1,30 @@
+{
+  "name": "jumpstart-backend",
+  "version": "1.0.0",
+  "description": "MERN backend for Jumpstart career assessment",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "dev:watch": "node --watch server.js",
+    "db:up": "docker compose up -d mongo",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f mongo",
+    "generate:assessment-500": "node scripts/generateComprehensive500Package.mjs",
+    "enrich:personality-csv": "node scripts/enrichPersonalityCsv.mjs",
+    "smoke:career-500q": "node scripts/smokeCareer500qScoring.mjs",
+    "seed:assessment": "node scripts/seedAssessmentFromJson.mjs",
+    "seed:admin": "node scripts/seedAdmin.mjs"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "google-auth-library": "^9.4.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.3",
+    "pdf-parse": "^2.4.5"
+  }
+}
