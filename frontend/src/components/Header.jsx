@@ -51,8 +51,9 @@ export default function Header() {
   }, [isAdmin]);
 
   const handleLogout = () => {
+    const didLogout = logout({ confirm: true });
+    if (!didLogout) return;
     setMobileOpen(false);
-    logout();
     navigate("/", { replace: true });
   };
 

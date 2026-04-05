@@ -49,8 +49,9 @@ const AdminHeader = ({ isSidebarOpen, setIsSidebarOpen }) => {
   };
 
   const handleLogout = () => {
+    const didLogout = logout({ confirm: true });
+    if (!didLogout) return;
     closeAllDropdowns();
-    logout();
     navigate("/login", { replace: true });
   };
 

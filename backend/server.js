@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import { ensureRequiredEnv } from "./config/env.js";
+import { ensureAdminAccount } from "./utils/adminBootstrap.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import configRoutes from "./routes/configRoutes.js";
@@ -53,6 +54,12 @@ app.use((err, req, res, next) => {
 
 const startServer = async () => {
   await connectDB();
+  const adminStatus = await ensureAdminAccount();
+  console.log(
+    `Admin account ready for ${adminStatus.email}${
+      adminStatus.created ? " (created)" : ""
+    }`
+  );
 
   const server = app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
