@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from "react";
-import { apiUnavailableMessage, apiV1BaseUrl } from "../config/env";
+import { apiUnavailableMessage, getApiV1Url } from "../config/env";
 
 export const AuthContext = createContext();
 
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
   const login = async ({ email, password }) => {
     let res;
     try {
-      res = await fetch(`${apiV1BaseUrl}/user/auth/login`, {
+      res = await fetch(getApiV1Url("/user/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }) => {
   const loginWithGoogle = async (google_id_token) => {
     let res;
     try {
-      res = await fetch(`${apiV1BaseUrl}/user/auth/social-login`, {
+      res = await fetch(getApiV1Url("/user/auth/social-login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

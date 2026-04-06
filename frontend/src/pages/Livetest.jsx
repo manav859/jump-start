@@ -8,6 +8,7 @@ import React, {
 import { useNavigate, useParams } from "react-router-dom";
 import { CheckCircle2, Clock3, Pause, Save } from "lucide-react";
 import api from "../api/api";
+import { getApiV1Url } from "../config/env";
 
 const LIKERT_OPTIONS = [
   { label: "Strongly Disagree", value: 1 },
@@ -390,7 +391,7 @@ export default function Livetest() {
         timeRemainingSeconds: Number(latestTimeRef.current) || 0,
       });
 
-      fetch(`${api.defaults.baseURL}/v1/user/test-progress`, {
+      fetch(getApiV1Url("/user/test-progress"), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

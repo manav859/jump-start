@@ -13,8 +13,38 @@ const PORT = process.env.PORT || 5000;
 
 ensureRequiredEnv();
 
+const parseAllowedOrigins = () => {
+  const configuredOrigins = [
+    process.env.FRONTEND_URL,
+    process.env.CORS_ALLOWED_ORIGINS,
+  ]
+    .flatMap((value) => String(value || "").split(","))
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  return new Set([
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    ...configuredOrigins,
+  ]);
+};
+
+const allowedOrigins = parseAllowedOrigins();
+
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.has(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error(`Origin ${origin} is not allowed by CORS`));
+  },
+  credentials: true,
+};
+
 const app = express();
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Root – so visiting http://localhost:5000/ shows API is up

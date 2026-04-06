@@ -1,8 +1,8 @@
 import axios from "axios";
-import { apiBaseUrl } from "../config/env";
+import { apiBaseUrl, apiUnavailableMessage, hasApiBaseUrl } from "../config/env";
 
 const api = axios.create({
-  baseURL: apiBaseUrl,
+  baseURL: hasApiBaseUrl ? apiBaseUrl : undefined,
   timeout: 15000,
   headers: {
     "Content-Type": "application/json",
@@ -12,6 +12,13 @@ const api = axios.create({
 // Attach token automatically (REQUEST INTERCEPTOR)
 api.interceptors.request.use(
   (config) => {
+    if (
+      !hasApiBaseUrl &&
+      !/^https?:\/\//i.test(String(config.url || ""))
+    ) {
+      return Promise.reject(new Error(apiUnavailableMessage));
+    }
+
     const token = localStorage.getItem("token");
 
     if (token) {

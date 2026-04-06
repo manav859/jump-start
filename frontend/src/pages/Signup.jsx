@@ -4,7 +4,7 @@ import { ArrowRight, BadgeCheck, Eye, EyeOff, Sparkles } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 import {
   apiUnavailableMessage,
-  apiV1BaseUrl,
+  getApiV1Url,
   googleConfigMessage,
   googleClientId,
   isGoogleAuthConfigured,
@@ -97,7 +97,7 @@ export default function Signup() {
     setMsg("");
 
     try {
-      const res = await fetch(`${apiV1BaseUrl}/user/auth/register`, {
+      const res = await fetch(getApiV1Url("/user/auth/register"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
