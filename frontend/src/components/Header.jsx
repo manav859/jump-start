@@ -2,6 +2,7 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LogOut, Menu, UserRound, X } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
+import ConfirmDialog from "./ConfirmDialog";
 
 const defaultNavItems = [
   { label: "Home", to: "/" },
@@ -27,6 +28,7 @@ export default function Header() {
   const location = useLocation();
   const { user, logout } = useContext(AuthContext);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const isAdmin = user?.role === "admin";
 
   const firstName = useMemo(() => {
@@ -51,8 +53,13 @@ export default function Header() {
   }, [isAdmin]);
 
   const handleLogout = () => {
-    const didLogout = logout({ confirm: true });
-    if (!didLogout) return;
+    setMobileOpen(false);
+    setShowLogoutDialog(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    logout();
+    setShowLogoutDialog(false);
     setMobileOpen(false);
     navigate("/", { replace: true });
   };
@@ -243,6 +250,16 @@ export default function Header() {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={showLogoutDialog}
+        title="Confirm Logout"
+        description="Are you sure you want to log out of your Jumpstart account?"
+        confirmLabel="Logout"
+        cancelLabel="Stay Logged In"
+        onCancel={() => setShowLogoutDialog(false)}
+        onConfirm={handleLogoutConfirm}
+      />
     </>
   );
 }

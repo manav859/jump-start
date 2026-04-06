@@ -120,22 +120,12 @@ export const AuthProvider = ({ children }) => {
   // ------------------------------------
   // 3️⃣ LOGOUT
   // ------------------------------------
-  const logout = ({ confirm = false } = {}) => {
-    if (
-      confirm &&
-      typeof window !== "undefined" &&
-      !window.confirm("Are you sure you want to log out?")
-    ) {
-      return false;
-    }
-
+  const logout = () => {
     setUser(null);
     setToken("");
 
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-
-    return true;
   };
 
   const updateUser = (nextUser) => {

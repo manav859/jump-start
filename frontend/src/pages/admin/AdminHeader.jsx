@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
 import api from "../../api/api";
+import ConfirmDialog from "../../components/ConfirmDialog";
 import {
   ADMIN_NOTIFICATIONS_REFRESH_EVENT,
   loadAdminNotificationState,
@@ -57,6 +58,7 @@ const AdminHeader = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const [notificationsError, setNotificationsError] = useState("");
   const [readNotificationIds, setReadNotificationIds] = useState([]);
   const [notificationStateReady, setNotificationStateReady] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
@@ -103,9 +105,13 @@ const AdminHeader = ({ isSidebarOpen, setIsSidebarOpen }) => {
   };
 
   const handleLogout = () => {
-    const didLogout = logout({ confirm: true });
-    if (!didLogout) return;
     closeAllDropdowns();
+    setShowLogoutDialog(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    logout();
+    setShowLogoutDialog(false);
     navigate("/login", { replace: true });
   };
 
@@ -447,6 +453,16 @@ const AdminHeader = ({ isSidebarOpen, setIsSidebarOpen }) => {
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={showLogoutDialog}
+        title="Confirm Logout"
+        description="Are you sure you want to log out of the Jumpstart admin panel?"
+        confirmLabel="Logout"
+        cancelLabel="Cancel"
+        onCancel={() => setShowLogoutDialog(false)}
+        onConfirm={handleLogoutConfirm}
+      />
     </header>
   );
 };
