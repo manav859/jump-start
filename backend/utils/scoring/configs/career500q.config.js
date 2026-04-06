@@ -238,6 +238,11 @@ export const CAREER_500Q_CONFIG = {
                 "Responses lean toward structured systems, solo ownership, and procedure-led execution.",
               careerImplication:
                 "Research, accounting, law, operations, project planning, quality-focused work",
+              highlights: [
+                "Prefers structured and predictable work.",
+                "Shows comfort with independent ownership.",
+                "Works best with clear procedures and organized systems.",
+              ],
             },
             B: {
               key: "balanced_collaborative",
@@ -246,6 +251,11 @@ export const CAREER_500Q_CONFIG = {
                 "Responses balance teamwork, flexibility, and shared decision-making.",
               careerImplication:
                 "Consulting, design, education, healthcare, professional services",
+              highlights: [
+                "Shows comfort with collaborative environments.",
+                "Balances flexibility with team coordination.",
+                "Works well in shared decision-making settings.",
+              ],
             },
             C: {
               key: "dynamic_autonomous",
@@ -254,6 +264,11 @@ export const CAREER_500Q_CONFIG = {
                 "Responses prefer autonomy, novelty, intensity, and self-directed movement.",
               careerImplication:
                 "Entrepreneurship, journalism, consulting, startups, fast-moving environments",
+              highlights: [
+                "Prefers flexible and fast-moving environments.",
+                "Shows a stronger autonomous-work tendency.",
+                "Thrives on novelty, intensity, and self-direction.",
+              ],
             },
           },
         },
@@ -777,30 +792,55 @@ export const CAREER_500Q_CONFIG = {
               interpretation:
                 "Activity choices repeatedly favor science, research, and investigative exploration.",
               careerImplication: "Science stream recommendation",
+              highlights: [
+                "Enjoys research, investigation, and scientific exploration.",
+                "Prefers analytical or discovery-based activities.",
+                "Shows stronger interest in evidence-driven tasks.",
+              ],
             },
             business: {
               label: "Business / Enterprising Pull",
               interpretation:
                 "Choices favor organized influence, business execution, and commercial leadership.",
               careerImplication: "Commerce stream recommendation",
+              highlights: [
+                "Enjoys leadership, initiative, and commercial activity.",
+                "Shows comfort influencing outcomes and people.",
+                "Prefers goal-driven and enterprise-oriented work.",
+              ],
             },
             artistic: {
               label: "Artistic / Creative Pull",
               interpretation:
                 "Choices repeatedly favor expressive, design-led, and creative experiences.",
               careerImplication: "Arts / Creative stream recommendation",
+              highlights: [
+                "Prefers expressive, design-led, or creative activities.",
+                "Shows interest in imagination, aesthetics, and originality.",
+                "Enjoys open-ended, media, or art-oriented experiences.",
+              ],
             },
             social: {
               label: "Social / Service Pull",
               interpretation:
                 "Choices repeatedly favor teaching, care, service, and direct people support.",
               careerImplication: "Education, healthcare, counseling, or service pathways",
+              highlights: [
+                "Enjoys helping, teaching, and direct people support.",
+                "Feels drawn to service-oriented or care-focused roles.",
+                "Shows comfort in human-centered activities.",
+              ],
             },
             technical: {
               label: "Technical / Applied Pull",
               interpretation:
                 "Choices show practical, build-oriented, or technology execution interests.",
               careerImplication: "Technical, engineering, or applied problem-solving pathways",
+              highlights: [
+                "Prefers practical, build-oriented, or hands-on problem solving.",
+                "Shows comfort with tools, systems, and applied execution.",
+                "Leans toward engineering or technical activity patterns.",
+              ],
             },
           },
         },
@@ -818,24 +858,44 @@ export const CAREER_500Q_CONFIG = {
               interpretation:
                 "Environment choices prefer research-focused, quieter, and independent settings.",
               careerImplication: "Science, research, technical careers",
+              highlights: [
+                "Prefers quiet, research-focused, or independent settings.",
+                "Works comfortably with focused solitary tasks.",
+                "Leans toward specialized or low-distraction environments.",
+              ],
             },
             collaborative: {
               label: "Collaborative / People / Service",
               interpretation:
                 "Environment choices favor collaboration, service, and direct human interaction.",
               careerImplication: "Education, healthcare, social services",
+              highlights: [
+                "Prefers collaborative and people-centered environments.",
+                "Enjoys service, teamwork, and shared activity.",
+                "Feels comfortable in interactive group settings.",
+              ],
             },
             dynamic: {
               label: "Dynamic / Leadership / Business",
               interpretation:
                 "Environment choices favor movement, leadership, and high-energy execution.",
               careerImplication: "Management, sales, entrepreneurship",
+              highlights: [
+                "Prefers fast-paced, high-energy environments.",
+                "Shows comfort with leadership and movement.",
+                "Leans toward business, execution, and decision-heavy settings.",
+              ],
             },
             creative: {
               label: "Creative / Flexible / Innovative",
               interpretation:
                 "Environment choices prefer flexibility, creative tooling, and novel setups.",
               careerImplication: "Arts, design, media, startups",
+              highlights: [
+                "Prefers flexible and innovative work settings.",
+                "Enjoys open-ended, creative, or experimental environments.",
+                "Leans toward design, media, or startup-like spaces.",
+              ],
             },
           },
         },

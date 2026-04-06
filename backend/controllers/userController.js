@@ -471,6 +471,12 @@ export const selectPackage = async (req, res) => {
   try {
     const { packageId, resetProgress = false } = req.body || {};
     if (!packageId) return res.status(400).json({ success: false, msg: "packageId is required" });
+    if (resetProgress === true) {
+      return res.status(409).json({
+        success: false,
+        msg: "Retaking completed tests is not available.",
+      });
+    }
     const [cfg, user] = await Promise.all([AssessmentConfig.getOrCreateDefault(), User.findById(req.user.id)]);
     if (!user) return res.status(404).json({ success: false, msg: "User not found" });
     const pkg = getActivePackages(cfg).find((p) => p.id === packageId);
@@ -493,7 +499,7 @@ export const selectPackage = async (req, res) => {
     ) {
       return res.status(409).json({
         success: false,
-        msg: "Your latest result for this package is still pending approval. Retakes unlock after admin approval.",
+        msg: "Your latest result for this package is still pending approval.",
       });
     }
 
@@ -528,12 +534,22 @@ export const purchasePackage = async (req, res) => {
     if (Array.isArray(user.purchasedPackages) && user.purchasedPackages.includes(pkg.id)) {
       return res.status(409).json({
         success: false,
-        msg: "This package is already purchased. You can retake it from your dashboard or test page.",
+        msg: "This package is already purchased and available in your account.",
       });
     }
 
     user.selectedPackageId = pkg.id;
     user.purchasedPackages = [...new Set([...(user.purchasedPackages || []), pkg.id])];
+    user.purchaseHistory = [
+      ...(Array.isArray(user.purchaseHistory) ? user.purchaseHistory : []),
+      {
+        packageId: pkg.id,
+        packageTitle: pkg.title,
+        amount: Number(pkg.amount || 0),
+        purchasedAt: new Date(),
+        paymentMethod: "Online",
+      },
+    ];
     user.testsInProgress = 0;
     user.testProgress = createEmptyTestProgress();
     await user.save();

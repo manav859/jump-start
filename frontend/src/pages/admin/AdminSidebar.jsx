@@ -35,13 +35,13 @@ const AdminSidebar = ({ isOpen }) => {
 
         {/* Navigation */}
         <nav className="flex flex-col gap-6">
-          {menuItems.map((item, index) => (
+          {menuItems.map((item) => (
             <NavLink
-              key={index}
+              key={item.path}
               to={item.path}
               title={item.label}
               className={({ isActive }) =>
-                `p-2 rounded-lg transition-colors flex items-center justify-center
+                `group relative p-2 rounded-lg transition-colors flex items-center justify-center
                 ${
                   isActive
                     ? "bg-[#14b8a61a] text-[#14b8a6]"
@@ -50,6 +50,9 @@ const AdminSidebar = ({ isOpen }) => {
               }
             >
               {item.icon}
+              <span className="pointer-events-none absolute left-full top-1/2 ml-3 hidden -translate-y-1/2 whitespace-nowrap rounded-xl bg-[#0F1729] px-3 py-2 text-xs font-semibold text-white opacity-0 shadow-lg transition-all duration-200 group-hover:opacity-100 md:flex">
+                {item.label}
+              </span>
             </NavLink>
           ))}
         </nav>

@@ -88,3 +88,86 @@ textarea {
   background: white;
   box-shadow: 0 16px 40px rgba(15, 23, 41, 0.06);
 }
+
+.jumpstart-report-print-mode {
+  background: white !important;
+}
+
+.jumpstart-report-print-mode #root {
+  background: white !important;
+}
+
+.jumpstart-report-print-mode header,
+.jumpstart-report-print-mode footer,
+.jumpstart-report-print-mode .report-print-hidden {
+  display: none !important;
+}
+
+.jumpstart-report-print-mode .report-print-page {
+  background: white !important;
+}
+
+.jumpstart-report-print-mode .report-print-root {
+  max-width: 1120px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.jumpstart-report-print-mode .surface-card,
+.jumpstart-report-print-mode .report-print-card,
+.jumpstart-report-print-mode .report-print-section {
+  box-shadow: none !important;
+  break-inside: avoid-page;
+  page-break-inside: avoid;
+}
+
+.jumpstart-report-print-mode .report-print-link {
+  color: #0f1729 !important;
+  text-decoration: none !important;
+}
+
+@media print {
+  @page {
+    margin: 14mm;
+  }
+
+  html,
+  body {
+    background: white !important;
+  }
+
+  body {
+    color: #0f1729;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  header,
+  footer,
+  .report-print-hidden {
+    display: none !important;
+  }
+
+  #root,
+  .report-print-page {
+    background: white !important;
+  }
+
+  .report-print-root {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .surface-card,
+  .report-print-card,
+  .report-print-section {
+    box-shadow: none !important;
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+
+  .report-print-link {
+    color: #0f1729 !important;
+    text-decoration: none !important;
+  }
+}

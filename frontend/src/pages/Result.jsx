@@ -17,6 +17,7 @@ import {
 import api from "../api/api";
 import { AuthContext } from "../context/AuthContext";
 import StatusPill from "../components/results/StatusPill";
+import usePrintableDocument from "../hooks/usePrintableDocument";
 import {
   formatStudentDate,
   getPrimaryActionLabel,
@@ -91,6 +92,7 @@ export default function Result() {
   const [openingTestId, setOpeningTestId] = useState("");
   const [shareFeedback, setShareFeedback] = useState("");
   const [data, setData] = useState(defaultPayload);
+  const { printDocument } = usePrintableDocument();
 
   useEffect(() => {
     api
@@ -218,7 +220,7 @@ export default function Result() {
 
   const handleDownload = () => {
     if (!data.hasResults) return;
-    window.print();
+    void printDocument();
   };
 
   const handleShare = async () => {
@@ -273,8 +275,8 @@ export default function Result() {
   }
 
   return (
-    <div className="bg-[#FAFAFA]">
-      <div className="mx-auto max-w-[1400px] px-5 py-12 lg:px-0">
+    <div className="report-print-page bg-[#FAFAFA]">
+      <div className="report-print-root mx-auto max-w-[1400px] px-5 py-12 lg:px-0">
         <div className="lg:px-8">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div>
@@ -286,7 +288,7 @@ export default function Result() {
               </p>
             </div>
 
-            <div className="flex flex-col items-start gap-3 sm:items-end">
+            <div className="report-print-hidden flex flex-col items-start gap-3 sm:items-end">
               <div className="flex flex-col gap-3 sm:flex-row">
                 <button
                   type="button"
@@ -313,7 +315,7 @@ export default function Result() {
           </div>
 
           <section
-            className={`${resultCardClass} mt-8 min-h-[144px] overflow-hidden rounded-[16px] bg-[radial-gradient(circle_at_10%_0%,rgba(232,249,250,0.75),transparent_36%),linear-gradient(180deg,#FFFFFF_0%,#FCFEFF_100%)] px-6 py-[26px]`}
+            className={`${resultCardClass} report-print-card mt-8 min-h-[144px] overflow-hidden rounded-[16px] bg-[radial-gradient(circle_at_10%_0%,rgba(232,249,250,0.75),transparent_36%),linear-gradient(180deg,#FFFFFF_0%,#FCFEFF_100%)] px-6 py-[26px]`}
           >
             <div className="grid gap-4 md:grid-cols-3">
               {summaryCards.map((card) => {
@@ -345,7 +347,7 @@ export default function Result() {
 
           {data.resultStatus === "pending_approval" ? (
             <section
-              className={`${resultCardClass} mt-6 rounded-[16px] border-[#F5D9A6] bg-[linear-gradient(180deg,#FFF9EE_0%,#FFFFFF_100%)] p-6`}
+              className={`${resultCardClass} report-print-card mt-6 rounded-[16px] border-[#F5D9A6] bg-[linear-gradient(180deg,#FFF9EE_0%,#FFFFFF_100%)] p-6`}
             >
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
@@ -358,7 +360,7 @@ export default function Result() {
                 </div>
                 <Link
                   to="/test-completed"
-                  className="inline-flex items-center gap-2 text-[14px] font-semibold text-[#188B8B] hover:underline"
+                  className="report-print-hidden inline-flex items-center gap-2 text-[14px] font-semibold text-[#188B8B] hover:underline"
                 >
                   View Submission Status
                   <ArrowRight className="h-4 w-4" />
@@ -371,7 +373,7 @@ export default function Result() {
 
           <div className="mt-8 grid gap-8 xl:grid-cols-[880px_424px]">
             <div className="space-y-6">
-              <section className={`${resultCardClass} min-h-[360px] rounded-[16px] p-[25px]`}>
+              <section className={`${resultCardClass} report-print-card min-h-[360px] rounded-[16px] p-[25px]`}>
                 <div>
                   <h2 className="text-[24px] font-semibold leading-6 text-[#0F1729]">
                     Your Tests
@@ -417,7 +419,7 @@ export default function Result() {
                               type="button"
                               onClick={() => handleCardAction(test)}
                               disabled={openingTestId === test.id}
-                              className="font-semibold text-[#188B8B] hover:underline disabled:opacity-60"
+                              className="report-print-hidden font-semibold text-[#188B8B] hover:underline disabled:opacity-60"
                             >
                               {actionLabel}
                             </button>
@@ -444,7 +446,7 @@ export default function Result() {
                 </div>
               </section>
 
-              <section className={`${resultCardClass} min-h-[500px] rounded-[16px] p-[25px]`}>
+              <section className={`${resultCardClass} report-print-card min-h-[500px] rounded-[16px] p-[25px]`}>
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-5 w-5 items-center justify-center text-[#188B8B]">
                     <Brain className="h-5 w-5" />
@@ -490,7 +492,7 @@ export default function Result() {
                 </div>
               </section>
 
-              <section className={`${resultCardClass} min-h-[672px] rounded-[16px] p-[25px]`}>
+              <section className={`${resultCardClass} report-print-card min-h-[672px] rounded-[16px] p-[25px]`}>
                 <div>
                   <h2 className="text-[24px] font-semibold leading-6 text-[#0F1729]">
                     Top Career Recommendations
@@ -539,7 +541,7 @@ export default function Result() {
                           <Link
                             to={`/careerdetail?career=${encodeURIComponent(career.title || "")}`}
                             state={{ career }}
-                            className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#188B8B] hover:underline"
+                            className="report-print-hidden inline-flex items-center gap-1.5 text-[13px] font-medium text-[#188B8B] hover:underline"
                           >
                             View Details
                             <ArrowRight className="h-4 w-4" />
@@ -556,7 +558,7 @@ export default function Result() {
 
                 <Link
                   to="/bookcounselling"
-                  className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-[14px] border-2 border-[#188B8B] px-5 text-[13px] font-medium text-[#188B8B] hover:bg-[#F6FDFC]"
+                  className="report-print-hidden mt-4 inline-flex h-10 w-full items-center justify-center rounded-[14px] border-2 border-[#188B8B] px-5 text-[13px] font-medium text-[#188B8B] hover:bg-[#F6FDFC]"
                 >
                   For more career advice, book a call!
                 </Link>
@@ -565,7 +567,7 @@ export default function Result() {
 
             <div className="space-y-6">
               <section
-                className={`${resultCardClass} min-h-[339px] rounded-[16px] border-[#F3D69B] bg-[radial-gradient(circle_at_100%_0%,rgba(255,238,205,0.7),transparent_38%),linear-gradient(180deg,#FFF9EE_0%,#FFFDF8_100%)] p-[25px]`}
+                className={`${resultCardClass} report-print-card min-h-[339px] rounded-[16px] border-[#F3D69B] bg-[radial-gradient(circle_at_100%_0%,rgba(255,238,205,0.7),transparent_38%),linear-gradient(180deg,#FFF9EE_0%,#FFFDF8_100%)] p-[25px]`}
               >
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-5 w-5 items-center justify-center text-[#F59F0A]">
@@ -610,7 +612,7 @@ export default function Result() {
                 </div>
               </section>
 
-              <section className={`${resultCardClass} min-h-[358px] rounded-[16px] p-[25px]`}>
+              <section className={`${resultCardClass} report-print-card min-h-[358px] rounded-[16px] p-[25px]`}>
                 <h2 className="text-[18px] font-semibold leading-7 text-[#0F1729]">
                   Recommended Next Steps
                 </h2>
@@ -644,13 +646,13 @@ export default function Result() {
 
                 <Link
                   to="/bookcounselling"
-                  className="primary-btn mt-3 flex h-10 w-full rounded-[14px] py-0 text-[13px] font-medium"
+                  className="primary-btn report-print-hidden mt-3 flex h-10 w-full rounded-[14px] py-0 text-[13px] font-medium"
                 >
                   Schedule Counselling
                 </Link>
               </section>
 
-              <section className={`${resultCardClass} min-h-[168px] rounded-[16px] p-[25px]`}>
+              <section className={`${resultCardClass} report-print-card min-h-[168px] rounded-[16px] p-[25px]`}>
                 <h2 className="text-[18px] font-semibold leading-7 text-[#0F1729]">
                   Complete Your Profile
                 </h2>
@@ -659,7 +661,7 @@ export default function Result() {
                 </p>
                 <Link
                   to="/test"
-                  className="secondary-btn mt-6 flex h-10 w-full rounded-[14px] py-0 text-[13px] font-medium"
+                  className="secondary-btn report-print-hidden mt-6 flex h-10 w-full rounded-[14px] py-0 text-[13px] font-medium"
                 >
                   <BookOpen className="mr-2 h-4 w-4" />
                   Browse Tests

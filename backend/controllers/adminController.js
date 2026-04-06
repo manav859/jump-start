@@ -52,34 +52,80 @@ const monthLabel = (key) => {
   return dt.toLocaleString("en-IN", { month: "short" });
 };
 
+const toTimestamp = (value) => {
+  const timestamp = value ? new Date(value).getTime() : 0;
+  return Number.isFinite(timestamp) ? timestamp : 0;
+};
+
 const getConfigLookup = (cfg) => {
   const map = new Map();
   for (const p of cfg?.packages || []) map.set(p.id, p);
   return map;
 };
 
+const getUserPurchaseEntries = (user, packageMap) => {
+  const explicitHistory = Array.isArray(user?.purchaseHistory)
+    ? user.purchaseHistory.filter((item) => item?.packageId)
+    : [];
+
+  if (explicitHistory.length > 0) {
+    return explicitHistory.map((purchase, idx) => {
+      const pkg = packageMap.get(purchase.packageId);
+      const amount = Number(
+        purchase.amount != null ? purchase.amount : pkg?.amount || 0
+      );
+      const purchasedAt =
+        purchase.purchasedAt || user.updatedAt || user.createdAt || null;
+
+      return {
+        id: `${String(user._id)}-purchase-${idx + 1}-${String(
+          purchase.packageId || "package"
+        )}-${toTimestamp(purchasedAt)}`,
+        userId: String(user._id),
+        name: user.name || "Unknown",
+        email: user.email || "",
+        package: purchase.packageTitle || pkg?.title || purchase.packageId,
+        packageId: purchase.packageId || "",
+        amount,
+        amountLabel: fmtCurrency(amount),
+        method: purchase.paymentMethod || "Online",
+        date: purchasedAt,
+        fallback: false,
+      };
+    });
+  }
+
+  const purchases = Array.isArray(user?.purchasedPackages) ? user.purchasedPackages : [];
+  return purchases.map((pkgId, idx) => {
+    const pkg = packageMap.get(pkgId);
+    const amount = Number(pkg?.amount || 0);
+    return {
+      id: `${String(user._id)}-purchase-fallback-${idx + 1}-${String(pkgId)}`,
+      userId: String(user._id),
+      name: user.name || "Unknown",
+      email: user.email || "",
+      package: pkg?.title || pkgId,
+      packageId: pkgId,
+      amount,
+      amountLabel: fmtCurrency(amount),
+      method: idx % 2 === 0 ? "UPI" : "Card",
+      date: user.updatedAt || user.createdAt || null,
+      fallback: true,
+    };
+  });
+};
+
 const buildPayments = (users, packageMap) => {
   const rows = [];
   for (const u of users) {
-    const purchases = Array.isArray(u.purchasedPackages) ? u.purchasedPackages : [];
-    purchases.forEach((pkgId, idx) => {
-      const pkg = packageMap.get(pkgId);
-      const amount = Number(pkg?.amount || 0);
+    getUserPurchaseEntries(u, packageMap).forEach((purchase) => {
       rows.push({
-        id: `${String(u._id).slice(-6).toUpperCase()}-${String(pkgId).toUpperCase()}-${idx + 1}`,
-        userId: String(u._id),
-        name: u.name || "Unknown",
-        email: u.email || "",
-        package: pkg?.title || pkgId,
-        amount,
-        amountLabel: fmtCurrency(amount),
-        method: idx % 2 === 0 ? "UPI" : "Card",
+        ...purchase,
         status: "Completed",
-        date: u.updatedAt || u.createdAt,
       });
     });
   }
-  return rows.sort((a, b) => new Date(b.date) - new Date(a.date));
+  return rows.sort((a, b) => toTimestamp(b.date) - toTimestamp(a.date));
 };
 
 const toInitials = (name = "") =>
@@ -112,6 +158,24 @@ const toFiniteNumber = (value, fallback = 0) => {
   const numeric = Number(value);
   return Number.isFinite(numeric) ? numeric : fallback;
 };
+
+const createAdminNotification = ({
+  id,
+  type,
+  title,
+  message,
+  eventAt,
+  link,
+}) => ({
+  id,
+  type,
+  title,
+  message,
+  eventAt,
+  timeLabel: shortAgo(eventAt),
+  dateLabel: fmtDate(eventAt),
+  link: link || "/admin/dashboard",
+});
 
 const roundScoreValue = (value) => {
   const numeric = Number(value);
@@ -393,6 +457,83 @@ const getUserByReportId = async ({
   return { user, isLegacyFallback: true };
 };
 
+const buildAdminNotifications = (users, cfg, limit = 12) => {
+  const packageMap = getConfigLookup(cfg);
+
+  const notifications = [
+    ...users.map((user) =>
+      createAdminNotification({
+        id: `registration-${String(user._id)}`,
+        type: "registration",
+        title: "New Registration",
+        message: `${user.name || "A new student"} created a Jumpstart account.`,
+        eventAt: user.createdAt,
+        link: "/admin/usermanagement",
+      })
+    ),
+    ...users.flatMap((user) =>
+      getUserPurchaseEntries(user, packageMap)
+        .filter((purchase) => !purchase.fallback)
+        .map((purchase) =>
+          createAdminNotification({
+            id: `payment-${purchase.id}`,
+            type: "payment",
+            title: "Payment Received",
+            message: `${purchase.name} purchased the ${purchase.package} package.`,
+            eventAt: purchase.date,
+            link: "/admin/payments",
+          })
+        )
+    ),
+    ...users.flatMap((user) =>
+      getStoredAssessmentReports(user, packageMap)
+        .filter(
+          (report) =>
+            report.publication.status ===
+              RESULT_PUBLICATION_STATUS.PENDING_APPROVAL &&
+            report.publication.submittedAt
+        )
+        .map((report) =>
+          createAdminNotification({
+            id: `review-${String(report._id)}`,
+            type: "review",
+            title: "New Report Review",
+            message: `${user.name || "A student"} submitted ${
+              report.packageTitle || report.packageId || "an assessment"
+            } for admin review.`,
+            eventAt: report.publication.submittedAt,
+            link: `/admin/testsubmissions/${String(report._id)}`,
+          })
+        )
+    ),
+    ...users.flatMap((user) =>
+      getStoredAssessmentReports(user, packageMap)
+        .filter(
+          (report) =>
+            report.publication.status === RESULT_PUBLICATION_STATUS.APPROVED &&
+            report.publication.approvedAt
+        )
+        .map((report) =>
+          createAdminNotification({
+            id: `published-${String(report._id)}`,
+            type: "published",
+            title: "Result Published",
+            message: `${user.name || "A student"}'s ${
+              report.packageTitle || report.packageId || "assessment"
+            } result is now published.`,
+            eventAt: report.publication.approvedAt,
+            link: `/admin/testsubmissions/${String(report._id)}`,
+          })
+        )
+    ),
+  ]
+    .filter((item) => toTimestamp(item.eventAt) > 0)
+    .sort((a, b) => toTimestamp(b.eventAt) - toTimestamp(a.eventAt))
+    .slice(0, limit);
+
+  return notifications;
+};
+
 // GET /api/v1/admin/dashboard
 export const getAdminDashboard = async (req, res) => {
   try {
@@ -459,6 +600,32 @@ export const getAdminDashboard = async (req, res) => {
     });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message || "Failed to load admin dashboard" });
+  }
+};
+
+// GET /api/v1/admin/notifications
+export const getAdminNotifications = async (req, res) => {
+  try {
+    const [users, cfg] = await Promise.all([
+      User.find({ role: { $ne: "admin" } })
+        .select(
+          "name email createdAt updatedAt purchasedPackages purchaseHistory selectedPackageId resultProfile resultPublication assessmentReports"
+        )
+        .lean(),
+      AssessmentConfig.getOrCreateDefault(),
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        items: buildAdminNotifications(users, cfg),
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Failed to load notifications",
+    });
   }
 };
 
@@ -539,7 +706,11 @@ export const deleteAdminUser = async (req, res) => {
 export const getAdminPayments = async (req, res) => {
   try {
     const [users, cfg] = await Promise.all([
-      User.find({ role: { $ne: "admin" } }).select("name email purchasedPackages updatedAt createdAt").lean(),
+      User.find({ role: { $ne: "admin" } })
+        .select(
+          "name email purchasedPackages purchaseHistory updatedAt createdAt"
+        )
+        .lean(),
       AssessmentConfig.getOrCreateDefault(),
     ]);
     const packageMap = getConfigLookup(cfg);

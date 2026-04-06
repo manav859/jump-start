@@ -75,6 +75,9 @@ const factorResultSchema = new mongoose.Schema(
     average: { type: Number, default: null },
     percentage: { type: Number, default: null },
     band: { type: String, default: "" },
+    bandMin: { type: Number, default: null },
+    bandMax: { type: Number, default: null },
+    bandRangeLabel: { type: String, default: "" },
     status: { type: String, default: "" },
     description: { type: String, default: "" },
     interpretation: { type: String, default: "" },
@@ -83,6 +86,18 @@ const factorResultSchema = new mongoose.Schema(
     scoreType: { type: String, default: "" },
     questionNumbers: { type: [Number], default: [] },
     questionRangeLabel: { type: String, default: "" },
+    answeredCount: { type: Number, default: null },
+    totalQuestions: { type: Number, default: null },
+  },
+  { _id: false }
+);
+
+const interpretationItemSchema = new mongoose.Schema(
+  {
+    key: { type: String, default: "" },
+    title: { type: String, default: "" },
+    detail: { type: String, default: "" },
+    meta: { type: String, default: "" },
   },
   { _id: false }
 );
@@ -91,6 +106,7 @@ const subsectionSchema = new mongoose.Schema(
   {
     id: { type: String, default: "" },
     key: { type: String, default: "" },
+    subsectionId: { type: String, default: "" },
     label: { type: String, default: "" },
     score: { type: Number, default: null },
     rawScore: { type: Number, default: null },
@@ -98,15 +114,25 @@ const subsectionSchema = new mongoose.Schema(
     average: { type: Number, default: null },
     percentage: { type: Number, default: null },
     band: { type: String, default: "" },
+    bandMin: { type: Number, default: null },
+    bandMax: { type: Number, default: null },
+    bandRangeLabel: { type: String, default: "" },
     status: { type: String, default: "" },
     description: { type: String, default: "" },
     interpretation: { type: String, default: "" },
     careerImplication: { type: String, default: "" },
     answerType: { type: String, default: "" },
     scoreType: { type: String, default: "" },
+    evaluationType: { type: String, default: "" },
+    displayMode: { type: String, default: "" },
+    usedForPersonalityType: { type: Boolean, default: false },
     questionNumbers: { type: [Number], default: [] },
     questionRangeLabel: { type: String, default: "" },
+    answeredCount: { type: Number, default: null },
+    totalQuestions: { type: Number, default: null },
     factorResults: { type: [factorResultSchema], default: [] },
+    clusterResults: { type: [factorResultSchema], default: [] },
+    interpretationItems: { type: [interpretationItemSchema], default: [] },
   },
   { _id: false }
 );
@@ -226,6 +252,17 @@ const resultPublicationSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const purchaseHistorySchema = new mongoose.Schema(
+  {
+    packageId: { type: String, default: "" },
+    packageTitle: { type: String, default: "" },
+    amount: { type: Number, default: null },
+    purchasedAt: { type: Date, default: null },
+    paymentMethod: { type: String, default: "Online" },
+  },
+  { _id: false }
+);
+
 const assessmentReportSchema = new mongoose.Schema({
   packageId: { type: String, default: "" },
   packageTitle: { type: String, default: "" },
@@ -265,6 +302,7 @@ const userSchema = new mongoose.Schema(
     lastLoginAt: { type: Date, default: null },
     selectedPackageId: { type: String, default: "" },
     purchasedPackages: [{ type: String }],
+    purchaseHistory: { type: [purchaseHistorySchema], default: [] },
 
     // Dashboard counters
     testsCompleted: { type: Number, default: 0 },

@@ -1,0 +1,479 @@
+{
+  "documentType": "assessment_personality_evaluation_spec",
+  "version": "1.0.0",
+  "assessment": {
+    "name": "Complete Comprehensive Career Aptitude Assessment",
+    "packageId": "complete-aptitude-500q",
+    "totalQuestions": 500,
+    "resultGenerationTrigger": "on_final_test_submission",
+    "entryPoint": {
+      "controllerFunction": "computeAssessmentResult",
+      "file": "userController.js",
+      "line": 1052
+    },
+    "scoringRouter": {
+      "file": "index.js",
+      "line": 4,
+      "strategy": "select scorer by packageId"
+    }
+  },
+  "evaluationPrinciples": {
+    "sectionLevelEvaluation": true,
+    "subsectionLevelEvaluation": true,
+    "questionLevelAggregation": true,
+    "personalityTypeDerivedFromSubsectionScores": true,
+    "directMbtiTestUsed": false,
+    "notes": [
+      "Each subsection must be evaluated independently from its mapped questions.",
+      "Section summaries should be built from subsection results, not from raw total question count alone.",
+      "Personality type must be inferred from scored dimensions, not assigned directly from a single MBTI questionnaire.",
+      "Interpretation should always use subsection averages or subsection-specific derived scores."
+    ]
+  },
+  "sections": [
+    {
+      "sectionId": "section_1",
+      "name": "Personality Assessment",
+      "questionRange": [1, 120],
+      "subsections": [
+        {
+          "subsectionId": "1.1",
+          "name": "Big Five Personality Traits (OCEAN)",
+          "questionRange": [1, 30],
+          "evaluationType": "subscale_average",
+          "dimensions": [
+            {
+              "key": "extraversion",
+              "questionMapping": [1, "6R", 11, "16R", 21, 26],
+              "usedForPersonalityType": true
+            },
+            {
+              "key": "openness",
+              "questionMapping": [2, 4, 9, 14, 19, 24, "29R"],
+              "usedForPersonalityType": true
+            },
+            {
+              "key": "conscientiousness",
+              "questionMapping": [7, "12R", 17, "22R", 27],
+              "usedForPersonalityType": true
+            },
+            {
+              "key": "agreeableness",
+              "questionMapping": [5, "10R", 15, "20R", 25, 30],
+              "usedForPersonalityType": true
+            },
+            {
+              "key": "neuroticism",
+              "questionMapping": [3, "8R", 13, "18R", 23, "28R"],
+              "usedForPersonalityType": true,
+              "postProcessing": {
+                "derivedMetric": "emotionalStability",
+                "formula": "100 - neuroticism"
+              }
+            }
+          ],
+          "output": {
+            "subsectionScoreMode": "average_per_dimension",
+            "requiredForPersonalityType": true
+          }
+        },
+        {
+          "subsectionId": "1.2",
+          "name": "HSPQ-Style Personality Factors",
+          "questionRange": [31, 72],
+          "evaluationType": "subscale_average",
+          "dimensions": [
+            { "key": "warmth", "questionMapping": [31, 35, 46, 56, 64, 72] },
+            { "key": "reasoning", "questionMapping": [32, 36, 43, 48, 53, 61, 69] },
+            { "key": "emotional_stability_hspq", "questionMapping": [33, 44, 54, 62, 70] },
+            { "key": "dominance", "questionMapping": [34, 41, 49, 58, 66] },
+            { "key": "rule_consciousness", "questionMapping": [38, 45, 55] },
+            { "key": "social_boldness", "questionMapping": ["42R", "50R", "52R", "60R", "68R"] },
+            { "key": "sensitivity", "questionMapping": [40, "47R", "57R", "59R", "65R", 67] },
+            { "key": "liveliness", "questionMapping": [39, 51, 63, 71] }
+          ],
+          "output": {
+            "subsectionScoreMode": "average_per_dimension",
+            "requiredForPersonalityType": false
+          }
+        },
+        {
+          "subsectionId": "1.3",
+          "name": "Work Style Preferences",
+          "questionRange": [73, 96],
+          "evaluationType": "categorical_preference_grouping",
+          "dimensions": [
+            { "key": "team_preference" },
+            { "key": "environment_preference" },
+            { "key": "task_structure_preference" },
+            { "key": "deadline_style" },
+            { "key": "learning_style" },
+            { "key": "schedule_preference" },
+            { "key": "problem_solving_style" },
+            { "key": "productivity_style" }
+          ],
+          "output": {
+            "subsectionScoreMode": "preference_pattern",
+            "requiredForPersonalityType": false
+          }
+        },
+        {
+          "subsectionId": "1.4",
+          "name": "Leadership and Social Interaction",
+          "questionRange": [97, 120],
+          "evaluationType": "factor_average",
+          "dimensions": [
+            { "key": "taking_charge", "questionMapping": [97, 100, 105, 113, 118] },
+            { "key": "organizing_teaching", "questionMapping": [98, 103, 107, 111, 116] },
+            { "key": "communication", "questionMapping": [99, 104, 108, 494, 498] },
+            { "key": "conflict_resolution", "questionMapping": [102, 108, 110, 491, 499] },
+            { "key": "team_building", "questionMapping": [106, 115, 117, 119, 120, 500] }
+          ],
+          "output": {
+            "subsectionScoreMode": "average_per_dimension",
+            "requiredForPersonalityType": false
+          }
+        }
+      ]
+    },
+    {
+      "sectionId": "section_2",
+      "name": "Multiple Intelligence Assessment",
+      "questionRange": [121, 200],
+      "subsections": [
+        { "subsectionId": "2.1", "name": "Logical-Mathematical Intelligence", "questionRange": [121, 130], "evaluationType": "average" },
+        { "subsectionId": "2.2", "name": "Linguistic-Verbal Intelligence", "questionRange": [131, 140], "evaluationType": "average" },
+        { "subsectionId": "2.3", "name": "Spatial-Visual Intelligence", "questionRange": [141, 150], "evaluationType": "average" },
+        { "subsectionId": "2.4", "name": "Musical-Rhythmic Intelligence", "questionRange": [151, 160], "evaluationType": "average" },
+        { "subsectionId": "2.5", "name": "Bodily-Kinesthetic Intelligence", "questionRange": [161, 170], "evaluationType": "average" },
+        { "subsectionId": "2.6", "name": "Interpersonal Intelligence", "questionRange": [171, 180], "evaluationType": "average" },
+        { "subsectionId": "2.7", "name": "Intrapersonal Intelligence", "questionRange": [181, 190], "evaluationType": "average" },
+        { "subsectionId": "2.8", "name": "Naturalistic Intelligence", "questionRange": [191, 200], "evaluationType": "average" }
+      ]
+    },
+    {
+      "sectionId": "section_3",
+      "name": "Interest Assessment",
+      "questionRange": [201, 290],
+      "subsections": [
+        {
+          "subsectionId": "3.1",
+          "name": "Holland Code (RIASEC)",
+          "questionRange": [201, 236],
+          "evaluationType": "average_per_interest_cluster",
+          "dimensions": [
+            { "key": "realistic", "questionRange": [201, 206] },
+            { "key": "investigative", "questionRange": [207, 212] },
+            { "key": "artistic", "questionRange": [213, 218] },
+            { "key": "social", "questionRange": [219, 224] },
+            { "key": "enterprising", "questionRange": [225, 230] },
+            { "key": "conventional", "questionRange": [231, 236] }
+          ]
+        },
+        {
+          "subsectionId": "3.2",
+          "name": "Subject Preferences",
+          "questionRange": [237, 254],
+          "evaluationType": "average_or_preference_strength"
+        },
+        {
+          "subsectionId": "3.3",
+          "name": "Activity Preferences",
+          "questionRange": [255, 272],
+          "evaluationType": "choice_pattern_analysis"
+        },
+        {
+          "subsectionId": "3.4",
+          "name": "Work Environment Preferences",
+          "questionRange": [273, 290],
+          "evaluationType": "choice_pattern_analysis"
+        }
+      ]
+    },
+    {
+      "sectionId": "section_4",
+      "name": "Aptitude Battery",
+      "questionRange": [291, 450],
+      "subsections": [
+        { "subsectionId": "4.1", "name": "Verbal Reasoning", "questionRange": [291, 315], "evaluationType": "correct_answer_count" },
+        { "subsectionId": "4.2", "name": "Numerical Ability", "questionRange": [316, 340], "evaluationType": "correct_answer_count" },
+        { "subsectionId": "4.3", "name": "Abstract Reasoning", "questionRange": [341, 365], "evaluationType": "correct_answer_count" },
+        { "subsectionId": "4.4", "name": "Spatial Relations", "questionRange": [366, 390], "evaluationType": "correct_answer_count" },
+        { "subsectionId": "4.5", "name": "Mechanical Reasoning", "questionRange": [391, 410], "evaluationType": "correct_answer_count" },
+        { "subsectionId": "4.6", "name": "Clerical Speed & Accuracy", "questionRange": [411, 430], "evaluationType": "correct_answer_count" },
+        { "subsectionId": "4.7", "name": "Critical Thinking", "questionRange": [431, 440], "evaluationType": "correct_answer_count" },
+        { "subsectionId": "4.8", "name": "Problem Solving", "questionRange": [441, 450], "evaluationType": "correct_answer_count" }
+      ]
+    },
+    {
+      "sectionId": "section_5",
+      "name": "Emotional Intelligence Assessment",
+      "questionRange": [451, 500],
+      "subsections": [
+        {
+          "subsectionId": "5.1",
+          "name": "Self-Awareness",
+          "questionRange": [451, 460],
+          "evaluationType": "average",
+          "usedForPersonalityType": false
+        },
+        {
+          "subsectionId": "5.2",
+          "name": "Self-Regulation",
+          "questionRange": [461, 470],
+          "evaluationType": "average",
+          "usedForPersonalityType": true
+        },
+        {
+          "subsectionId": "5.3",
+          "name": "Motivation",
+          "questionRange": [471, 480],
+          "evaluationType": "average",
+          "usedForPersonalityType": true
+        },
+        {
+          "subsectionId": "5.4",
+          "name": "Empathy",
+          "questionRange": [481, 490],
+          "evaluationType": "average",
+          "usedForPersonalityType": true
+        },
+        {
+          "subsectionId": "5.5",
+          "name": "Social Skills",
+          "questionRange": [491, 500],
+          "evaluationType": "average",
+          "usedForPersonalityType": true
+        }
+      ]
+    }
+  ],
+  "personalityTypeEvaluation": {
+    "appliesToPackageId": "complete-aptitude-500q",
+    "implementation": {
+      "packageDefinitionFile": "comprehensive500Package.generated.js",
+      "packageDefinitionLine": 2,
+      "scoreFunction": {
+        "name": "scoreCareer500QPackage",
+        "file": "career500q.js",
+        "line": 866
+      },
+      "typeBuilder": {
+        "name": "buildPersonalityType",
+        "file": "career500q.js",
+        "line": 1102
+      }
+    },
+    "sourceSubsections": {
+      "bigFive": "1.1",
+      "emotionalIntelligence": ["5.2", "5.3", "5.4", "5.5"]
+    },
+    "requiredInputs": [
+      "extraversion",
+      "openness",
+      "agreeableness",
+      "conscientiousness",
+      "neuroticism",
+      "empathy",
+      "social_skills",
+      "self_regulation",
+      "motivation"
+    ],
+    "derivedInputs": [
+      {
+        "key": "emotionalStability",
+        "formula": "100 - neuroticism",
+        "source": "neuroticism"
+      },
+      {
+        "key": "feeling",
+        "formula": "(agreeableness * 0.55) + (empathy * 0.30) + (social_skills * 0.15)"
+      },
+      {
+        "key": "judging",
+        "formula": "(conscientiousness * 0.75) + (self_regulation * 0.25)"
+      },
+      {
+        "key": "assertive",
+        "formula": "(emotionalStability * 0.60) + (self_regulation * 0.25) + (motivation * 0.15)"
+      }
+    ],
+    "axisConstruction": [
+      {
+        "axis": "E_I",
+        "sourceMetric": "extraversion",
+        "threshold": 50,
+        "rule": ">= 50 => E, else I"
+      },
+      {
+        "axis": "N_S",
+        "sourceMetric": "openness",
+        "threshold": 50,
+        "rule": ">= 50 => N, else S"
+      },
+      {
+        "axis": "F_T",
+        "sourceMetric": "feeling",
+        "threshold": 50,
+        "rule": ">= 50 => F, else T"
+      },
+      {
+        "axis": "J_P",
+        "sourceMetric": "judging",
+        "threshold": 50,
+        "rule": ">= 50 => J, else P"
+      },
+      {
+        "axis": "A_T",
+        "sourceMetric": "assertive",
+        "threshold": 50,
+        "rule": ">= 50 => A, else T"
+      }
+    ],
+    "baseCodeConstruction": {
+      "format": "{E/I}{N/S}{F/T}{J/P}-{A/T}",
+      "example": "INTJ-A"
+    },
+    "archetypeLookup": {
+      "file": "resultProfiling.js",
+      "line": 334,
+      "examples": [
+        { "code": "INTJ", "title": "Architect" },
+        { "code": "ENFP", "title": "Catalyst" }
+      ]
+    },
+    "resultRule": {
+      "displayedTypeIsInferred": true,
+      "inferenceSources": [
+        "Big Five factor scores",
+        "Emotional intelligence subsection scores",
+        "Threshold-based MBTI-like axis conversion",
+        "Final archetype lookup"
+      ]
+    }
+  },
+  "fallbackPersonalityEvaluation": {
+    "appliesTo": "all_non_complete_aptitude_500q_packages",
+    "routerTarget": "fallback scorer",
+    "implementation": {
+      "file": "resultProfiling.js",
+      "line": 1288
+    },
+    "axisAssignment": {
+      "function": "getPersonalityAxisForQuestion",
+      "file": "personalityQuestionMetadata.js",
+      "line": 286,
+      "sources": [
+        "CSV subscale metadata",
+        "hardcoded question-id overrides",
+        "text-pattern inference"
+      ]
+    },
+    "axisScoring": {
+      "function": "getAxisScore",
+      "file": "resultProfiling.js",
+      "line": 774,
+      "method": "average Likert answers for each axis"
+    },
+    "profileBuilder": {
+      "function": "buildPersonalityProfile",
+      "file": "resultProfiling.js",
+      "line": 902,
+      "construction": "same E/I, N/S, F/T, J/P, A/T logic"
+    },
+    "resultRule": {
+      "displayedTypeIsInferred": true,
+      "inferenceSources": [
+        "per-question axis grouping",
+        "axis score averages",
+        "shared MBTI-like code construction",
+        "archetype lookup"
+      ]
+    }
+  },
+  "properEvaluationRequirements": {
+    "mustEvaluateBySubsection": [
+      "Big Five dimensions separately",
+      "Emotional Intelligence subsections separately",
+      "Holland/RIASEC clusters separately",
+      "Multiple Intelligence types separately",
+      "Aptitude subsections separately"
+    ],
+    "mustAvoid": [
+      "using only total question count as interpretation basis",
+      "mixing unrelated subsection scores before subsection evaluation is complete",
+      "assigning personality type without subsection-derived dimension scores",
+      "treating the personality type as a direct MBTI exam output"
+    ],
+    "recommendedResultShape": {
+      "sectionScore": "aggregated from subsection outputs",
+      "subsectionScore": "computed from mapped question groups only",
+      "dimensionScore": "stored explicitly where applicable",
+      "personalityType": "computed after all required subsection metrics are available",
+      "archetype": "resolved after base personality code generation"
+    }
+  },
+  "exampleResultPayloadShape": {
+    "scores": {
+      "sections": [
+        {
+          "sectionId": "section_1",
+          "name": "Personality Assessment",
+          "subsections": [
+            {
+              "subsectionId": "1.1",
+              "name": "Big Five Personality Traits (OCEAN)",
+              "dimensions": {
+                "extraversion": 62.5,
+                "openness": 71.0,
+                "conscientiousness": 58.0,
+                "agreeableness": 64.0,
+                "neuroticism": 36.0,
+                "emotionalStability": 64.0
+              }
+            },
+            {
+              "subsectionId": "1.2",
+              "name": "HSPQ-Style Personality Factors",
+              "dimensions": {}
+            },
+            {
+              "subsectionId": "1.3",
+              "name": "Work Style Preferences",
+              "dimensions": {}
+            },
+            {
+              "subsectionId": "1.4",
+              "name": "Leadership and Social Interaction",
+              "dimensions": {}
+            }
+          ]
+        },
+        {
+          "sectionId": "section_5",
+          "name": "Emotional Intelligence Assessment",
+          "subsections": [
+            { "subsectionId": "5.2", "name": "Self-Regulation", "score": 68.0 },
+            { "subsectionId": "5.3", "name": "Motivation", "score": 72.0 },
+            { "subsectionId": "5.4", "name": "Empathy", "score": 66.0 },
+            { "subsectionId": "5.5", "name": "Social Skills", "score": 61.0 }
+          ]
+        }
+      ]
+    },
+    "personalityComputation": {
+      "feeling": 64.55,
+      "judging": 60.5,
+      "assertive": 66.45,
+      "axes": {
+        "E_I": "E",
+        "N_S": "N",
+        "F_T": "F",
+        "J_P": "J",
+        "A_T": "A"
+      },
+      "baseCode": "ENFJ-A",
+      "archetypeTitle": "example_lookup_result"
+    }
+  }
+}

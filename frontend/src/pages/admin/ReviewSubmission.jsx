@@ -15,6 +15,7 @@ import OverallScoreSummaryCard from "../../components/admin/OverallScoreSummaryC
 import SectionBreakdownCard from "../../components/admin/SectionBreakdownCard";
 import ReviewActionBar from "../../components/admin/ReviewActionBar";
 import ResultStatusBadge from "../../components/admin/ResultStatusBadge";
+import { emitAdminNotificationsRefresh } from "../../utils/adminNotifications";
 
 const chipClass =
   "rounded-full border border-[#D7E7EC] bg-white px-3 py-1 text-xs font-semibold text-[#4E5D72]";
@@ -73,6 +74,7 @@ export default function ReviewSubmission() {
             }
           : prev
       );
+      emitAdminNotificationsRefresh();
     } catch (err) {
       setError(err?.response?.data?.msg || "Failed to publish this result.");
     } finally {
@@ -91,6 +93,7 @@ export default function ReviewSubmission() {
     setDeleting(true);
     try {
       await api.delete(`/v1/admin/results/${userId}`);
+      emitAdminNotificationsRefresh();
       navigate("/admin/testsubmissions");
     } catch (err) {
       setError(err?.response?.data?.msg || "Failed to delete this result.");

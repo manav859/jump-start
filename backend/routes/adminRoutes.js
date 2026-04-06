@@ -2,6 +2,7 @@ import express from "express";
 import { adminOnly, protect } from "../middleware/auth.js";
 import {
   getAdminDashboard,
+  getAdminNotifications,
   getAdminUsers,
   patchAdminUser,
   deleteAdminUser,
@@ -19,6 +20,7 @@ const router = express.Router();
 router.use(protect, adminOnly);
 
 router.get("/dashboard", getAdminDashboard);
+router.get("/notifications", getAdminNotifications);
 router.get("/users", getAdminUsers);
 router.patch("/users/:userId", patchAdminUser);
 router.delete("/users/:userId", deleteAdminUser);

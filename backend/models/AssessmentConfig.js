@@ -39,10 +39,54 @@ const packageSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const supportPageSchema = new mongoose.Schema(
+  {
+    enabled: { type: Boolean, default: true },
+    title: { type: String, required: true },
+    summary: { type: String, default: "" },
+    items: { type: [String], default: [] },
+    faqItems: {
+      type: [
+        new mongoose.Schema(
+          {
+            heading: { type: String, default: "" },
+            content: { type: String, default: "" },
+          },
+          { _id: false }
+        ),
+      ],
+      default: [],
+    },
+  },
+  { _id: false }
+);
+
+const supportPagesSchema = new mongoose.Schema(
+  {
+    privacyPolicy: {
+      type: supportPageSchema,
+      default: () => ({}),
+    },
+    termsOfService: {
+      type: supportPageSchema,
+      default: () => ({}),
+    },
+    faqs: {
+      type: supportPageSchema,
+      default: () => ({}),
+    },
+  },
+  { _id: false }
+);
+
 const assessmentConfigSchema = new mongoose.Schema(
   {
     key: { type: String, required: true, unique: true, default: "default" },
     packages: [packageSchema],
+    supportPages: {
+      type: supportPagesSchema,
+      default: () => ({}),
+    },
   },
   { timestamps: true }
 );
@@ -144,6 +188,105 @@ const createPrimaryPackage = () => ({
 
 const createDefaultPackages = () => [createPrimaryPackage(), createDummyPackage()];
 
+const createDefaultSupportPages = () => ({
+  privacyPolicy: {
+    enabled: true,
+    title: "Privacy Policy",
+    summary: "How Jumpstart collects, uses, and protects student information.",
+    items: [
+      "We collect only the information needed to create your account, run assessments, and generate your report.",
+      "Assessment responses and profile details are used to prepare result analysis, recommendations, and support services.",
+      "Your personal information is not sold to third parties and is shared only when required to deliver the service or meet legal obligations.",
+      "You can contact Jumpstart support to request updates or removal of your stored personal information.",
+    ],
+  },
+  termsOfService: {
+    enabled: true,
+    title: "Terms of Service",
+    summary: "Rules and responsibilities for using Jumpstart assessments and reports.",
+    items: [
+      "Assessment purchases provide access to the selected test package and related report features available on your account.",
+      "Users must provide accurate information and must not misuse the platform, attempt unauthorized access, or disrupt the service.",
+      "Reports and recommendations are guidance tools and should be used alongside professional advice where appropriate.",
+      "Jumpstart may update platform features, pricing, or service terms when necessary to improve the product or comply with policy changes.",
+    ],
+  },
+  faqs: {
+    enabled: true,
+    title: "FAQs",
+    summary: "Answers to common questions about tests, reports, and admin review.",
+    items: [],
+    faqItems: [
+      {
+        heading: "How long does admin review take?",
+        content: "Most submitted reports are reviewed within 48 hours.",
+      },
+      {
+        heading: "Can I see my result before approval?",
+        content: "No. Published reports appear only after admin approval is complete.",
+      },
+      {
+        heading: "Where can I find my purchased tests?",
+        content: "Purchased packages are listed in your dashboard and results area.",
+      },
+      {
+        heading: "How do I get extra help?",
+        content: "Use the Help Center or book a counselling session from your account.",
+      },
+    ],
+  },
+});
+
+const normalizeTextItems = (items = []) =>
+  Array.isArray(items)
+    ? items.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
+
+const splitLegacyFaqItem = (value = "") => {
+  const text = String(value || "").trim();
+  if (!text) return null;
+
+  const questionBreakIndex = text.indexOf("? ");
+  if (questionBreakIndex >= 0) {
+    return {
+      heading: text.slice(0, questionBreakIndex + 1).trim(),
+      content: text.slice(questionBreakIndex + 2).trim(),
+    };
+  }
+
+  const colonBreakIndex = text.indexOf(": ");
+  if (colonBreakIndex >= 0) {
+    return {
+      heading: text.slice(0, colonBreakIndex).trim(),
+      content: text.slice(colonBreakIndex + 2).trim(),
+    };
+  }
+
+  return {
+    heading: text,
+    content: "",
+  };
+};
+
+const normalizeFaqItems = (faqItems = [], fallbackItems = []) => {
+  const normalizedFaqItems = Array.isArray(faqItems)
+    ? faqItems
+        .map((item) => ({
+          heading: String(item?.heading || "").trim(),
+          content: String(item?.content || "").trim(),
+        }))
+        .filter((item) => item.heading || item.content)
+    : [];
+
+  if (normalizedFaqItems.length) {
+    return normalizedFaqItems;
+  }
+
+  return normalizeTextItems(fallbackItems)
+    .map((item) => splitLegacyFaqItem(item))
+    .filter(Boolean);
+};
+
 let cachedDefaultConfig = null;
 
 const countQuestions = (pkg = {}) =>
@@ -183,6 +326,46 @@ const mergeSeededPackage = (target, seeded) => {
   return changed;
 };
 
+const mergeSeededSupportPage = (target, seeded, pageKey = "") => {
+  let changed = false;
+
+  if (target.enabled == null) {
+    target.enabled = seeded.enabled !== false;
+    changed = true;
+  }
+  if (!target.title && seeded.title) {
+    target.title = seeded.title;
+    changed = true;
+  }
+  if (!target.summary && seeded.summary) {
+    target.summary = seeded.summary;
+    changed = true;
+  }
+  if ((!Array.isArray(target.items) || target.items.length === 0) && seeded.items?.length) {
+    target.items = seeded.items;
+    changed = true;
+  }
+  if (
+    (!Array.isArray(target.faqItems) || target.faqItems.length === 0) &&
+    Array.isArray(seeded.faqItems) &&
+    seeded.faqItems.length
+  ) {
+    target.faqItems = seeded.faqItems;
+    changed = true;
+  }
+  if (pageKey === "faqs") {
+    const normalizedFaqItems = normalizeFaqItems(target.faqItems, target.items);
+    if (
+      JSON.stringify(normalizedFaqItems) !== JSON.stringify(Array.isArray(target.faqItems) ? target.faqItems : [])
+    ) {
+      target.faqItems = normalizedFaqItems;
+      changed = true;
+    }
+  }
+
+  return changed;
+};
+
 const loadDefaultConfig = () => {
   if (cachedDefaultConfig) {
     return cachedDefaultConfig;
@@ -191,6 +374,7 @@ const loadDefaultConfig = () => {
   cachedDefaultConfig = {
     key: "default",
     packages: createDefaultPackages(),
+    supportPages: createDefaultSupportPages(),
   };
 
   return cachedDefaultConfig;
@@ -212,6 +396,7 @@ assessmentConfigSchema.statics.getOrCreateDefault = async function getOrCreateDe
 
   let changed = false;
   const packageSeeds = createDefaultPackages();
+  const supportPageSeeds = createDefaultSupportPages();
 
   if (!Array.isArray(cfg.packages) || cfg.packages.length === 0) {
     cfg.packages = packageSeeds;
@@ -246,6 +431,33 @@ assessmentConfigSchema.statics.getOrCreateDefault = async function getOrCreateDe
     } else {
       cfg.packages = nextPackages;
     }
+  }
+
+  if (!cfg.supportPages) {
+    cfg.supportPages = supportPageSeeds;
+    changed = true;
+  } else {
+    if (!cfg.supportPages.privacyPolicy) {
+      cfg.supportPages.privacyPolicy = supportPageSeeds.privacyPolicy;
+      changed = true;
+    }
+    if (!cfg.supportPages.termsOfService) {
+      cfg.supportPages.termsOfService = supportPageSeeds.termsOfService;
+      changed = true;
+    }
+    if (!cfg.supportPages.faqs) {
+      cfg.supportPages.faqs = supportPageSeeds.faqs;
+      changed = true;
+    }
+    changed =
+      mergeSeededSupportPage(cfg.supportPages.privacyPolicy, supportPageSeeds.privacyPolicy, "privacyPolicy") ||
+      changed;
+    changed =
+      mergeSeededSupportPage(cfg.supportPages.termsOfService, supportPageSeeds.termsOfService, "termsOfService") ||
+      changed;
+    changed =
+      mergeSeededSupportPage(cfg.supportPages.faqs, supportPageSeeds.faqs, "faqs") ||
+      changed;
   }
 
   if (changed) {

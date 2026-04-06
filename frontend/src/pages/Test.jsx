@@ -49,7 +49,7 @@ const getPlanActionMeta = (plan) => {
         badgeLabel: "Result Pending",
         badgeClass: "bg-amber-50 text-amber-700",
         helperText:
-          "Your latest submission is awaiting admin approval. Retake will unlock after approval.",
+          "Your latest submission is awaiting admin approval.",
         actionLabel: "View Submission Status",
         mode: "pending",
       };
@@ -58,9 +58,9 @@ const getPlanActionMeta = (plan) => {
     return {
       badgeLabel: "Purchased",
       badgeClass: "bg-emerald-50 text-emerald-700",
-      helperText: "Already purchased. You can retake this assessment anytime.",
-      actionLabel: "Retake Assessment",
-      mode: "retake",
+      helperText: "This assessment is already completed. Review it from your results hub.",
+      actionLabel: "Open Results Hub",
+      mode: "results",
     };
   }
 
@@ -175,6 +175,11 @@ export default function Test() {
       return;
     }
 
+    if (action.mode === "results") {
+      navigate(plan.publishedReportId ? `/result/${plan.publishedReportId}` : "/result");
+      return;
+    }
+
     setOpeningPlanId(plan.id);
     try {
       if (action.mode === "unlock") {
@@ -182,7 +187,7 @@ export default function Test() {
       }
       await api.patch("/v1/user/package/select", {
         packageId: plan.id,
-        resetProgress: action.mode === "retake",
+        resetProgress: false,
       });
       if (user) {
         updateUser({ ...user, selectedPackageId: plan.id });

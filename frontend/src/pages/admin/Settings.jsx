@@ -24,6 +24,94 @@ const blankSection = (idx) => ({
   questions: [],
 });
 
+const blankSupportPage = (title) => ({
+  enabled: true,
+  title,
+  summary: "",
+  items: [],
+  faqItems: [],
+});
+
+const createBlankFaqItem = () => ({
+  heading: "",
+  content: "",
+});
+
+const normalizeTextBlocks = (items = []) =>
+  Array.isArray(items) ? items.map((item) => String(item || "")) : [];
+
+const splitLegacyFaqItem = (value = "") => {
+  const text = String(value || "").trim();
+  if (!text) return null;
+
+  const questionBreakIndex = text.indexOf("? ");
+  if (questionBreakIndex >= 0) {
+    return {
+      heading: text.slice(0, questionBreakIndex + 1).trim(),
+      content: text.slice(questionBreakIndex + 2).trim(),
+    };
+  }
+
+  const colonBreakIndex = text.indexOf(": ");
+  if (colonBreakIndex >= 0) {
+    return {
+      heading: text.slice(0, colonBreakIndex).trim(),
+      content: text.slice(colonBreakIndex + 2).trim(),
+    };
+  }
+
+  return {
+    heading: text,
+    content: "",
+  };
+};
+
+const normalizeFaqEntries = (faqItems = [], fallbackItems = []) => {
+  const normalizedFaqItems = Array.isArray(faqItems)
+    ? faqItems
+        .map((item) => ({
+          heading: String(item?.heading || ""),
+          content: String(item?.content || ""),
+        }))
+        .filter((item) => item.heading.trim() || item.content.trim())
+    : [];
+
+  if (normalizedFaqItems.length) {
+    return normalizedFaqItems;
+  }
+
+  return normalizeTextBlocks(fallbackItems)
+    .map((item) => splitLegacyFaqItem(item))
+    .filter(Boolean);
+};
+
+const supportPageDefinitions = [
+  {
+    key: "privacyPolicy",
+    label: "Privacy Policy",
+    path: "/privacy-policy",
+    contentType: "text",
+  },
+  {
+    key: "termsOfService",
+    label: "Terms of Service",
+    path: "/terms-of-service",
+    contentType: "text",
+  },
+  {
+    key: "faqs",
+    label: "FAQs",
+    path: "/faqs",
+    contentType: "faq",
+  },
+];
+
+const blankSupportPages = {
+  privacyPolicy: blankSupportPage("Privacy Policy"),
+  termsOfService: blankSupportPage("Terms of Service"),
+  faqs: blankSupportPage("FAQs"),
+};
+
 export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -35,6 +123,8 @@ export default function Settings() {
   const [draft, setDraft] = useState(blankPackage);
   const [featuresText, setFeaturesText] = useState("");
   const [editingSection, setEditingSection] = useState(null);
+  const [supportPages, setSupportPages] = useState(blankSupportPages);
+  const [savingSupportPages, setSavingSupportPages] = useState(false);
 
   const selectedPackage = useMemo(() => packages.find((p) => p.id === selectedId) || null, [packages, selectedId]);
 
@@ -59,10 +149,32 @@ export default function Settings() {
       .get("/v1/admin/config")
       .then((res) => {
         const list = res?.data?.data?.packages || [];
+        const nextSupportPages = res?.data?.data?.supportPages || {};
         setPackages(list);
         const id = list[0]?.id || "";
         setSelectedId(id);
         hydrateDraft(list[0] || null);
+        setSupportPages({
+          privacyPolicy: {
+            ...blankSupportPage("Privacy Policy"),
+            ...(nextSupportPages.privacyPolicy || {}),
+            items: normalizeTextBlocks(nextSupportPages.privacyPolicy?.items),
+          },
+          termsOfService: {
+            ...blankSupportPage("Terms of Service"),
+            ...(nextSupportPages.termsOfService || {}),
+            items: normalizeTextBlocks(nextSupportPages.termsOfService?.items),
+          },
+          faqs: {
+            ...blankSupportPage("FAQs"),
+            ...(nextSupportPages.faqs || {}),
+            items: normalizeTextBlocks(nextSupportPages.faqs?.items),
+            faqItems: normalizeFaqEntries(
+              nextSupportPages.faqs?.faqItems,
+              nextSupportPages.faqs?.items
+            ),
+          },
+        });
       })
       .catch((err) => setError(err?.response?.data?.msg || "Failed to load packages"))
       .finally(() => setLoading(false));
@@ -102,6 +214,130 @@ export default function Settings() {
       })
       .catch((err) => setError(err?.response?.data?.msg || "Failed to save package"))
       .finally(() => setSaving(false));
+  };
+
+  const updateSupportPage = (pageKey, patch) => {
+    setSupportPages((current) => ({
+      ...current,
+      [pageKey]: {
+        ...current[pageKey],
+        ...patch,
+      },
+    }));
+  };
+
+  const updateSupportTextItem = (pageKey, index, value) => {
+    setSupportPages((current) => {
+      const nextItems = [...(current[pageKey]?.items || [])];
+      nextItems[index] = value;
+      return {
+        ...current,
+        [pageKey]: {
+          ...current[pageKey],
+          items: nextItems,
+        },
+      };
+    });
+  };
+
+  const addSupportTextItem = (pageKey) => {
+    setSupportPages((current) => ({
+      ...current,
+      [pageKey]: {
+        ...current[pageKey],
+        items: [...(current[pageKey]?.items || []), ""],
+      },
+    }));
+  };
+
+  const removeSupportTextItem = (pageKey, index) => {
+    setSupportPages((current) => ({
+      ...current,
+      [pageKey]: {
+        ...current[pageKey],
+        items: (current[pageKey]?.items || []).filter((_, itemIndex) => itemIndex !== index),
+      },
+    }));
+  };
+
+  const updateFaqItem = (pageKey, index, patch) => {
+    setSupportPages((current) => {
+      const nextFaqItems = [...(current[pageKey]?.faqItems || [])];
+      nextFaqItems[index] = {
+        ...createBlankFaqItem(),
+        ...nextFaqItems[index],
+        ...patch,
+      };
+      return {
+        ...current,
+        [pageKey]: {
+          ...current[pageKey],
+          faqItems: nextFaqItems,
+        },
+      };
+    });
+  };
+
+  const addFaqItem = (pageKey) => {
+    setSupportPages((current) => ({
+      ...current,
+      [pageKey]: {
+        ...current[pageKey],
+        faqItems: [...(current[pageKey]?.faqItems || []), createBlankFaqItem()],
+      },
+    }));
+  };
+
+  const removeFaqItem = (pageKey, index) => {
+    setSupportPages((current) => ({
+      ...current,
+      [pageKey]: {
+        ...current[pageKey],
+        faqItems: (current[pageKey]?.faqItems || []).filter(
+          (_, itemIndex) => itemIndex !== index
+        ),
+      },
+    }));
+  };
+
+  const saveSupportPages = () => {
+    setSavingSupportPages(true);
+    setError("");
+    setSuccess("");
+
+    const payload = supportPageDefinitions.reduce((acc, definition) => {
+      const currentPage = supportPages[definition.key] || blankSupportPage(definition.label);
+      acc[definition.key] = {
+        enabled: currentPage.enabled !== false,
+        title: currentPage.title,
+        summary: currentPage.summary,
+        items:
+          definition.contentType === "faq"
+            ? []
+            : (currentPage.items || []).map((item) => String(item || "").trim()).filter(Boolean),
+        faqItems:
+          definition.contentType === "faq"
+            ? (currentPage.faqItems || [])
+                .map((item) => ({
+                  heading: String(item?.heading || "").trim(),
+                  content: String(item?.content || "").trim(),
+                }))
+                .filter((item) => item.heading || item.content)
+            : [],
+      };
+      return acc;
+    }, {});
+
+    api
+      .put("/v1/admin/support-pages", { supportPages: payload })
+      .then(() => {
+        setSuccess("Support pages saved.");
+        load();
+      })
+      .catch((err) =>
+        setError(err?.response?.data?.msg || "Failed to save support pages")
+      )
+      .finally(() => setSavingSupportPages(false));
   };
 
   const updateSection = (index, patch) => {
@@ -273,6 +509,217 @@ export default function Settings() {
                   </div>
                 </div>
               ))}
+            </div>
+          </section>
+
+          <section className="bg-white rounded-2xl border border-gray-100 p-6">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Support Pages</h2>
+                <p className="mt-1 text-sm text-gray-500">
+                  Manage the footer pages for Privacy Policy, Terms of Service, and FAQs.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={saveSupportPages}
+                disabled={savingSupportPages}
+                className="px-4 py-2 rounded-lg bg-[#188B8B] text-white text-sm font-semibold disabled:opacity-60"
+              >
+                {savingSupportPages ? "Saving..." : "Save Support Pages"}
+              </button>
+            </div>
+
+            <div className="mt-6 space-y-5">
+              {supportPageDefinitions.map((page) => {
+                const pageDraft = supportPages[page.key] || blankSupportPage(page.label);
+
+                return (
+                  <div key={page.key} className="rounded-2xl border border-[#E4E7EC] p-5">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-[#0F1729]">
+                          {page.label}
+                        </h3>
+                        <p className="mt-1 text-xs text-gray-500">
+                          Public route: {page.path}
+                        </p>
+                      </div>
+
+                      <label className="inline-flex items-center gap-2 text-sm font-medium text-[#0F1729]">
+                        <input
+                          type="checkbox"
+                          checked={pageDraft.enabled !== false}
+                          onChange={(event) =>
+                            updateSupportPage(page.key, {
+                              enabled: event.target.checked,
+                            })
+                          }
+                        />
+                        Show in footer
+                      </label>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <input
+                        value={pageDraft.title || ""}
+                        onChange={(event) =>
+                          updateSupportPage(page.key, {
+                            title: event.target.value,
+                          })
+                        }
+                        className="border rounded-lg px-3 py-2"
+                        placeholder="Page title"
+                      />
+                      <input
+                        value={page.path}
+                        readOnly
+                        className="border rounded-lg px-3 py-2 bg-gray-100 text-gray-500"
+                      />
+                    </div>
+
+                    <textarea
+                      className="mt-4 border rounded-lg px-3 py-2 w-full min-h-[100px]"
+                      value={pageDraft.summary || ""}
+                      onChange={(event) =>
+                        updateSupportPage(page.key, {
+                          summary: event.target.value,
+                        })
+                      }
+                      placeholder="Short page summary"
+                    />
+
+                    {page.contentType === "faq" ? (
+                      <div className="mt-4 rounded-xl border border-[#E4E7EC] bg-[#FBFCFD] p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-semibold text-[#0F1729]">
+                              FAQ Entries
+                            </p>
+                            <p className="mt-1 text-xs text-gray-500">
+                              Add question and answer pairs for the public accordion.
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => addFaqItem(page.key)}
+                            className="px-3 py-1.5 rounded-lg border border-[#188B8B] text-[#188B8B] text-sm font-semibold"
+                          >
+                            + Add FAQ
+                          </button>
+                        </div>
+
+                        <div className="mt-4 space-y-4">
+                          {(pageDraft.faqItems || []).length ? (
+                            pageDraft.faqItems.map((faqItem, faqIndex) => (
+                              <div
+                                key={`${page.key}-faq-${faqIndex}`}
+                                className="rounded-xl border border-[#E4E7EC] bg-white p-4"
+                              >
+                                <div className="flex items-center justify-between gap-3">
+                                  <p className="text-sm font-semibold text-[#0F1729]">
+                                    FAQ {faqIndex + 1}
+                                  </p>
+                                  <button
+                                    type="button"
+                                    onClick={() => removeFaqItem(page.key, faqIndex)}
+                                    className="px-3 py-1.5 rounded-lg border border-red-300 text-red-600 text-xs font-semibold"
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+
+                                <input
+                                  value={faqItem.heading || ""}
+                                  onChange={(event) =>
+                                    updateFaqItem(page.key, faqIndex, {
+                                      heading: event.target.value,
+                                    })
+                                  }
+                                  className="mt-3 border rounded-lg px-3 py-2 w-full"
+                                  placeholder="Question heading"
+                                />
+
+                                <textarea
+                                  className="mt-3 border rounded-lg px-3 py-2 w-full min-h-[120px]"
+                                  value={faqItem.content || ""}
+                                  onChange={(event) =>
+                                    updateFaqItem(page.key, faqIndex, {
+                                      content: event.target.value,
+                                    })
+                                  }
+                                  placeholder="Answer content"
+                                />
+                              </div>
+                            ))
+                          ) : (
+                            <div className="rounded-xl border border-dashed border-[#D8E6EC] bg-white px-4 py-6 text-sm text-[#65758B]">
+                              No FAQ entries added yet.
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mt-4 rounded-xl border border-[#E4E7EC] bg-[#FBFCFD] p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-semibold text-[#0F1729]">
+                              Content Blocks
+                            </p>
+                            <p className="mt-1 text-xs text-gray-500">
+                              Add or remove plain content paragraphs for this page.
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => addSupportTextItem(page.key)}
+                            className="px-3 py-1.5 rounded-lg border border-[#188B8B] text-[#188B8B] text-sm font-semibold"
+                          >
+                            + Add Block
+                          </button>
+                        </div>
+
+                        <div className="mt-4 space-y-4">
+                          {(pageDraft.items || []).length ? (
+                            pageDraft.items.map((item, itemIndex) => (
+                              <div
+                                key={`${page.key}-item-${itemIndex}`}
+                                className="rounded-xl border border-[#E4E7EC] bg-white p-4"
+                              >
+                                <div className="flex items-center justify-between gap-3">
+                                  <p className="text-sm font-semibold text-[#0F1729]">
+                                    Block {itemIndex + 1}
+                                  </p>
+                                  <button
+                                    type="button"
+                                    onClick={() => removeSupportTextItem(page.key, itemIndex)}
+                                    className="px-3 py-1.5 rounded-lg border border-red-300 text-red-600 text-xs font-semibold"
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+
+                                <textarea
+                                  className="mt-3 border rounded-lg px-3 py-2 w-full min-h-[120px]"
+                                  value={item || ""}
+                                  onChange={(event) =>
+                                    updateSupportTextItem(page.key, itemIndex, event.target.value)
+                                  }
+                                  placeholder="Content paragraph"
+                                />
+                              </div>
+                            ))
+                          ) : (
+                            <div className="rounded-xl border border-dashed border-[#D8E6EC] bg-white px-4 py-6 text-sm text-[#65758B]">
+                              No content blocks added yet.
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </section>
         </>

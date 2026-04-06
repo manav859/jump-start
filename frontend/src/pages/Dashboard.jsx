@@ -33,7 +33,6 @@ const getPackageStatusMeta = (status) => {
       label: "Completed",
       badgeClass: "bg-emerald-50 text-emerald-700",
       cardClass: "border-[#D8F3E6] bg-emerald-50/30 hover:border-[#52B788]",
-      actionLabel: "Retake Assessment",
       clickable: true,
     };
   }
@@ -57,9 +56,9 @@ const getPackageStatusMeta = (status) => {
   };
 };
 
-const getPackageActionMeta = (status, publicationStatus) => {
-  if (status === "completed") {
-    if (publicationStatus === "pending_approval") {
+const getPackageActionMeta = (pkg) => {
+  if (pkg.status === "completed") {
+    if (pkg.publicationStatus === "pending_approval") {
       return {
         label: "View Submission Status",
         mode: "pending",
@@ -67,12 +66,12 @@ const getPackageActionMeta = (status, publicationStatus) => {
     }
 
     return {
-      label: "Retake Assessment",
-      mode: "retake",
+      label: "Open Results Hub",
+      mode: "results",
     };
   }
 
-  if (status === "in_progress") {
+  if (pkg.status === "in_progress") {
     return {
       label: "Resume Assessment",
       mode: "open",
@@ -209,7 +208,7 @@ export default function Dashboard() {
 
   const handleOpenPackage = async (pkg) => {
     const statusMeta = getPackageStatusMeta(pkg.status);
-    const actionMeta = getPackageActionMeta(pkg.status, pkg.publicationStatus);
+    const actionMeta = getPackageActionMeta(pkg);
     if (!statusMeta.clickable) return;
 
     if (actionMeta.mode === "pending") {
@@ -217,15 +216,19 @@ export default function Dashboard() {
       return;
     }
 
+    if (actionMeta.mode === "results") {
+      navigate(pkg.publishedReportId ? `/result/${pkg.publishedReportId}` : "/result");
+      return;
+    }
+
     setPackageError("");
     setOpeningPackageId(pkg.id);
 
     try {
-      const shouldResetProgress = actionMeta.mode === "retake";
-      if (stats.selected_package_id !== pkg.id || shouldResetProgress) {
+      if (stats.selected_package_id !== pkg.id) {
         await api.patch("/v1/user/package/select", {
           packageId: pkg.id,
-          resetProgress: shouldResetProgress,
+          resetProgress: false,
         });
         setStats((prev) => ({
           ...prev,
@@ -350,10 +353,7 @@ export default function Dashboard() {
               {stats.purchased_packages.length ? (
                 stats.purchased_packages.map((pkg) => {
                   const statusMeta = getPackageStatusMeta(pkg.status);
-                  const actionMeta = getPackageActionMeta(
-                    pkg.status,
-                    pkg.publicationStatus
-                  );
+                  const actionMeta = getPackageActionMeta(pkg);
                   const publicationMeta = getPackagePublicationMeta(
                     pkg.publicationStatus
                   );

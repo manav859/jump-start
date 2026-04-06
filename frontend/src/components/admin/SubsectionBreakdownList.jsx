@@ -8,7 +8,13 @@ const getBreakdownStatusLabel = (status) => {
 };
 
 const SCORE_BAND_LABELS = new Set(["High", "Moderate", "Low"]);
+const HIGH_SIGNAL_BANDS = new Set(["High", "Excellent", "Strong"]);
 const SUBSECTION_PREFIX_PATTERN = /^\d+(?:\.\d+)*\s*/;
+const LIKERT_BAND_RANGES = {
+  High: "4.0-5.0",
+  Moderate: "3.0-3.99",
+  Low: "1.0-2.99",
+};
 
 const getDisplayLabel = (label) =>
   String(label || "").replace(SUBSECTION_PREFIX_PATTERN, "").trim();
@@ -31,7 +37,7 @@ const getDerivedInterpretationLabel = (item) => {
   if (!label) return "";
 
   const band = String(item?.band || "").trim();
-  if (SCORE_BAND_LABELS.has(band)) {
+  if (band && band !== "Review Required" && item?.scoreType !== "profile_consistency") {
     if (item?.key === "neuroticism") return `${band} Neuroticism`;
     return `${band} ${label}`;
   }
@@ -50,53 +56,330 @@ const getDerivedInterpretationLabel = (item) => {
   return `Low ${label}`;
 };
 
-const getInterpretationText = (item) =>
-  getDerivedInterpretationLabel(item) ||
-  item?.interpretation ||
-  item?.description ||
-  "Interpretation unavailable for this subsection.";
+const trimTrailingPunctuation = (value) =>
+  String(value || "")
+    .trim()
+    .replace(/[.!,;:\s]+$/g, "");
 
-const getSecondaryDescription = (item, primaryText) =>
-  [item?.interpretation, item?.description]
+const getInterpretationRange = (item) => {
+  const configuredRange = String(item?.bandRangeLabel || "").trim();
+  if (configuredRange) return configuredRange;
+  if (item?.scoreType !== "average") return "";
+  return LIKERT_BAND_RANGES[String(item?.band || "").trim()] || "";
+};
+
+const getInterpretationHeading = (item) => {
+  if (item?.scoreType === "profile_consistency" && item?.band) {
+    return String(item.band).trim();
+  }
+
+  return (
+    getDerivedInterpretationLabel(item) ||
+    getDisplayLabel(item?.label) ||
+    String(item?.band || "").trim() ||
+    "Interpretation"
+  );
+};
+
+const getInterpretationNarrative = (item, heading) =>
+  [item?.description, item?.interpretation]
     .map((value) => String(value || "").trim())
-    .find((value) => value && value !== primaryText) || "";
+    .find((value) => value && value !== heading) || "";
 
-const getScoreDisplay = (subsection) => {
-  if (subsection.scoreType === "average") {
+const getScoreSummaryLabel = (item) => {
+  if (item?.scoreType === "average" && Number.isFinite(Number(item?.average))) {
+    return `${formatScoreValue(item.average)} / 5 average`;
+  }
+
+  if (
+    item?.scoreType === "correct_count" &&
+    Number.isFinite(Number(item?.score)) &&
+    Number.isFinite(Number(item?.maxScore))
+  ) {
+    return `${formatScoreValue(item.score)} / ${formatScoreValue(item.maxScore)}`;
+  }
+
+  return "";
+};
+
+const buildInterpretationBody = (item, heading) => {
+  const narrative = getInterpretationNarrative(item, heading);
+  const careerImplication = String(item?.careerImplication || "").trim();
+  const cleanedNarrative = careerImplication
+    ? trimTrailingPunctuation(narrative)
+    : narrative;
+  const scoreSummary = getScoreSummaryLabel(item);
+
+  if (cleanedNarrative && careerImplication) {
+    return `${cleanedNarrative} -> ${careerImplication}`;
+  }
+
+  if (cleanedNarrative || careerImplication) {
+    return cleanedNarrative || careerImplication;
+  }
+
+  if (scoreSummary) {
+    return item?.scoreType === "average"
+      ? "Average score across the questions mapped to this field."
+      : "Score across the questions mapped to this field.";
+  }
+
+  return "Interpretation unavailable.";
+};
+
+const isHighSideInterpretationItem = (item) => {
+  const band = String(item?.band || "").trim();
+  if (band) {
+    return HIGH_SIGNAL_BANDS.has(band);
+  }
+
+  const average = Number(item?.average);
+  if (Number.isFinite(average)) {
+    const maxScore = Number(item?.maxScore);
+    if (Number.isFinite(maxScore) && maxScore > 0) {
+      return average / maxScore >= 0.8;
+    }
+    return average >= 4;
+  }
+
+  const percentage = Number(item?.percentage);
+  if (Number.isFinite(percentage)) {
+    return percentage >= 75;
+  }
+
+  return false;
+};
+
+const getConfiguredInterpretationItems = (subsection) =>
+  Array.isArray(subsection?.interpretationItems)
+    ? subsection.interpretationItems
+        .map((item) => {
+          const heading = String(item?.title || "").trim();
+          const meta = String(item?.meta || "").trim();
+          return {
+            key: item?.key || heading,
+            heading: meta ? `${heading} (${meta})` : heading,
+            body: String(item?.detail || "").trim(),
+          };
+        })
+        .filter((item) => item.heading)
+    : [];
+
+const getUniqueQuestionCount = (questionNumbers = []) =>
+  new Set(
+    (Array.isArray(questionNumbers) ? questionNumbers : [])
+      .map((value) => Number(value))
+      .filter(Number.isFinite)
+  ).size;
+
+const parseQuestionRangeCount = (questionRangeLabel) => {
+  const parts = String(questionRangeLabel || "")
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (!parts.length) return null;
+
+  const total = parts.reduce((sum, part) => {
+    const rangeMatch = part.match(/^(\d+)\s*-\s*(\d+)$/);
+    if (rangeMatch) {
+      const start = Number(rangeMatch[1]);
+      const end = Number(rangeMatch[2]);
+      if (Number.isFinite(start) && Number.isFinite(end) && end >= start) {
+        return sum + (end - start + 1);
+      }
+      return sum;
+    }
+
+    const singleValue = Number(part);
+    if (Number.isFinite(singleValue)) {
+      return sum + 1;
+    }
+
+    return sum;
+  }, 0);
+
+  return total > 0 ? total : null;
+};
+
+const getQuestionProgressCounts = (subsection) => {
+  const explicitAnsweredCount = Number(subsection?.answeredCount);
+  const explicitTotalQuestions = Number(subsection?.totalQuestions);
+  const hasExplicitAnsweredCount =
+    Number.isFinite(explicitAnsweredCount) && explicitAnsweredCount >= 0;
+  const derivedTotalQuestions =
+    (Number.isFinite(explicitTotalQuestions) && explicitTotalQuestions > 0
+      ? explicitTotalQuestions
+      : 0) ||
+    getUniqueQuestionCount(subsection?.questionNumbers) ||
+    parseQuestionRangeCount(subsection?.questionRangeLabel) ||
+    0;
+
+  if (!derivedTotalQuestions) {
+    return null;
+  }
+
+  if (hasExplicitAnsweredCount && explicitAnsweredCount > 0) {
     return {
-      label: "Average",
-      value:
-        subsection.average == null
-          ? "Review required"
-          : `${formatScoreValue(subsection.average)} / 5`,
-      meta:
-        subsection.percentage == null
-          ? subsection.band || ""
-          : `${formatScoreValue(subsection.percentage)}%`,
+      answeredCount: Math.min(explicitAnsweredCount, derivedTotalQuestions),
+      totalQuestions: derivedTotalQuestions,
     };
   }
 
-  if (subsection.scoreType === "profile_consistency") {
+  if (hasExplicitAnsweredCount && explicitAnsweredCount === 0 && subsection?.status === "incomplete") {
     return {
-      label: "Profile",
-      value: subsection.band || "Review required",
-      meta:
-        subsection.percentage == null
-          ? "Awaiting review"
-          : `${formatScoreValue(subsection.percentage)}% consistency`,
+      answeredCount: 0,
+      totalQuestions: derivedTotalQuestions,
+    };
+  }
+
+  if (subsection?.status !== "incomplete") {
+    return {
+      answeredCount: derivedTotalQuestions,
+      totalQuestions: derivedTotalQuestions,
+    };
+  }
+
+  return {
+    answeredCount: 0,
+    totalQuestions: derivedTotalQuestions,
+  };
+};
+
+const getQuestionProgressValue = (subsection) => {
+  const counts = getQuestionProgressCounts(subsection);
+  if (counts) {
+    return `${formatScoreValue(counts.answeredCount)} / ${formatScoreValue(
+      counts.totalQuestions
+    )}`;
+  }
+
+  return "Not available";
+};
+
+const getNormalizedScorePercent = (subsection) => {
+  const explicitPercentage = Number(subsection?.percentage);
+  if (Number.isFinite(explicitPercentage)) {
+    return explicitPercentage;
+  }
+
+  if (subsection?.scoreType === "average") {
+    const averageValue = Number(
+      subsection?.average != null ? subsection.average : subsection?.score
+    );
+    if (Number.isFinite(averageValue)) {
+      return ((averageValue - 1) / 4) * 100;
+    }
+  }
+
+  if (subsection?.scoreType === "profile_consistency") {
+    const score = Number(subsection?.score);
+    const maxScore = Number(subsection?.maxScore);
+    if (Number.isFinite(score) && Number.isFinite(maxScore) && maxScore > 0) {
+      return (score / maxScore) * 100;
+    }
+  }
+
+  return null;
+};
+
+const buildInterpretationItems = (subsection) => {
+  const configuredItems = getConfiguredInterpretationItems(subsection);
+  if (configuredItems.length) {
+    return configuredItems;
+  }
+
+  const factorResults = Array.isArray(subsection?.factorResults)
+    ? subsection.factorResults.filter(
+        (item) => item && item.status !== "incomplete" && item.status !== "review_required"
+      )
+    : [];
+  const clusterResults = Array.isArray(subsection?.clusterResults)
+    ? subsection.clusterResults.filter(
+        (item) => item && item.status !== "incomplete" && item.status !== "review_required"
+      )
+    : [];
+  const displayMode = String(subsection?.displayMode || "").trim();
+  const useHighSignalDimensionMode =
+    displayMode === "high_signal_dimensions" ||
+    (!displayMode && (factorResults.length > 0 || clusterResults.length > 0));
+  const items = useHighSignalDimensionMode
+    ? factorResults.length
+      ? factorResults
+      : clusterResults.length
+        ? clusterResults
+        : [subsection]
+    : [subsection];
+  const filteredItems = useHighSignalDimensionMode
+    ? items.filter((item) => isHighSideInterpretationItem(item))
+    : items;
+
+  const legacyItems = filteredItems.map((item) => {
+    const heading = getInterpretationHeading(item);
+    const range = getInterpretationRange(item);
+    const scoreSummary = !range ? getScoreSummaryLabel(item) : "";
+    const headingSuffix = range || scoreSummary;
+
+    return {
+      key: item.id || item.key || item.label || heading,
+      heading: headingSuffix ? `${heading} (${headingSuffix})` : heading,
+      body: buildInterpretationBody(item, heading),
+    };
+  });
+
+  if (legacyItems.length) {
+    return legacyItems;
+  }
+
+  if (String(subsection?.interpretation || "").trim()) {
+    return [
+      {
+        key: subsection.id || subsection.key || subsection.label || "summary",
+        heading: String(subsection.interpretation).trim(),
+        body: String(subsection.careerImplication || "").trim(),
+      },
+    ];
+  }
+
+  return [];
+};
+
+const getScoreDisplay = (subsection) => {
+  if (subsection.scoreType === "profile_consistency") {
+    const percentage = getNormalizedScorePercent(subsection);
+    return {
+      label: "Consistency",
+      value:
+        percentage == null
+          ? subsection.score == null || subsection.maxScore == null
+            ? "Not available"
+            : `${formatScoreValue(subsection.score)} / ${formatScoreValue(
+                subsection.maxScore
+              )}`
+          : `${formatScoreValue(percentage)}%`,
+      meta: subsection.band || "Pattern-based",
     };
   }
 
   if (subsection.scoreType === "review_only") {
     return {
-      label: "Review",
-      value: "Manual review",
-      meta: subsection.questionRangeLabel || "",
+      label: "Answered",
+      value: getQuestionProgressValue(subsection),
+      meta: "Manual review",
+    };
+  }
+
+  if (subsection.scoreType === "average") {
+    const percentage = getNormalizedScorePercent(subsection);
+    return {
+      label: "Score",
+      value: percentage == null ? "Not available" : `${formatScoreValue(percentage)}%`,
+      meta: subsection.band || "Normalized",
     };
   }
 
   return {
-    label: "Score",
+    label: "Correct",
     value:
       subsection.score == null
         ? "Review required"
@@ -104,9 +387,9 @@ const getScoreDisplay = (subsection) => {
             subsection.maxScore
           )}`,
     meta:
-      subsection.percentage == null
-        ? subsection.band || ""
-        : `${formatScoreValue(subsection.percentage)}%`,
+      subsection.bandRangeLabel ||
+      subsection.band ||
+      (subsection.percentage == null ? "" : `${formatScoreValue(subsection.percentage)}%`),
   };
 };
 
@@ -126,12 +409,14 @@ export default function SubsectionBreakdownList({
     <div className="space-y-3">
       {subsections.map((subsection) => {
         const scoreDisplay = getScoreDisplay(subsection);
-        const interpretationText = getInterpretationText(subsection);
-        const secondaryDescription = getSecondaryDescription(
-          subsection,
-          interpretationText
-        );
+        const interpretationItems = buildInterpretationItems(subsection);
         const displayLabel = getDisplayLabel(subsection.label);
+        const usesHighSignalDimensions =
+          String(subsection?.displayMode || "").trim() === "high_signal_dimensions" ||
+          ((!subsection?.displayMode || subsection.displayMode === "") &&
+            ((Array.isArray(subsection?.factorResults) && subsection.factorResults.length > 0) ||
+              (Array.isArray(subsection?.clusterResults) &&
+                subsection.clusterResults.length > 0)));
         return (
           <div
             key={subsection.id || subsection.key || subsection.label}
@@ -164,14 +449,26 @@ export default function SubsectionBreakdownList({
                     <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8A94A6] sm:text-xs sm:tracking-[0.12em]">
                       Interpretation
                     </p>
-                    <p className="mt-1 text-[13px] leading-6 text-[#4E5D72] sm:text-sm sm:leading-7">
-                      {interpretationText}
-                    </p>
-                    {secondaryDescription ? (
-                      <p className="mt-1.5 text-[13px] leading-6 text-[#8A94A6] sm:mt-2 sm:text-sm sm:leading-7">
-                        {secondaryDescription}
+                    {interpretationItems.length ? (
+                      <ul className="mt-1.5 list-disc space-y-2 pl-5 text-[13px] leading-6 text-[#4E5D72] sm:mt-2 sm:space-y-2.5 sm:text-sm sm:leading-7">
+                        {interpretationItems.map((item) => (
+                          <li key={item.key}>
+                            <span className="font-semibold text-[#0F1729]">
+                              {item.heading}
+                            </span>
+                            {item.body ? (
+                              <span className="text-[#4E5D72]">: {item.body}</span>
+                            ) : null}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="mt-1 text-[13px] leading-6 text-[#4E5D72] sm:text-sm sm:leading-7">
+                        {usesHighSignalDimensions
+                          ? "Interpretation details are unavailable for the saved result data in this subsection."
+                          : "Interpretation unavailable for this subsection."}
                       </p>
-                    ) : null}
+                    )}
                   </div>
 
                 </div>

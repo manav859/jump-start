@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
 import upiIcon from "../assets/upi.svg";
 import creditIcon from "../assets/credit.svg";
@@ -277,8 +277,20 @@ const Payment = () => {
                 className="mt-1 h-4 w-4 appearance-none rounded-full border border-[#188B8B] checked:bg-[#188B8B] checked:border-[#188B8B] focus:outline-none relative"
               />
               <span className="text-[#0F1729]">
-                I accept the <span className="text-[#188B8B]">Terms & Conditions</span> and{' '}
-                <span className="text-[#188B8B]">Privacy Policy</span>
+                I accept the{" "}
+                <Link
+                  to="/terms-of-service"
+                  className="text-[#188B8B] hover:underline"
+                >
+                  Terms & Conditions
+                </Link>{" "}
+                and{" "}
+                <Link
+                  to="/privacy-policy"
+                  className="text-[#188B8B] hover:underline"
+                >
+                  Privacy Policy
+                </Link>
               </span>
             </label>
 

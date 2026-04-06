@@ -29,6 +29,9 @@ const cloneFactorResult = (item = {}) => ({
   average: toNullableNumber(item.average),
   percentage: toNullableNumber(item.percentage),
   band: item.band || "",
+  bandMin: toNullableNumber(item.bandMin),
+  bandMax: toNullableNumber(item.bandMax),
+  bandRangeLabel: item.bandRangeLabel || "",
   status: item.status || "",
   description: item.description || "",
   interpretation: item.interpretation || "",
@@ -39,11 +42,21 @@ const cloneFactorResult = (item = {}) => ({
     ? item.questionNumbers.map((value) => Number(value)).filter(Number.isFinite)
     : [],
   questionRangeLabel: item.questionRangeLabel || "",
+  answeredCount: toNullableNumber(item.answeredCount),
+  totalQuestions: toNullableNumber(item.totalQuestions),
+});
+
+const cloneInterpretationItem = (item = {}) => ({
+  key: item.key || "",
+  title: item.title || "",
+  detail: item.detail || "",
+  meta: item.meta || "",
 });
 
 const cloneSubsection = (subsection = {}) => ({
   id: subsection.id || "",
   key: subsection.key || "",
+  subsectionId: subsection.subsectionId || "",
   label: subsection.label || "",
   score: toNullableNumber(subsection.score),
   rawScore: toNullableNumber(subsection.rawScore),
@@ -51,17 +64,27 @@ const cloneSubsection = (subsection = {}) => ({
   average: toNullableNumber(subsection.average),
   percentage: toNullableNumber(subsection.percentage),
   band: subsection.band || "",
+  bandMin: toNullableNumber(subsection.bandMin),
+  bandMax: toNullableNumber(subsection.bandMax),
+  bandRangeLabel: subsection.bandRangeLabel || "",
   status: subsection.status || "",
   description: subsection.description || "",
   interpretation: subsection.interpretation || "",
   careerImplication: subsection.careerImplication || "",
   answerType: subsection.answerType || "",
   scoreType: subsection.scoreType || "",
+  evaluationType: subsection.evaluationType || "",
+  displayMode: subsection.displayMode || "",
+  usedForPersonalityType: Boolean(subsection.usedForPersonalityType),
   questionNumbers: Array.isArray(subsection.questionNumbers)
     ? subsection.questionNumbers.map((value) => Number(value)).filter(Number.isFinite)
     : [],
   questionRangeLabel: subsection.questionRangeLabel || "",
+  answeredCount: toNullableNumber(subsection.answeredCount),
+  totalQuestions: toNullableNumber(subsection.totalQuestions),
   factorResults: cloneArray(subsection.factorResults, cloneFactorResult),
+  clusterResults: cloneArray(subsection.clusterResults, cloneFactorResult),
+  interpretationItems: cloneArray(subsection.interpretationItems, cloneInterpretationItem),
 });
 
 export const createEmptyResultProfile = () => ({

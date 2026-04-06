@@ -33,6 +33,7 @@ const Payments = lazy(() => import("./pages/admin/Payments"));
 const Analytics = lazy(() => import("./pages/admin/Analytics"));
 const Settings = lazy(() => import("./pages/admin/Settings"));
 const ReviewSubmission = lazy(() => import("./pages/admin/ReviewSubmission"));
+const SupportContentPage = lazy(() => import("./pages/SupportContentPage"));
 
 function RouteFallback() {
   return (
@@ -79,6 +80,18 @@ const router = createBrowserRouter([
       {
         path: "/result/:reportId",
         element: protectedPage(<StudentReport />),
+      },
+      {
+        path: "/privacy-policy",
+        element: withSuspense(<SupportContentPage pageKey="privacyPolicy" />),
+      },
+      {
+        path: "/terms-of-service",
+        element: withSuspense(<SupportContentPage pageKey="termsOfService" />),
+      },
+      {
+        path: "/faqs",
+        element: withSuspense(<SupportContentPage pageKey="faqs" />),
       },
       {
         path: "/test-completed",

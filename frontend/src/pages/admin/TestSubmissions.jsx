@@ -10,6 +10,7 @@ import {
 import api from "../../api/api";
 import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import ResultStatusBadge from "../../components/admin/ResultStatusBadge";
+import { emitAdminNotificationsRefresh } from "../../utils/adminNotifications";
 
 export default function TestSubmissions() {
   const navigate = useNavigate();
@@ -64,6 +65,7 @@ export default function TestSubmissions() {
             : item
         )
       );
+      emitAdminNotificationsRefresh();
     } catch (err) {
       setActionError(err?.response?.data?.msg || "Failed to publish this result.");
     } finally {
@@ -82,6 +84,7 @@ export default function TestSubmissions() {
     try {
       await api.delete(`/v1/admin/results/${row.id}`);
       setRows((prev) => prev.filter((item) => item.id !== row.id));
+      emitAdminNotificationsRefresh();
     } catch (err) {
       setActionError(err?.response?.data?.msg || "Failed to delete this result.");
     } finally {

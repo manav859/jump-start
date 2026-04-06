@@ -1,5 +1,11 @@
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail, MapPin, Phone } from "lucide-react";
+import api from "../api/api";
+import {
+  fallbackSupportPages,
+  supportPageDefinitions,
+} from "../data/supportPages";
 
 const quickLinks = [
   { label: "Home", to: "/" },
@@ -8,14 +14,59 @@ const quickLinks = [
   { label: "Results", to: "/result" },
 ];
 
-const supportLinks = [
+const defaultSupportLinks = [
   { label: "Help Center", to: "/bookcounselling" },
-  { label: "Privacy Policy", to: "/" },
-  { label: "Terms of Service", to: "/" },
-  { label: "FAQs", to: "/" },
+  ...Object.values(fallbackSupportPages)
+    .filter((page) => page.enabled !== false)
+    .map((page) => ({
+      label: page.title,
+      to: page.path || supportPageDefinitions[page.key]?.path || "/",
+    })),
 ];
 
 export default function Footer() {
+  const [supportPages, setSupportPages] = useState(fallbackSupportPages);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    api
+      .get("/v1/public/support-pages")
+      .then((res) => {
+        if (cancelled) return;
+        setSupportPages(res?.data?.data?.pages || fallbackSupportPages);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setSupportPages(fallbackSupportPages);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const supportLinks = useMemo(() => {
+    const dynamicLinks = Object.values(supportPages || {})
+      .filter((page) => page?.enabled !== false)
+      .map((page) => ({
+        label:
+          page?.title ||
+          supportPageDefinitions[page?.key || ""]?.title ||
+          "Support Page",
+        to:
+          page?.path ||
+          supportPageDefinitions[page?.key || ""]?.path ||
+          "/",
+      }));
+
+    if (!dynamicLinks.length) {
+      return defaultSupportLinks;
+    }
+
+    return [{ label: "Help Center", to: "/bookcounselling" }, ...dynamicLinks];
+  }, [supportPages]);
+
   return (
     <footer className="bg-[#060708] text-white">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.15fr_0.85fr_0.85fr_1fr] lg:px-8">

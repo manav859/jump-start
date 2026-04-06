@@ -10,14 +10,22 @@ const getSectionScoreLine = (section) => {
   )}`;
 };
 
-export default function SectionBreakdownCard({ section, defaultOpen = true }) {
+export default function SectionBreakdownCard({
+  section,
+  defaultOpen = true,
+  forceOpen = false,
+}) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const showContent = forceOpen || isOpen;
 
   return (
-    <div className="rounded-[18px] border border-[#DCE9EE] bg-white shadow-sm sm:rounded-[26px]">
+    <div className="report-print-section rounded-[18px] border border-[#DCE9EE] bg-white shadow-sm sm:rounded-[26px]">
       <button
         type="button"
-        onClick={() => setIsOpen((value) => !value)}
+        onClick={() => {
+          if (forceOpen) return;
+          setIsOpen((value) => !value);
+        }}
         className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-2.5 px-3 py-3 text-left sm:gap-4 sm:px-5 sm:py-5"
       >
         <div className="rounded-[14px] bg-[#EAFBFB] p-2 text-[#188B8B] sm:rounded-2xl sm:p-3">
@@ -34,12 +42,12 @@ export default function SectionBreakdownCard({ section, defaultOpen = true }) {
 
         <ChevronDown
           className={`mt-1 h-5 w-5 shrink-0 text-[#65758B] transition-transform ${
-            isOpen ? "rotate-180" : ""
+            showContent ? "rotate-180" : ""
           }`}
         />
       </button>
 
-      {isOpen ? (
+      {showContent ? (
         <div className="border-t border-[#E8EEF3] px-3 py-3 sm:px-5 sm:py-5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8A94A6] sm:text-xs sm:tracking-[0.16em]">
             Subsection Breakdown

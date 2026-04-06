@@ -12,6 +12,7 @@ import api from "../api/api";
 import ResultPendingPanel from "../components/ResultPendingPanel";
 import SectionBreakdownCard from "../components/admin/SectionBreakdownCard";
 import StatusPill from "../components/results/StatusPill";
+import usePrintableDocument from "../hooks/usePrintableDocument";
 import {
   formatStudentDate,
   getResultMeta,
@@ -33,6 +34,7 @@ export default function StudentReport() {
   const [payload, setPayload] = useState(() =>
     normalizeStudentReportPayload({})
   );
+  const { isPreparingPrint, printDocument } = usePrintableDocument();
 
   useEffect(() => {
     if (!reportId) {
@@ -97,17 +99,17 @@ export default function StudentReport() {
   }
 
   const handleDownload = () => {
-    window.print();
+    void printDocument();
   };
 
   return (
-    <div className="bg-[#F7F8FA]">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+    <div className="report-print-page bg-[#F7F8FA]">
+      <div className="report-print-root mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <Link
               to="/result"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#4E5D72] hover:text-[#188B8B]"
+              className="report-print-hidden inline-flex items-center gap-2 text-sm font-semibold text-[#4E5D72] hover:text-[#188B8B]"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to My Results
@@ -140,14 +142,14 @@ export default function StudentReport() {
           <button
             type="button"
             onClick={handleDownload}
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-[#B6DFE4] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#188B8B] hover:bg-[#F6FDFC] sm:px-5 sm:py-3 sm:text-sm"
+            className="report-print-hidden inline-flex items-center justify-center gap-2 rounded-full border border-[#B6DFE4] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#188B8B] hover:bg-[#F6FDFC] sm:px-5 sm:py-3 sm:text-sm"
           >
             <Download className="h-4 w-4" />
             Download Report
           </button>
         </div>
 
-        <section className="surface-card mt-8 rounded-[22px] p-4 sm:rounded-[30px] sm:p-6">
+        <section className="surface-card report-print-card mt-8 rounded-[22px] p-4 sm:rounded-[30px] sm:p-6">
           <div className="grid gap-4 md:grid-cols-4">
             <div className="rounded-[18px] bg-[#F7FBFB] px-4 py-4 sm:rounded-[22px] sm:px-5 sm:py-5">
               <p className="text-[13px] font-semibold text-[#65758B] sm:text-sm">Overall Score</p>
@@ -192,7 +194,7 @@ export default function StudentReport() {
         </section>
 
         <div className="mt-8 grid items-start gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.9fr)]">
-          <section className="surface-card self-start rounded-[22px] p-5 sm:rounded-[30px] sm:p-7">
+          <section className="surface-card report-print-card self-start rounded-[22px] p-5 sm:rounded-[30px] sm:p-7">
             <div className="flex items-center gap-2.5 sm:gap-3">
               <div className="rounded-[16px] bg-[#EAFBFB] p-2.5 text-[#188B8B] sm:rounded-2xl sm:p-3">
                 <Target className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -233,7 +235,7 @@ export default function StudentReport() {
           </section>
 
           <div className="space-y-6">
-            <section className="surface-card rounded-[22px] bg-[linear-gradient(180deg,#FFF8EA_0%,#FFFFFF_100%)] p-5 sm:rounded-[30px] sm:p-7">
+            <section className="surface-card report-print-card rounded-[22px] bg-[linear-gradient(180deg,#FFF8EA_0%,#FFFFFF_100%)] p-5 sm:rounded-[30px] sm:p-7">
               <div className="flex items-center gap-2.5 sm:gap-3">
                 <div className="rounded-[16px] bg-[#FFF1D3] p-2.5 text-[#F59F0A] sm:rounded-2xl sm:p-3">
                   <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -280,7 +282,7 @@ export default function StudentReport() {
           </div>
         </div>
 
-        <section className="surface-card mt-6 rounded-[22px] p-5 sm:rounded-[30px] sm:p-7">
+        <section className="surface-card report-print-card mt-6 rounded-[22px] p-5 sm:rounded-[30px] sm:p-7">
           <h2 className="text-[20px] font-bold leading-8 text-[#0F1729] sm:text-2xl">
             Key Observations
           </h2>
@@ -302,7 +304,7 @@ export default function StudentReport() {
           </div>
         </section>
 
-        <section className="surface-card mt-8 rounded-[24px] p-5 sm:rounded-[30px] sm:p-7">
+        <section className="surface-card report-print-card mt-8 rounded-[24px] p-5 sm:rounded-[30px] sm:p-7">
           <div>
             <h2 className="text-[20px] font-bold leading-8 text-[#0F1729] sm:text-2xl">
               Section-wise Breakdown
@@ -319,6 +321,7 @@ export default function StudentReport() {
                   key={section.sectionId || section.title}
                   section={section}
                   defaultOpen={index === 0}
+                  forceOpen={isPreparingPrint}
                 />
               ))
             ) : (

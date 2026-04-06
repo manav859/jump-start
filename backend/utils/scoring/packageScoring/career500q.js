@@ -11,6 +11,8 @@ import {
   getBandLabel,
   resolveInterpretationBand,
 } from "../interpreters/bandInterpreter.js";
+import { buildSubsectionInterpretation } from "../interpreters/subsectionInterpretationRegistry.js";
+import { resolveCareer500QSubsectionSpec } from "../specs/career500qEvaluationSpec.js";
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -29,6 +31,52 @@ const roundPercent = (value) => {
   const numeric = Number(value);
   if (!Number.isFinite(numeric)) return null;
   return Math.round(numeric);
+};
+
+const formatBandBoundary = (value, style = "score") => {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return "";
+
+  if (style === "average") {
+    if (Number.isInteger(numeric)) return numeric.toFixed(1);
+    const fixedTwo = numeric.toFixed(2);
+    return fixedTwo.endsWith("0") ? numeric.toFixed(1) : fixedTwo;
+  }
+
+  return Number.isInteger(numeric) ? `${numeric}` : `${roundTo(numeric, 2)}`;
+};
+
+const buildBandRangeLabel = (band, style = "score") => {
+  if (!band || band.min == null || band.max == null) return "";
+  return `${formatBandBoundary(band.min, style)}-${formatBandBoundary(band.max, style)}`;
+};
+
+const buildDefaultDisplayMode = (result = {}) =>
+  Array.isArray(result.factorResults) && result.factorResults.length
+    ? "high_signal_dimensions"
+    : Array.isArray(result.clusterResults) && result.clusterResults.length
+      ? "high_signal_dimensions"
+      : "subsection_summary";
+
+const finalizeSubsectionResult = (subsectionConfig, result = {}) => {
+  const specMeta = resolveCareer500QSubsectionSpec(subsectionConfig);
+  const baseResult = {
+    subsectionId: specMeta.subsectionId || "",
+    evaluationType: specMeta.evaluationType || subsectionConfig.scoringMethod || "",
+    displayMode: specMeta.displayMode || buildDefaultDisplayMode(result),
+    usedForPersonalityType: Boolean(specMeta.requiredForPersonalityType),
+    ...result,
+  };
+  const interpretationPayload = buildSubsectionInterpretation(subsectionConfig, baseResult);
+
+  return {
+    ...baseResult,
+    interpretation: interpretationPayload.summary || baseResult.interpretation || "",
+    description: interpretationPayload.summary || baseResult.description || "",
+    interpretationItems: Array.isArray(interpretationPayload.items)
+      ? interpretationPayload.items
+      : [],
+  };
 };
 
 const likertToPercent = (avgValue) =>
@@ -233,6 +281,30 @@ const buildDefaultLikertBands = (factor = {}) => [
   },
 ];
 
+const buildSubjectPreferenceBands = (cluster = {}) => [
+  {
+    label: "High",
+    min: 4,
+    max: 5,
+    interpretation: `High preference for ${cluster.label || "this subject group"}.`,
+    careerImplication: "",
+  },
+  {
+    label: "Moderate",
+    min: 3,
+    max: 3.99,
+    interpretation: `Moderate preference for ${cluster.label || "this subject group"}.`,
+    careerImplication: "",
+  },
+  {
+    label: "Low",
+    min: 1,
+    max: 2.99,
+    interpretation: `Low preference for ${cluster.label || "this subject group"}.`,
+    careerImplication: "",
+  },
+];
+
 const buildFactorNarrative = (factor = {}, band = null) => {
   const label = getBandLabel(band);
   const bandInterpretation = getBandInterpretation(band);
@@ -360,6 +432,17 @@ const scoreCategoricalProfile = (subsectionConfig, questionMap, rules = []) => {
     .filter(([, count]) => count > 0);
   const [dominantKey, dominantCount] = rankedProfiles[0] || ["", 0];
   const dominantProfile = profileDictionary?.[dominantKey] || null;
+  const profileBreakdown = rankedProfiles.map(([profileKey, count]) => ({
+    key: profileKey,
+    label: profileDictionary?.[profileKey]?.label || profileKey,
+    count,
+    percentage: answeredCount ? roundPercent((count / answeredCount) * 100) : null,
+    interpretation: profileDictionary?.[profileKey]?.interpretation || "",
+    careerImplication: profileDictionary?.[profileKey]?.careerImplication || "",
+    highlights: Array.isArray(profileDictionary?.[profileKey]?.highlights)
+      ? profileDictionary[profileKey].highlights
+      : [],
+  }));
   const consistency = answeredCount
     ? roundPercent((dominantCount / answeredCount) * 100)
     : null;
@@ -385,9 +468,13 @@ const scoreCategoricalProfile = (subsectionConfig, questionMap, rules = []) => {
       answeredCount,
       uniqueQuestionCount(subsectionConfig.questionNumbers)
     ),
+    answeredCount,
+    totalQuestions: uniqueQuestionCount(subsectionConfig.questionNumbers),
     description:
       dominantProfile?.interpretation ||
       "No dominant preference pattern could be resolved from the answered options.",
+    dominantProfileKey: dominantKey || "",
+    profileBreakdown,
   };
 };
 
@@ -413,12 +500,17 @@ const scoreBandedLikertAverage = (subsectionConfig, questionMap) => {
     average: metrics.average,
     percentage: metrics.percentage,
     band: getBandLabel(band),
+    bandMin: band?.min == null ? null : Number(band.min),
+    bandMax: band?.max == null ? null : Number(band.max),
+    bandRangeLabel: buildBandRangeLabel(band, "average"),
     interpretation:
       getBandInterpretation(band) || "Interpretation unavailable for this subsection.",
     careerImplication: getBandCareerImplication(band),
     questionNumbers: subsectionConfig.questionNumbers,
     questionRangeLabel: buildQuestionRangeLabel(subsectionConfig.questionNumbers),
     status: metrics.status,
+    answeredCount: metrics.answeredCount,
+    totalQuestions: metrics.totalQuestions,
     description:
       getBandInterpretation(band) || "Interpretation unavailable for this subsection.",
   };
@@ -458,6 +550,9 @@ const scoreFactorProfile = (subsectionConfig, questionMap) => {
       average: metrics.average,
       percentage: metrics.percentage,
       band: getBandLabel(band),
+      bandMin: band?.min == null ? null : Number(band.min),
+      bandMax: band?.max == null ? null : Number(band.max),
+      bandRangeLabel: buildBandRangeLabel(band, "average"),
       interpretation: primaryInterpretation,
       careerImplication:
         getBandCareerImplication(band) || factor.careerImplication || "",
@@ -573,6 +668,8 @@ const scoreFactorProfile = (subsectionConfig, questionMap) => {
     questionNumbers: subsectionConfig.questionNumbers,
     questionRangeLabel: buildQuestionRangeLabel(subsectionConfig.questionNumbers),
     status: summarizeStatus(answeredCount, totalQuestions),
+    answeredCount,
+    totalQuestions,
     description: interpretation,
     factorResults,
   };
@@ -614,10 +711,29 @@ const SUBJECT_COMBINATION_MATCHERS = [
 const scoreSubjectClusterProfile = (subsectionConfig, questionMap) => {
   const clusterResults = (subsectionConfig.subjectClusters || []).map((cluster) => {
     const metrics = computeLikertMetrics(cluster.questionNumbers, questionMap);
+    const bandDefinitions = buildSubjectPreferenceBands(cluster);
+    const band = resolveInterpretationBand(metrics.average, bandDefinitions);
     return {
-      ...cluster,
+      id: `${subsectionConfig.key}.${cluster.key}`,
+      key: cluster.key,
+      label: cluster.label,
+      answerType: subsectionConfig.answerType,
+      scoreType: "average",
+      score: metrics.average,
+      rawScore: metrics.rawScore,
+      maxScore: 5,
       average: metrics.average,
       percentage: metrics.percentage,
+      band: getBandLabel(band),
+      bandMin: band?.min == null ? null : Number(band.min),
+      bandMax: band?.max == null ? null : Number(band.max),
+      bandRangeLabel: buildBandRangeLabel(band, "average"),
+      status: summarizeStatus(metrics.answeredCount, metrics.totalQuestions),
+      description: getBandInterpretation(band),
+      interpretation: getBandInterpretation(band),
+      careerImplication: "",
+      questionNumbers: cluster.questionNumbers,
+      questionRangeLabel: buildQuestionRangeLabel(cluster.questionNumbers || []),
       answeredCount: metrics.answeredCount,
       totalQuestions: metrics.totalQuestions,
     };
@@ -671,14 +787,21 @@ const scoreSubjectClusterProfile = (subsectionConfig, questionMap) => {
     maxScore: 5,
     average: averageScore,
     percentage: averageScore == null ? null : likertToPercent(averageScore),
-    band: clusterResults[0]?.label || "",
+    band: "",
+    bandMin: null,
+    bandMax: null,
+    bandRangeLabel: "",
     interpretation,
     careerImplication,
     questionNumbers: subsectionConfig.questionNumbers,
     questionRangeLabel: buildQuestionRangeLabel(subsectionConfig.questionNumbers),
     status: summarizeStatus(questionScores.length, uniqueQuestionCount(subsectionConfig.questionNumbers)),
+    answeredCount: questionScores.length,
+    totalQuestions: uniqueQuestionCount(subsectionConfig.questionNumbers),
     description: interpretation,
     clusterResults,
+    topSubjects,
+    combinationMatch: combinationMatch || null,
   };
 };
 
@@ -726,6 +849,9 @@ const scoreObjectiveSubsection = (subsectionConfig, questionMap) => {
     average: null,
     percentage: metrics.percentage,
     band: getBandLabel(band),
+    bandMin: band?.min == null ? null : Number(band.min),
+    bandMax: band?.max == null ? null : Number(band.max),
+    bandRangeLabel: buildBandRangeLabel(band, "score"),
     interpretation:
       getBandInterpretation(band) || "Interpretation unavailable for this aptitude block.",
     careerImplication: getBandCareerImplication(band),
@@ -740,24 +866,40 @@ const scoreObjectiveSubsection = (subsectionConfig, questionMap) => {
 };
 
 const scoreSubsection = (subsectionConfig, questionMap) => {
+  let result;
   switch (subsectionConfig.scoringMethod) {
     case "banded_likert_average":
-      return scoreBandedLikertAverage(subsectionConfig, questionMap);
+      result = scoreBandedLikertAverage(subsectionConfig, questionMap);
+      break;
     case "factor_profile":
-      return scoreFactorProfile(subsectionConfig, questionMap);
+      result = scoreFactorProfile(subsectionConfig, questionMap);
+      break;
     case "work_style_profile":
-      return scoreCategoricalProfile(subsectionConfig, questionMap);
+      result = scoreCategoricalProfile(subsectionConfig, questionMap);
+      break;
     case "subject_cluster_profile":
-      return scoreSubjectClusterProfile(subsectionConfig, questionMap);
+      result = scoreSubjectClusterProfile(subsectionConfig, questionMap);
+      break;
     case "interest_activity_profile":
-      return scoreCategoricalProfile(subsectionConfig, questionMap, ACTIVITY_OPTION_RULES);
+      result = scoreCategoricalProfile(
+        subsectionConfig,
+        questionMap,
+        ACTIVITY_OPTION_RULES
+      );
+      break;
     case "environment_profile":
-      return scoreCategoricalProfile(subsectionConfig, questionMap, ENVIRONMENT_OPTION_RULES);
+      result = scoreCategoricalProfile(
+        subsectionConfig,
+        questionMap,
+        ENVIRONMENT_OPTION_RULES
+      );
+      break;
     case "objective_correct":
     case "manual_review_only":
-      return scoreObjectiveSubsection(subsectionConfig, questionMap);
+      result = scoreObjectiveSubsection(subsectionConfig, questionMap);
+      break;
     default:
-      return {
+      result = {
         key: subsectionConfig.key,
         label: subsectionConfig.label,
         answerType: subsectionConfig.answerType,
@@ -775,19 +917,26 @@ const scoreSubsection = (subsectionConfig, questionMap) => {
         status: "incomplete",
         description: "Scoring method not implemented for this subsection.",
       };
+      break;
   }
+
+  return finalizeSubsectionResult(subsectionConfig, result);
 };
 
 const buildSectionInterpretation = (sectionResult) => {
   const completedSubsections = (sectionResult.subsections || []).filter(
     (item) => item.status !== "incomplete"
   );
-  const topSubsections = [...completedSubsections]
-    .filter((item) => item.percentage != null)
-    .sort((a, b) => Number(b.percentage || 0) - Number(a.percentage || 0))
-    .slice(0, 2);
+  const topFindings = completedSubsections
+    .flatMap((item) =>
+      (Array.isArray(item.interpretationItems) ? item.interpretationItems : [])
+        .slice(0, 1)
+        .map((entry) => entry.title)
+    )
+    .filter(Boolean)
+    .slice(0, 3);
 
-  if (!topSubsections.length) {
+  if (!topFindings.length) {
     return {
       interpretation: "Section-level interpretation is not available yet.",
       careerImplication: "",
@@ -795,11 +944,9 @@ const buildSectionInterpretation = (sectionResult) => {
   }
 
   return {
-    interpretation: `Strongest subsection signals: ${joinList(
-      topSubsections.map((item) => item.label)
-    )}.`,
+    interpretation: `Key findings: ${joinList(topFindings)}.`,
     careerImplication: joinList(
-      topSubsections.map((item) => item.careerImplication).filter(Boolean)
+      completedSubsections.map((item) => item.careerImplication).filter(Boolean).slice(0, 3)
     ),
   };
 };

@@ -8,6 +8,64 @@ const SUPPORTED_PACKAGE_IDS = new Set([
   DUMMY_TEST_PACKAGE_ID,
 ]);
 
+const SUPPORT_PAGE_KEYS = ["privacyPolicy", "termsOfService", "faqs"];
+
+const SUPPORT_PAGE_PATHS = {
+  privacyPolicy: "/privacy-policy",
+  termsOfService: "/terms-of-service",
+  faqs: "/faqs",
+};
+
+const normalizeTextItems = (items = []) =>
+  Array.isArray(items)
+    ? items.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
+
+const splitLegacyFaqItem = (value = "") => {
+  const text = String(value || "").trim();
+  if (!text) return null;
+
+  const questionBreakIndex = text.indexOf("? ");
+  if (questionBreakIndex >= 0) {
+    return {
+      heading: text.slice(0, questionBreakIndex + 1).trim(),
+      content: text.slice(questionBreakIndex + 2).trim(),
+    };
+  }
+
+  const colonBreakIndex = text.indexOf(": ");
+  if (colonBreakIndex >= 0) {
+    return {
+      heading: text.slice(0, colonBreakIndex).trim(),
+      content: text.slice(colonBreakIndex + 2).trim(),
+    };
+  }
+
+  return {
+    heading: text,
+    content: "",
+  };
+};
+
+const normalizeFaqItems = (faqItems = [], fallbackItems = []) => {
+  const normalizedFaqItems = Array.isArray(faqItems)
+    ? faqItems
+        .map((item) => ({
+          heading: String(item?.heading || "").trim(),
+          content: String(item?.content || "").trim(),
+        }))
+        .filter((item) => item.heading || item.content)
+    : [];
+
+  if (normalizedFaqItems.length) {
+    return normalizedFaqItems;
+  }
+
+  return normalizeTextItems(fallbackItems)
+    .map((item) => splitLegacyFaqItem(item))
+    .filter(Boolean);
+};
+
 const parseCsv = (raw = "") => {
   const rows = [];
   let row = [];
@@ -156,6 +214,35 @@ const getCfg = async () => AssessmentConfig.getOrCreateDefault();
 
 const findPackage = (cfg, packageId) => (cfg.packages || []).find((p) => p.id === packageId);
 
+const normalizeSupportPage = (page = {}, fallbackTitle = "", pageKey = "") => ({
+  enabled: page?.enabled !== false,
+  title: String(page?.title || fallbackTitle || "").trim(),
+  summary: String(page?.summary || "").trim(),
+  items: pageKey === "faqs" ? normalizeTextItems(page?.items) : normalizeTextItems(page?.items),
+  faqItems:
+    pageKey === "faqs" ? normalizeFaqItems(page?.faqItems, page?.items) : [],
+});
+
+const toPublicSupportPages = (cfg) =>
+  SUPPORT_PAGE_KEYS.reduce((acc, key) => {
+    const page = normalizeSupportPage(
+      cfg?.supportPages?.[key] || {},
+      key === "privacyPolicy"
+        ? "Privacy Policy"
+        : key === "termsOfService"
+          ? "Terms of Service"
+          : "FAQs",
+      key
+    );
+
+    acc[key] = {
+      key,
+      path: SUPPORT_PAGE_PATHS[key],
+      ...page,
+    };
+    return acc;
+  }, {});
+
 // GET /api/v1/public/config
 export const getPublicConfig = async (req, res) => {
   try {
@@ -163,9 +250,33 @@ export const getPublicConfig = async (req, res) => {
     const packages = (cfg.packages || [])
       .filter((p) => p.active !== false && getQuestionCount(p) > 0)
       .sort((a, b) => a.sortOrder - b.sortOrder);
-    return res.status(200).json({ success: true, data: { packages: packages.map(toPublicPackage) } });
+    return res.status(200).json({
+      success: true,
+      data: {
+        packages: packages.map(toPublicPackage),
+        supportPages: toPublicSupportPages(cfg),
+      },
+    });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message || "Failed to load config" });
+  }
+};
+
+// GET /api/v1/public/support-pages
+export const getPublicSupportPages = async (req, res) => {
+  try {
+    const cfg = await getCfg();
+    return res.status(200).json({
+      success: true,
+      data: {
+        pages: toPublicSupportPages(cfg),
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Failed to load support pages",
+    });
   }
 };
 
@@ -208,9 +319,50 @@ export const getPublicSectionQuestions = async (req, res) => {
 export const getAdminConfig = async (req, res) => {
   try {
     const cfg = await getCfg();
-    return res.status(200).json({ success: true, data: { key: cfg.key, packages: cfg.packages || [] } });
+    return res.status(200).json({
+      success: true,
+      data: {
+        key: cfg.key,
+        packages: cfg.packages || [],
+        supportPages: toPublicSupportPages(cfg),
+      },
+    });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message || "Failed to load admin config" });
+  }
+};
+
+// PUT /api/v1/admin/support-pages
+export const putAdminSupportPages = async (req, res) => {
+  try {
+    const rawPages = req.body?.supportPages || {};
+    const cfg = await getCfg();
+
+    SUPPORT_PAGE_KEYS.forEach((key) => {
+      const existingTitle =
+        cfg?.supportPages?.[key]?.title ||
+        (key === "privacyPolicy"
+          ? "Privacy Policy"
+          : key === "termsOfService"
+            ? "Terms of Service"
+            : "FAQs");
+
+      cfg.supportPages[key] = normalizeSupportPage(rawPages[key], existingTitle, key);
+    });
+
+    await cfg.save();
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        supportPages: toPublicSupportPages(cfg),
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Failed to save support pages",
+    });
   }
 };
 
