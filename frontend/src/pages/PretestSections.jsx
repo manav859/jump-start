@@ -175,10 +175,10 @@ export default function PretestSections() {
             return (
               <div
                 key={section.sectionId}
-                className="surface-card rounded-[28px] p-6"
+                className="surface-card flex h-full flex-col rounded-[28px] p-6"
               >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
+                <div className="flex items-start justify-between gap-5">
+                  <div className="flex-1">
                     <h2 className="text-2xl font-semibold text-[#0F1729]">
                       Section {section.sectionId}: {section.title}
                     </h2>
@@ -194,13 +194,13 @@ export default function PretestSections() {
                     </div>
                   </div>
                   <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${state.badgeClass}`}
+                    className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${state.badgeClass}`}
                   >
                     {state.label}
                   </span>
                 </div>
 
-                <div className="mt-5 rounded-2xl bg-[#F8FAFC] px-4 py-3 text-sm text-[#65758B]">
+                <div className="mt-5 flex-grow rounded-2xl bg-[#F8FAFC] px-4 py-3 text-sm text-[#65758B]">
                   Answered: {answeredCount} of {section.totalQuestions || 0}
                 </div>
 

@@ -16,6 +16,7 @@ import SectionBreakdownCard from "../../components/admin/SectionBreakdownCard";
 import ReviewActionBar from "../../components/admin/ReviewActionBar";
 import ResultStatusBadge from "../../components/admin/ResultStatusBadge";
 import { emitAdminNotificationsRefresh } from "../../utils/adminNotifications";
+import { ReviewSkeleton } from "../../components/admin/Skeletons";
 
 const chipClass =
   "rounded-full border border-[#D7E7EC] bg-white px-3 py-1 text-xs font-semibold text-[#4E5D72]";
@@ -102,11 +103,7 @@ export default function ReviewSubmission() {
   };
 
   if (loading) {
-    return (
-      <main className="mx-auto flex min-h-[70vh] max-w-[1440px] items-center justify-center px-6 py-8">
-        <p className="text-[#65758B]">Loading submission review...</p>
-      </main>
-    );
+    return <ReviewSkeleton />;
   }
 
   if (error && !detail) {

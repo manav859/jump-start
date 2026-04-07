@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Search, ChevronDown, Download, CreditCard, Smartphone } from "lucide-react";
 import api from "../../api/api";
+import { TableSkeleton } from "../../components/admin/Skeletons";
 
 const PaymentStatusBadge = ({ status }) => {
   const styles = {
@@ -12,6 +13,7 @@ const PaymentStatusBadge = ({ status }) => {
 
 const Payments = () => {
   const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState({
     totalRevenueLabel: "₹0",
     thisMonthLabel: "₹0",
@@ -29,7 +31,8 @@ const Payments = () => {
         setRows(res?.data?.data?.rows || []);
         setSummary(res?.data?.data?.summary || {});
       })
-      .catch((err) => console.error("Payments load failed:", err));
+      .catch((err) => console.error("Payments load failed:", err))
+      .finally(() => setLoading(false));
   }, []);
 
   const filteredPayments = useMemo(
@@ -121,7 +124,9 @@ const Payments = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {filteredPayments.length > 0 ? (
+              {loading ? (
+                <tr><td colSpan={8} className="p-0 border-none"><TableSkeleton rows={5} cols={8} /></td></tr>
+              ) : filteredPayments.length > 0 ? (
                 filteredPayments.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-5 text-xs font-bold text-gray-500 whitespace-nowrap">{item.id}</td>

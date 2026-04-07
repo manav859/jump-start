@@ -11,6 +11,7 @@ import api from "../../api/api";
 import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import ResultStatusBadge from "../../components/admin/ResultStatusBadge";
 import { emitAdminNotificationsRefresh } from "../../utils/adminNotifications";
+import { TableSkeleton } from "../../components/admin/Skeletons";
 
 export default function TestSubmissions() {
   const navigate = useNavigate();
@@ -175,11 +176,8 @@ export default function TestSubmissions() {
               <tbody className="divide-y divide-[#EEF3F6] bg-white">
                 {loading ? (
                   <tr>
-                    <td
-                      colSpan={6}
-                      className="px-6 py-10 text-center text-sm text-[#65758B]"
-                    >
-                      Loading submissions...
+                    <td colSpan={6} className="p-0 border-none">
+                      <TableSkeleton rows={5} cols={6} />
                     </td>
                   </tr>
                 ) : filteredRows.length === 0 ? (

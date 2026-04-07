@@ -40,7 +40,7 @@ const includedBenefits = [
   },
 ];
 
-const formatPrice = (amount) => `Rs ${Number(amount || 0).toLocaleString("en-IN")}`;
+const formatPrice = (amount) => `₹ ${Number(amount || 0).toLocaleString("en-IN")}`;
 
 const getPlanActionMeta = (plan) => {
   if (plan.ownershipStatus === "completed") {
@@ -283,7 +283,7 @@ export default function Test() {
                     <p className="mt-2 text-sm text-[#65758B]">{action.helperText}</p>
                   </div>
 
-                  <ul className="mt-8 space-y-3 text-sm text-[#475467]">
+                  <ul className="mt-8 space-y-3 text-sm text-[#475467] flex-grow">
                     {(plan.features || []).map((feature) => (
                       <li key={feature} className="flex items-start gap-3">
                         <span className="mt-0.5 rounded-full bg-[#E8F9F8] p-1 text-[#188B8B]">

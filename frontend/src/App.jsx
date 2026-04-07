@@ -7,8 +7,7 @@ import AdminLayout from "./layout/AdminLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const Home = lazy(() => import("./pages/Home"));
-const Login = lazy(() => import("./pages/Login"));
-const Signup = lazy(() => import("./pages/Signup"));
+const Auth = lazy(() => import("./pages/Auth"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Test = lazy(() => import("./pages/Test"));
 const Pretest = lazy(() => import("./pages/Pretest"));
@@ -56,8 +55,8 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       { path: "/", element: withSuspense(<Home />) },
-      { path: "/login", element: withSuspense(<Login />) },
-      { path: "/signup", element: withSuspense(<Signup />) },
+      { path: "/login", element: withSuspense(<Auth />) },
+      { path: "/signup", element: withSuspense(<Auth />) },
       { path: "/test", element: withSuspense(<Test />) },
       { path: "/pretest", element: protectedPage(<Pretest />) },
       { path: "/Pretest", element: protectedPage(<Pretest />) },

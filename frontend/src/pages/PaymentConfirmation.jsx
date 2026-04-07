@@ -12,8 +12,7 @@ import api from "../api/api";
 import { AuthContext } from "../context/AuthContext";
 import { GST_RATE } from "../data/testPackages";
 
-const formatPrice = (amount) =>
-  `Rs ${Number(amount || 0).toLocaleString("en-IN")}`;
+const formatPrice = (amount) => `₹ ${Number(amount || 0).toLocaleString("en-IN")}`;
 
 const formatDate = (isoString) => {
   const value = new Date(isoString);

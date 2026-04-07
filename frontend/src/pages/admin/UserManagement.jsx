@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Search, ChevronDown } from "lucide-react";
 import api from "../../api/api";
+import { TableSkeleton } from "../../components/admin/Skeletons";
 
 const SubscriptionBadge = ({ type }) => {
   const styles = {
@@ -127,7 +128,7 @@ const UserManagement = () => {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {loading ? (
-                <tr><td colSpan={8} className="px-6 py-12 text-center text-gray-400">Loading users...</td></tr>
+                <tr><td colSpan={8} className="p-0 border-none"><TableSkeleton rows={5} cols={8} /></td></tr>
               ) : filteredUsers.length > 0 ? (
                 filteredUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50/50 transition-colors group">

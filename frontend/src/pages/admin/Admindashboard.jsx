@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { TrendingUp, Plus, Percent, Download } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
 import api from "../../api/api";
+import { DashboardSkeleton } from "../../components/admin/Skeletons";
 
 const StatusBadge = ({ status }) => {
   const styles = {
@@ -10,7 +11,7 @@ const StatusBadge = ({ status }) => {
     "In Progress": "bg-orange-50 text-orange-600",
     Submitted: "bg-blue-50 text-blue-600",
   };
-  return <span className={`px-3 py-1 rounded-full text-xs font-semibold ${styles[status] || "bg-slate-100 text-slate-600"}`}>{status}</span>;
+  return <span className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${styles[status] || "bg-slate-100 text-slate-600"}`}>{status}</span>;
 };
 
 const AdminDashboard = () => {
@@ -32,7 +33,7 @@ const AdminDashboard = () => {
   }, []);
 
   if (loading) {
-    return <div className="p-8 text-gray-500">Loading admin dashboard...</div>;
+    return <DashboardSkeleton />;
   }
 
   return (
@@ -93,32 +94,35 @@ const AdminDashboard = () => {
         </div>
       </div>
 
+      {/* Recent Activity — scrollable on mobile */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden">
         <div className="p-6 border-b">
           <h3 className="text-lg font-bold">Recent Activity</h3>
         </div>
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-gray-400 uppercase">Time</th>
-              <th className="px-6 py-3 text-left text-gray-400 uppercase">User</th>
-              <th className="px-6 py-3 text-left text-gray-400 uppercase">Action</th>
-              <th className="px-6 py-3 text-left text-gray-400 uppercase">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {data.recentActivities.map((row) => (
-              <tr key={row.id}>
-                <td className="px-6 py-4 text-gray-500">{row.time}</td>
-                <td className="px-6 py-4 font-semibold">{row.user}</td>
-                <td className="px-6 py-4">{row.action}</td>
-                <td className="px-6 py-4">
-                  <StatusBadge status={row.status} />
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[600px] text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-gray-400 uppercase">Time</th>
+                <th className="px-6 py-3 text-left text-gray-400 uppercase">User</th>
+                <th className="px-6 py-3 text-left text-gray-400 uppercase">Action</th>
+                <th className="px-6 py-3 text-left text-gray-400 uppercase">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y">
+              {data.recentActivities.map((row) => (
+                <tr key={row.id}>
+                  <td className="px-6 py-4 text-gray-500 whitespace-nowrap">{row.time}</td>
+                  <td className="px-6 py-4 font-semibold whitespace-nowrap">{row.user}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{row.action}</td>
+                  <td className="px-6 py-4">
+                    <StatusBadge status={row.status} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-50">

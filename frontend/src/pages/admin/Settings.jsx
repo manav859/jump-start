@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import api from "../../api/api";
+import { SettingsSkeleton } from "../../components/admin/Skeletons";
 
 const blankPackage = {
   id: "",
@@ -381,7 +382,7 @@ export default function Settings() {
       .finally(() => setSyncing(""));
   };
 
-  if (loading) return <div className="p-6 md:p-8">Loading settings...</div>;
+  if (loading) return <SettingsSkeleton />;
 
   return (
     <div className="p-6 md:p-8 max-w-[1280px] mx-auto w-full flex flex-col gap-6">
