@@ -231,15 +231,13 @@ const APTITUDE_GROUPS = [
     key: "spatialRelations",
     label: "Spatial Relations",
     description: "Visualizing shapes, rotations, folding, and three-dimensional relationships.",
-    fromQuestionId: 366,
-    toQuestionId: 390,
+    questionIds: Array.from({ length: 25 }, (_, index) => 366 + index),
   },
   {
     key: "mechanicalReasoning",
     label: "Mechanical Reasoning",
     description: "Understanding gears, pulleys, force, motion, and physical systems.",
-    fromQuestionId: 391,
-    toQuestionId: 410,
+    questionIds: Array.from({ length: 20 }, (_, index) => 391 + index),
   },
   {
     key: "clericalAccuracy",
@@ -263,6 +261,11 @@ const APTITUDE_GROUPS = [
     toQuestionId: 450,
   },
 ];
+
+const aptitudeGroupIncludesQuestion = (group = {}, questionId) =>
+  Array.isArray(group.questionIds) && group.questionIds.length
+    ? group.questionIds.includes(questionId)
+    : questionId >= group.fromQuestionId && questionId <= group.toQuestionId;
 
 const INTEREST_THEME_LABELS = {
   realistic: "Practical Interests",
@@ -738,7 +741,7 @@ const computeAptitudeScores = (section, answers) =>
 
     (section?.questions || []).forEach((question, questionIndex) => {
       const questionId = getQuestionId(question, questionIndex);
-      if (questionId < group.fromQuestionId || questionId > group.toQuestionId) return;
+      if (!aptitudeGroupIncludesQuestion(group, questionId)) return;
       questionCount += 1;
       const rawAnswer = String(
         answers[getAnswerKey(section.sectionId, questionIndex)] || ""

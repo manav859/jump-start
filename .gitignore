@@ -15,6 +15,7 @@
 *.log
 *.pid
 tmp-*.txt
+tmp-chrome-profile*
 backend-server*.log
 
 # OS and editor noise

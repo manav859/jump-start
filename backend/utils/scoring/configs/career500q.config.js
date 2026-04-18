@@ -1,6 +1,9 @@
 const range = (start, end) =>
   Array.from({ length: end - start + 1 }, (_, index) => start + index);
 
+const SPATIAL_RELATION_QUESTION_NUMBERS = range(366, 390);
+const MECHANICAL_REASONING_QUESTION_NUMBERS = range(391, 410);
+
 const likertBands = ({ high, moderate, low }) => [
   {
     label: "High",
@@ -37,7 +40,7 @@ export const CAREER_500Q_CONFIG = {
   ],
   ambiguityNotes: [
     "Leadership subsection 1.4 intentionally cross-references EQ questions 491, 498, 499, and 500 in the scoring guide.",
-    "Spatial Relations 4.4 does not include machine-readable answer keys in the PDF export; it is flagged for review-only handling.",
+    "Spatial Relations 4.4 now uses explicit PDF-backed overrides from backend/config/spatialPdfQuestionBank.js for the booklet-aligned Q76-Q100 live range.",
     "The current generated package still stores section 1.2 and 1.3 booklet prompts without the full A/B/C option metadata from the PDF, so those blocks need a seed/package refresh for fully exact live capture.",
     "Work Style 1.3 and Interest subsections 3.3/3.4 provide summary interpretation guidance in the PDF rather than full per-question scoring keys, so those blocks use package-specific explicit profile routing informed by the booklet wording.",
   ],
@@ -1031,30 +1034,28 @@ export const CAREER_500Q_CONFIG = {
           key: "spatial_relations",
           label: "4.4 Spatial Relations",
           displayOrder: 4,
-          questionNumbers: range(366, 390),
+          questionNumbers: SPATIAL_RELATION_QUESTION_NUMBERS,
           answerType: "single",
-          scoringMethod: "manual_review_only",
-          scoreType: "review_only",
-          reviewNote:
-            "The answer-key PDF only provides conceptual scoring principles for these diagram items; machine scoring is intentionally disabled until diagram-level keys are available.",
+          scoringMethod: "objective_correct",
+          scoreType: "correct_count",
           bands: objectiveBands([
             {
               label: "Strong",
-              min: 20,
-              max: 25,
+              min: 21,
+              max: 26,
               interpretation: "Strong spatial ability.",
               careerImplication: "Architecture, engineering, surgery, design",
             },
             {
               label: "Good",
               min: 16,
-              max: 19,
+              max: 20,
               interpretation: "Good spatial skills.",
               careerImplication: "Technical fields, trades, visual arts",
             },
             {
               label: "Average",
-              min: 12,
+              min: 11,
               max: 15,
               interpretation: "Average spatial ability.",
               careerImplication: "General professional work",
@@ -1062,7 +1063,7 @@ export const CAREER_500Q_CONFIG = {
             {
               label: "Developing",
               min: 0,
-              max: 11,
+              max: 10,
               interpretation: "Spatial reasoning appears less established in the current evidence.",
               careerImplication:
                 "Focus on verbal or numerical strengths in humanities, business, or service work",
@@ -1073,36 +1074,36 @@ export const CAREER_500Q_CONFIG = {
           key: "mechanical_reasoning",
           label: "4.5 Mechanical Reasoning",
           displayOrder: 5,
-          questionNumbers: range(391, 410),
+          questionNumbers: MECHANICAL_REASONING_QUESTION_NUMBERS,
           answerType: "single",
           scoringMethod: "objective_correct",
           scoreType: "correct_count",
           bands: objectiveBands([
             {
               label: "Strong",
-              min: 16,
-              max: 20,
+              min: 15,
+              max: 19,
               interpretation: "Strong mechanical aptitude.",
               careerImplication: "Engineering, trades, technical fields",
             },
             {
               label: "Good",
-              min: 13,
-              max: 15,
+              min: 12,
+              max: 14,
               interpretation: "Good mechanical understanding.",
               careerImplication: "Applied technology, maintenance",
             },
             {
               label: "Average",
-              min: 10,
-              max: 12,
+              min: 9,
+              max: 11,
               interpretation: "Average mechanical sense.",
               careerImplication: "General technical work",
             },
             {
               label: "Developing",
               min: 0,
-              max: 9,
+              max: 8,
               interpretation: "Mechanical systems are not yet the strongest aptitude area.",
               careerImplication: "Service, arts, business, and non-mechanical fields",
             },

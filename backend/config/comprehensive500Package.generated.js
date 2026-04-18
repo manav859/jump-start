@@ -3558,7 +3558,7 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "316",
-          "text": "If 3x + 7 22, then x equals:",
+          "text": "If 3x + 7 = 22, then x equals:",
           "type": "single",
           "options": [
             "3",
@@ -3614,7 +3614,7 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "320",
-          "text": "The ratio of boys to girls in a class is 3 4. If there are 28 students total, how many are boys?",
+          "text": "The ratio of boys to girls in a class is 3:4. If there are 28 students total, how many are boys?",
           "type": "single",
           "options": [
             "12",
@@ -3670,7 +3670,7 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "324",
-          "text": "If 4y - 3 2y + 11, then y equals:",
+          "text": "If 4y - 3 = 2y + 11, then y equals:",
           "type": "single",
           "options": [
             "6",
@@ -3698,7 +3698,7 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "326",
-          "text": "What is 3/4 2/5?",
+          "text": "What is (3/4) × (2/5)?",
           "type": "single",
           "options": [
             "3/10",
@@ -3740,7 +3740,7 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "329",
-          "text": "If 5x + 3 3x + 15, then x equals:",
+          "text": "If 5x + 3 = 3x + 15, then x equals:",
           "type": "single",
           "options": [
             "4",
@@ -3754,7 +3754,7 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "330",
-          "text": "A circle has radius 5. What is its area? Use π = 3.14)",
+          "text": "A circle has radius 5. What is its area? (Use π = 3.14)",
           "type": "single",
           "options": [
             "78.5",
@@ -3824,7 +3824,7 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "335",
-          "text": "What is 2/3 1/4?",
+          "text": "What is (2/3) + (1/4)?",
           "type": "single",
           "options": [
             "3/7",
@@ -3838,7 +3838,7 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "336",
-          "text": "If 6x - 4 2x + 12, then x equals:",
+          "text": "If 6x - 4 = 2x + 12, then x equals:",
           "type": "single",
           "options": [
             "3",
@@ -3880,7 +3880,7 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "339",
-          "text": "If 7y + 2 5y + 18, then y equals:",
+          "text": "If 7y + 2 = 5y + 18, then y equals:",
           "type": "single",
           "options": [
             "6",
@@ -4258,7 +4258,7 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "366",
-          "text": "Which shape can be folded to make a cube? Description: Shows 4 different net patterns]",
+          "text": "When put together, what 3-dimensional shape will you get?",
           "type": "single",
           "options": [
             "Pattern A",
@@ -4266,13 +4266,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Pattern C",
             "Pattern D"
           ],
-          "correctOption": "",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "367",
-          "text": "If you rotate this shape 90° clockwise: L What does it become?",
+          "text": "When folded, what pattern is possible?",
           "type": "single",
           "options": [
             "⅃",
@@ -4280,13 +4280,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "⌐",
             "└"
           ],
-          "correctOption": "",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "368",
-          "text": "Which view shows the object from the top? Description: 3D object with 4 view options]",
+          "text": "Which figure represents the assembly of the following pieces?",
           "type": "single",
           "options": [
             "View A",
@@ -4294,13 +4294,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "View C",
             "View D"
           ],
-          "correctOption": "",
+          "correctOption": "D",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "369",
-          "text": "How many blocks are needed to build this structure? Description: 3D block structure]",
+          "text": "Which cube is obtained by folding the shape below?",
           "type": "single",
           "options": [
             "6",
@@ -4308,13 +4308,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "8",
             "9"
           ],
-          "correctOption": "",
+          "correctOption": "D",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "370",
-          "text": "Which piece completes the puzzle? Description: Jigsaw puzzle with missing piece]",
+          "text": "Which cube is obtained by folding the shape below?",
           "type": "single",
           "options": [
             "Piece A",
@@ -4322,13 +4322,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Piece C",
             "Piece D"
           ],
-          "correctOption": "",
+          "correctOption": "D",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "371",
-          "text": "If you flip this shape horizontally: P What does it become?",
+          "text": "Which cube cannot be made based on the unfolded cube?",
           "type": "single",
           "options": [
             "P",
@@ -4336,13 +4336,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "b",
             "d"
           ],
-          "correctOption": "",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "372",
-          "text": "Which shadow matches this object? Description: 3D object with 4 shadow options]",
+          "text": "Which cube cannot be made based on the unfolded cube?",
           "type": "single",
           "options": [
             "Shadow A",
@@ -4350,13 +4350,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Shadow C",
             "Shadow D"
           ],
-          "correctOption": "",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "373",
-          "text": "How many cubes are in this stack? Description: 3D cube arrangement]",
+          "text": "Which figure is a rotation of the object?",
           "type": "single",
           "options": [
             "12",
@@ -4364,13 +4364,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "14",
             "15"
           ],
-          "correctOption": "",
+          "correctOption": "D",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "374",
-          "text": "Which figure is the same as the first one rotated? Description: Reference shape with 4 rotated options]",
+          "text": "Which figure is a rotation of the object?",
           "type": "single",
           "options": [
             "Figure A",
@@ -4378,13 +4378,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Figure C",
             "Figure D"
           ],
-          "correctOption": "",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "375",
-          "text": "If you unfold this cube, which pattern do you get? Description: Cube with 4 net patterns]",
+          "text": "Which figure is a rotation of the given object?",
           "type": "single",
           "options": [
             "Net A",
@@ -4392,13 +4392,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Net C",
             "Net D"
           ],
-          "correctOption": "",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "376",
-          "text": "Which piece fits in the blank space? Description: Pattern with missing section]",
+          "text": "Which figure is a top-down view of the given shape?",
           "type": "single",
           "options": [
             "Piece A",
@@ -4406,13 +4406,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Piece C",
             "Piece D"
           ],
-          "correctOption": "",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "377",
-          "text": "From which angle is this object viewed? Description: 3D object view]",
+          "text": "Which figure fits the given object, in order to make a cube?",
           "type": "single",
           "options": [
             "Front",
@@ -4420,13 +4420,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Left",
             "Right"
           ],
-          "correctOption": "",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "378",
-          "text": "How many faces does this shape have? Description: 3D geometric shape]",
+          "text": "Which figure fits the given object using rotation only, in order to make a square?",
           "type": "single",
           "options": [
             "5",
@@ -4434,13 +4434,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "7",
             "8"
           ],
-          "correctOption": "",
+          "correctOption": "D",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "379",
-          "text": "Which shape is identical to the sample? Description: Reference shape with options]",
+          "text": "Which cube cannot be made based on the unfolded cube?",
           "type": "single",
           "options": [
             "Shape A",
@@ -4448,13 +4448,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Shape C",
             "Shape D"
           ],
-          "correctOption": "",
+          "correctOption": "D",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "380",
-          "text": "If you rotate this 180°: ◄ What does it become?",
+          "text": "Which piece corresponds to the given solid?",
           "type": "single",
           "options": [
             "►",
@@ -4462,13 +4462,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "▼",
             "◄"
           ],
-          "correctOption": "",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "381",
-          "text": "Which cross-section would you get cutting this shape? Description: 3D shape with cutting plane]",
+          "text": "Which figure is the rotation of object?",
           "type": "single",
           "options": [
             "Circle",
@@ -4476,13 +4476,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Triangle",
             "Rectangle"
           ],
-          "correctOption": "",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "382",
-          "text": "How many edges does a cube have?",
+          "text": "Which figure is the rotation of the object?",
           "type": "single",
           "options": [
             "6",
@@ -4490,13 +4490,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "10",
             "12"
           ],
-          "correctOption": "",
+          "correctOption": "D",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "383",
-          "text": "Which figure shows the object from below? Description: 3D object with view options]",
+          "text": "Which of the 4 figures presented (A, B, C, D) is a rotation of the first?",
           "type": "single",
           "options": [
             "View A",
@@ -4504,13 +4504,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "View C",
             "View D"
           ],
-          "correctOption": "",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "384",
-          "text": "If these shapes overlap, what do you see? Description: Two overlapping shapes]",
+          "text": "Which piece corresponds to the given solid?",
           "type": "single",
           "options": [
             "Result A",
@@ -4518,13 +4518,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Result C",
             "Result D"
           ],
-          "correctOption": "",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "385",
-          "text": "Which way should you turn to face north if you're facing east?",
+          "text": "Which piece corresponds to the given solid?",
           "type": "single",
           "options": [
             "Turn left 90°",
@@ -4532,13 +4532,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Turn 180°",
             "Don't turn"
           ],
-          "correctOption": "",
+          "correctOption": "D",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "386",
-          "text": "How many vertices does this shape have? Description: 3D geometric shape]",
+          "text": "Which object can be made by folding the given shape?",
           "type": "single",
           "options": [
             "6",
@@ -4546,13 +4546,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "10",
             "12"
           ],
-          "correctOption": "",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "387",
-          "text": "Which pattern continues this sequence? Description: Spatial pattern sequence]",
+          "text": "Which figure can be formed using 2D rotation?",
           "type": "single",
           "options": [
             "Pattern A",
@@ -4560,13 +4560,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Pattern C",
             "Pattern D"
           ],
-          "correctOption": "",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "388",
-          "text": "If you fold this paper along the dotted line, where does point X end up? Description: Paper folding diagram]",
+          "text": "Which figure can be formed with the given pieces?",
           "type": "single",
           "options": [
             "Position A",
@@ -4574,13 +4574,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Position C",
             "Position D"
           ],
-          "correctOption": "",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "389",
-          "text": "Which 3D shape can be made from this pattern? Description: 2D net pattern]",
+          "text": "To which object does the given top view correspond?",
           "type": "single",
           "options": [
             "Cone",
@@ -4588,13 +4588,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Pyramid",
             "Prism"
           ],
-          "correctOption": "",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "390",
-          "text": "How many different ways can you arrange these 3 blocks? Description: 3 identical blocks]",
+          "text": "Which figure is a vertical reflection across the x axis?",
           "type": "single",
           "options": [
             "1",
@@ -4602,7 +4602,7 @@ const COMPREHENSIVE_500_PACKAGE = {
             "3",
             "6"
           ],
-          "correctOption": "",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 0.1
         },
@@ -4748,7 +4748,7 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "421",
-          "text": "Mark identical times. 1. 10 45 AM / 10 45 AM 2. 02 30 PM / 02 30 PM 3. 08 15 AM / 08 51 AM 4. 11 20 PM / 11 20 PM",
+          "text": "Mark identical times. 1. 10:45 AM / 10:45 AM 2. 02:30 PM / 02:30 PM 3. 08:15 AM / 08:51 AM 4. 11:20 PM / 11:20 PM",
           "type": "single",
           "options": [
             "Pairs 1 and 3 are identical.",
@@ -4888,41 +4888,38 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "391",
-          "text": "If gear A turns clockwise, which direction will gear B turn? Description: Two connected gears]",
+          "text": "If the weight of each pulley is equal to the load, what is the ratio between the pulling force F and the load L? (F / L = ?)",
           "type": "single",
           "options": [
-            "Clockwise",
-            "Counterclockwise",
-            "Won't turn",
-            "Both directions"
-          ],
-          "correctOption": "B",
-          "reverseScored": false,
-          "weight": 1
-        },
-        {
-          "questionId": "392",
-          "text": "Which lever arrangement requires the least force to lift the weight? Description: Three lever diagrams with different fulcrum positions]",
-          "type": "single",
-          "options": [
-            "Lever A",
-            "Lever B",
-            "Lever C",
-            "All equal"
+            "1/4",
+            "1/8",
+            "1"
           ],
           "correctOption": "C",
           "reverseScored": false,
           "weight": 1
         },
         {
-          "questionId": "393",
-          "text": "If you push down on this end, what happens to the other end? Description: Simple lever system]",
+          "questionId": "392",
+          "text": "How many revolutions does the wheel M make when K completes 4 revolutions?",
           "type": "single",
           "options": [
-            "Goes up",
-            "Goes down",
-            "Stays same",
-            "Moves sideways"
+            "1",
+            "2",
+            "4"
+          ],
+          "correctOption": "A",
+          "reverseScored": false,
+          "weight": 1
+        },
+        {
+          "questionId": "393",
+          "text": "Which statement is WRONG about springs?",
+          "type": "single",
+          "options": [
+            "Springs are a kind of simple machines",
+            "Springs can be used as energy stores",
+            "Springs constant depends on the properties of material they are made of"
           ],
           "correctOption": "A",
           "reverseScored": false,
@@ -4930,13 +4927,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "394",
-          "text": "Which pulley system gives the greatest mechanical advantage? Description: Three pulley arrangements]",
+          "text": "How many inches must one pull the rope down in order to lift the load in the figure by 28 inches?",
           "type": "single",
           "options": [
-            "System A",
-            "System B",
-            "System C",
-            "All equal"
+            "14 in",
+            "28 in",
+            "56 in"
           ],
           "correctOption": "C",
           "reverseScored": false,
@@ -4944,69 +4940,64 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "395",
-          "text": "What will happen if you turn the handle clockwise? Description: Gear and handle mechanism]",
+          "text": "Electrons in a circuit flow from a place where there are __?__ electrons to a place where there are __?__ electrons.",
           "type": "single",
           "options": [
-            "Weight goes up",
-            "Weight goes down",
-            "No movement",
-            "Handle breaks"
+            "Less, More",
+            "Many, No",
+            "More, Less"
           ],
-          "correctOption": "A",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 1
         },
         {
           "questionId": "396",
-          "text": "Which inclined plane requires less force to move the box? Description: Two ramps with different angles]",
+          "text": "We use __?__ to measure a specific gas pressure.",
           "type": "single",
           "options": [
-            "Steep ramp",
-            "Gentle ramp",
-            "Same force",
-            "Can't determine"
+            "Barometer",
+            "Thermometer",
+            "Manometer"
           ],
-          "correctOption": "B",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 1
         },
         {
           "questionId": "397",
-          "text": "If water flows into this container, which section fills first? Description: Connected container system]",
+          "text": "Which term is NOT related to gears?",
           "type": "single",
           "options": [
-            "Section A",
-            "Section B",
-            "Section C",
-            "All at once"
+            "Cogwheel",
+            "Pinion",
+            "Rack"
           ],
-          "correctOption": "B",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 1
         },
         {
           "questionId": "398",
-          "text": "Which wheel will turn faster? Description: Belt and pulley system with different sized wheels]",
+          "text": "A screw is a combination of:",
           "type": "single",
           "options": [
-            "Large wheel",
-            "Small wheel",
-            "Same speed",
-            "Neither turns"
+            "Nail and wedge",
+            "Inclined plane and wedge",
+            "Inclined plane and cylinder"
           ],
-          "correctOption": "B",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 1
         },
         {
           "questionId": "399",
-          "text": "What's the mechanical advantage of this lever? Description: Lever with measurements]",
+          "text": "Which of the following materials can become a magnet?",
           "type": "single",
           "options": [
-            "1 1",
-            "2 1",
-            "3 1",
-            "4 1"
+            "Aluminum",
+            "Copper",
+            "Zinc"
           ],
           "correctOption": "C",
           "reverseScored": false,
@@ -5014,41 +5005,38 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "400",
-          "text": "If you turn this screw clockwise, what happens? Description: Screw mechanism]",
+          "text": "If the big wheel (A) turns 3 times at clockwise direction, how many times and in which direction does the small one (B) turn?",
           "type": "single",
           "options": [
-            "Goes in",
-            "Comes out",
-            "No change",
-            "Breaks"
+            "3 times counter-clockwise",
+            "6 times counter-clockwise",
+            "6 times clockwise"
           ],
-          "correctOption": "A",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 1
         },
         {
           "questionId": "401",
-          "text": "Which spring will compress the most under the same weight? Description: Three springs with different characteristics]",
+          "text": "What happens to the current passing through the main branch in the circuit shown in the figure if one of the bulbs smashes?",
           "type": "single",
           "options": [
-            "Spring A",
-            "Spring B",
-            "Spring C",
-            "All equal"
+            "It becomes zero",
+            "It doubles",
+            "It decreases by a factor of 1.5"
           ],
-          "correctOption": "B",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 1
         },
         {
           "questionId": "402",
-          "text": "What direction will the ball roll? Description: Inclined surface with ball]",
+          "text": "If gear A rotates in the clockwise direction, what will the direction of wheels B, C and D be?",
           "type": "single",
           "options": [
-            "Left",
-            "Right",
-            "Won't move",
-            "Up"
+            "B clockwise, C clockwise, D counter-clockwise",
+            "B counter-clockwise, C clockwise, D clockwise",
+            "B counter-clockwise, C counter-clockwise, D counter-clockwise"
           ],
           "correctOption": "B",
           "reverseScored": false,
@@ -5056,13 +5044,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "403",
-          "text": "Which gear will turn the fastest? Description: Gear train with different sized gears]",
+          "text": "Which of the following does NOT use magnetism to operate?",
           "type": "single",
           "options": [
-            "Gear A",
-            "Gear B",
-            "Gear C",
-            "Same speed"
+            "Compass",
+            "NMR apparatus",
+            "Vehicle"
           ],
           "correctOption": "C",
           "reverseScored": false,
@@ -5070,13 +5057,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "404",
-          "text": "If you heat this metal rod, what happens to its length?",
+          "text": "Belts usually are made from materials that __?__ friction.",
           "type": "single",
           "options": [
-            "Gets longer",
-            "Gets shorter",
-            "Stays same",
-            "Depends on metal"
+            "Increase",
+            "Reduce",
+            "Don't change"
           ],
           "correctOption": "A",
           "reverseScored": false,
@@ -5084,85 +5070,79 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "405",
-          "text": "Which bottle will empty faster if both caps are removed? Description: Two bottles with different neck sizes]",
+          "text": "Which statement about levers is CORRECT?",
           "type": "single",
           "options": [
-            "Wide neck",
-            "Narrow neck",
-            "Same rate",
-            "Neither empties"
+            "All levers have the same value of mechanical advantage",
+            "A lever is a kind of simple machine",
+            "Crowbar is an example of third class levers"
           ],
-          "correctOption": "A",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 1
         },
         {
           "questionId": "406",
-          "text": "What force is needed to balance this see-saw? Description: See-saw with weights and distances marked]",
+          "text": "What would happen to the distance Earth-Sun if one year became 400 days without any change in the gravitational force?",
           "type": "single",
           "options": [
-            "10 lbs",
-            "15 lbs",
-            "20 lbs",
-            "25 lbs"
+            "Distance would increase",
+            "Distance would decrease",
+            "Distance would remain the same"
           ],
-          "correctOption": "C",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 1
         },
         {
           "questionId": "407",
-          "text": "Which pendulum will swing faster? Description: Two pendulums with different lengths]",
+          "text": "Centripetal force is proportional to…",
           "type": "single",
           "options": [
-            "Long pendulum",
-            "Short pendulum",
-            "Same speed",
-            "Neither swings"
+            "Radius of curvature",
+            "Mass of the rotating object",
+            "Speed of rotation"
           ],
-          "correctOption": "B",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 1
         },
         {
           "questionId": "408",
-          "text": "If you compress this spring, what happens to its potential energy?",
+          "text": "Which statement is CORRECT?",
           "type": "single",
           "options": [
-            "Increases",
-            "Decreases",
-            "Stays same",
-            "Becomes kinetic"
-          ],
-          "correctOption": "A",
-          "reverseScored": false,
-          "weight": 1
-        },
-        {
-          "questionId": "409",
-          "text": "Which ramp will the ball reach the bottom fastest? Description: Two ramps with different shapes]",
-          "type": "single",
-          "options": [
-            "Straight ramp",
-            "Curved ramp",
-            "Same time",
-            "Ball won't roll"
+            "Linear motion is a special case of circular motion",
+            "Circular motion is a special case of linear motion",
+            "When linear motion stops, circular motion begins"
           ],
           "correctOption": "B",
           "reverseScored": false,
           "weight": 1
         },
         {
-          "questionId": "410",
-          "text": "What happens when you mix hot and cold water?",
+          "questionId": "409",
+          "text": "Which statement below is WRONG about springs?",
           "type": "single",
           "options": [
-            "Temperature equalizes",
-            "Hot water rises",
-            "Cold water rises",
-            "No mixing"
+            "Springs are simple machines as they make the object move",
+            "The extension or compression of springs always occur in the direction of the applied force",
+            "To increase the elasticity of a system of springs, we must combine them in series"
           ],
           "correctOption": "A",
+          "reverseScored": false,
+          "weight": 1
+        },
+        {
+          "questionId": "410",
+          "text": "Why can we not use the equation P = rho * g * h for calculating the air pressure at a height h taking as a reference level the upper part of the atmosphere?",
+          "type": "single",
+          "options": [
+            "Because the atmosphere is very thick",
+            "Because the density of the atmosphere is not uniform",
+            "Because the atmosphere is not a fluid"
+          ],
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 1
         },
@@ -5350,13 +5330,13 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "444",
-          "text": "A clock shows the correct time at noon. If it runs fast by 2 minutes every hour, what time will it show when the actual time is 6 00 PM?",
+          "text": "A clock shows the correct time at noon. If it runs fast by 2 minutes every hour, what time will it show when the actual time is 6:00 PM?",
           "type": "single",
           "options": [
-            "6 10 PM",
-            "6 12 PM",
-            "6 14 PM",
-            "6 16 PM"
+            "6:10 PM",
+            "6:12 PM",
+            "6:14 PM",
+            "6:16 PM"
           ],
           "correctOption": "B",
           "reverseScored": false,
@@ -5434,13 +5414,13 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "450",
-          "text": "A train leaves New York at 3 00 PM traveling 60 mph. Another train leaves Boston at 4 00 PM traveling 80 mph toward New York. If the cities are 200 miles apart, when will the trains meet?",
+          "text": "A train leaves New York at 3:00 PM traveling 60 mph. Another train leaves Boston at 4:00 PM traveling 80 mph toward New York. If the cities are 200 miles apart, when will the trains meet?",
           "type": "single",
           "options": [
-            "5 00 PM",
-            "5 30 PM",
-            "6 00 PM",
-            "6 30 PM"
+            "5:00 PM",
+            "5:30 PM",
+            "6:00 PM",
+            "6:30 PM"
           ],
           "correctOption": "A",
           "reverseScored": false,

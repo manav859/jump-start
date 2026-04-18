@@ -12,6 +12,7 @@
     "db:down": "docker compose down",
     "db:logs": "docker compose logs -f mongo",
     "generate:assessment-500": "node scripts/generateComprehensive500Package.mjs",
+    "repair:section4": "node scripts/repairSection4QuestionBank.mjs",
     "enrich:personality-csv": "node scripts/enrichPersonalityCsv.mjs",
     "smoke:career-500q": "node scripts/smokeCareer500qScoring.mjs",
     "seed:assessment": "node scripts/seedAssessmentFromJson.mjs",

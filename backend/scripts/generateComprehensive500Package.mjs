@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { PDFParse } from "pdf-parse";
 import { applyPersonalityMetadataToQuestions } from "../utils/personalityQuestionMetadata.js";
+import { LIVE_SPATIAL_RELATIONS_OVERRIDES } from "../config/spatialPdfQuestionBank.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -449,6 +450,228 @@ const parseClericalQuestions = (lines, startQuestionId) => {
 };
 
 const buildSection4Questions = (aptitudeLines, answerKeyLines) => {
+  const normalizeTimeValues = (value = "") =>
+    String(value).replace(
+      /\b(\d{1,2})\s+(\d{2})\s*(AM|PM)\b/gi,
+      (_match, hours, minutes, meridiem) =>
+        `${hours}:${minutes} ${String(meridiem).toUpperCase()}`
+    );
+  const normalizeQuestionTimes = (question = {}) => ({
+    ...question,
+    text: normalizeTimeValues(question.text || ""),
+    options: Array.isArray(question.options)
+      ? question.options.map((option) => normalizeTimeValues(option))
+      : [],
+  });
+
+  const spatialRelationsOverrides = LIVE_SPATIAL_RELATIONS_OVERRIDES;
+
+  if (spatialRelationsOverrides.length !== 25) {
+    throw new Error(
+      `Spatial Relations overrides expected 25 core live questions, got ${spatialRelationsOverrides.length}`
+    );
+  }
+  const numericalAbilityOverrides = [
+    {
+      text: "If 3x + 7 = 22, then x equals:",
+    },
+    null,
+    null,
+    null,
+    {
+      text:
+        "The ratio of boys to girls in a class is 3:4. If there are 28 students total, how many are boys?",
+    },
+    null,
+    null,
+    null,
+    {
+      text: "If 4y - 3 = 2y + 11, then y equals:",
+    },
+    null,
+    {
+      text: "What is (3/4) × (2/5)?",
+    },
+    null,
+    null,
+    {
+      text: "If 5x + 3 = 3x + 15, then x equals:",
+    },
+    {
+      text: "A circle has radius 5. What is its area? (Use π = 3.14)",
+    },
+    null,
+    null,
+    null,
+    null,
+    {
+      text: "What is (2/3) + (1/4)?",
+    },
+    {
+      text: "If 6x - 4 = 2x + 12, then x equals:",
+    },
+    null,
+    null,
+    {
+      text: "If 7y + 2 = 5y + 18, then y equals:",
+    },
+    null,
+  ];
+  const mechanicalReasoningOverrides = [
+    {
+      text:
+        "If the weight of each pulley is equal to the load, what is the ratio between the pulling force F and the load L? (F / L = ?)",
+      options: ["1/4", "1/8", "1"],
+      correctOption: "C",
+    },
+    {
+      text: "How many revolutions does the wheel M make when K completes 4 revolutions?",
+      options: ["1", "2", "4"],
+      correctOption: "A",
+    },
+    {
+      text: "Which statement is WRONG about springs?",
+      options: [
+        "Springs are a kind of simple machines",
+        "Springs can be used as energy stores",
+        "Springs constant depends on the properties of material they are made of",
+      ],
+      correctOption: "A",
+    },
+    {
+      text:
+        "How many inches must one pull the rope down in order to lift the load in the figure by 28 inches?",
+      options: ["14 in", "28 in", "56 in"],
+      correctOption: "C",
+    },
+    {
+      text:
+        "Electrons in a circuit flow from a place where there are __?__ electrons to a place where there are __?__ electrons.",
+      options: ["Less, More", "Many, No", "More, Less"],
+      correctOption: "C",
+    },
+    {
+      text: "We use __?__ to measure a specific gas pressure.",
+      options: ["Barometer", "Thermometer", "Manometer"],
+      correctOption: "C",
+    },
+    {
+      text: "Which term is NOT related to gears?",
+      options: ["Cogwheel", "Pinion", "Rack"],
+      correctOption: "C",
+    },
+    {
+      text: "A screw is a combination of:",
+      options: [
+        "Nail and wedge",
+        "Inclined plane and wedge",
+        "Inclined plane and cylinder",
+      ],
+      correctOption: "C",
+    },
+    {
+      text: "Which of the following materials can become a magnet?",
+      options: ["Aluminum", "Copper", "Zinc"],
+      correctOption: "C",
+    },
+    {
+      text:
+        "If the big wheel (A) turns 3 times at clockwise direction, how many times and in which direction does the small one (B) turn?",
+      options: [
+        "3 times counter-clockwise",
+        "6 times counter-clockwise",
+        "6 times clockwise",
+      ],
+      correctOption: "C",
+    },
+    {
+      text:
+        "What happens to the current passing through the main branch in the circuit shown in the figure if one of the bulbs smashes?",
+      options: [
+        "It becomes zero",
+        "It doubles",
+        "It decreases by a factor of 1.5",
+      ],
+      correctOption: "C",
+    },
+    {
+      text:
+        "If gear A rotates in the clockwise direction, what will the direction of wheels B, C and D be?",
+      options: [
+        "B clockwise, C clockwise, D counter-clockwise",
+        "B counter-clockwise, C clockwise, D clockwise",
+        "B counter-clockwise, C counter-clockwise, D counter-clockwise",
+      ],
+      correctOption: "B",
+    },
+    {
+      text: "Which of the following does NOT use magnetism to operate?",
+      options: ["Compass", "NMR apparatus", "Vehicle"],
+      correctOption: "C",
+    },
+    {
+      text: "Belts usually are made from materials that __?__ friction.",
+      options: ["Increase", "Reduce", "Don't change"],
+      correctOption: "A",
+    },
+    {
+      text: "Which statement about levers is CORRECT?",
+      options: [
+        "All levers have the same value of mechanical advantage",
+        "A lever is a kind of simple machine",
+        "Crowbar is an example of third class levers",
+      ],
+      correctOption: "B",
+    },
+    {
+      text:
+        "What would happen to the distance Earth-Sun if one year became 400 days without any change in the gravitational force?",
+      options: [
+        "Distance would increase",
+        "Distance would decrease",
+        "Distance would remain the same",
+      ],
+      correctOption: "B",
+    },
+    {
+      text: "Centripetal force is proportional to\u2026",
+      options: [
+        "Radius of curvature",
+        "Mass of the rotating object",
+        "Speed of rotation",
+      ],
+      correctOption: "A",
+    },
+    {
+      text: "Which statement is CORRECT?",
+      options: [
+        "Linear motion is a special case of circular motion",
+        "Circular motion is a special case of linear motion",
+        "When linear motion stops, circular motion begins",
+      ],
+      correctOption: "B",
+    },
+    {
+      text: "Which statement below is WRONG about springs?",
+      options: [
+        "Springs are simple machines as they make the object move",
+        "The extension or compression of springs always occur in the direction of the applied force",
+        "To increase the elasticity of a system of springs, we must combine them in series",
+      ],
+      correctOption: "A",
+    },
+    {
+      text:
+        "Why can we not use the equation P = rho * g * h for calculating the air pressure at a height h taking as a reference level the upper part of the atmosphere?",
+      options: [
+        "Because the atmosphere is very thick",
+        "Because the density of the atmosphere is not uniform",
+        "Because the atmosphere is not a fluid",
+      ],
+      correctOption: "B",
+    },
+  ];
+
   const mcqConfigs = [
     {
       startQuestionId: 291,
@@ -541,12 +764,23 @@ const buildSection4Questions = (aptitudeLines, answerKeyLines) => {
         : [];
 
     parsedQuestions.forEach((question, index) => {
+      const numericalOverride =
+        config.startQuestionId === 316 ? numericalAbilityOverrides[index] : null;
+      const spatialOverride =
+        config.startQuestionId === 366 ? spatialRelationsOverrides[index] : null;
+      const mechanicalOverride =
+        config.startQuestionId === 391 ? mechanicalReasoningOverrides[index] : null;
+
+      const override = numericalOverride || spatialOverride || mechanicalOverride;
+      const resolvedText = override?.text || question.text;
+      const resolvedOptions = override?.options || question.options;
+
       questions.push(
         createSingleQuestion(
           config.startQuestionId + index,
-          question.text,
-          question.options,
-          answerLetters[index] || "",
+          normalizeTimeValues(resolvedText),
+          resolvedOptions.map((option) => normalizeTimeValues(option)),
+          override?.correctOption || answerLetters[index] || "",
           config.weight
         )
       );
@@ -556,7 +790,7 @@ const buildSection4Questions = (aptitudeLines, answerKeyLines) => {
   const clericalQuestions = parseClericalQuestions(
     getSectionSlice(aptitudeLines, /4\.6 CLERICAL SPEED/i, /4\.7 CRITICAL THINKING/i),
     411
-  );
+  ).map(normalizeQuestionTimes);
 
   questions.splice(100, 0, ...clericalQuestions);
 

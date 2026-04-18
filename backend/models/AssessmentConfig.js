@@ -288,12 +288,130 @@ const normalizeFaqItems = (faqItems = [], fallbackItems = []) => {
 };
 
 let cachedDefaultConfig = null;
+const APTITUDE_BATTERY_SECTION_ID = 4;
+const SECTION_4_CANONICAL_SYNC_IDS = new Set(
+  Array.from({ length: 40 }, (_, index) => String(391 + index))
+);
 
 const countQuestions = (pkg = {}) =>
   (pkg.sections || []).reduce(
     (sum, section) => sum + ((section.questions || []).length || 0),
     0
   );
+
+const normalizeQuestionText = (value = "") =>
+  String(value || "").replace(/\s+/g, " ").trim();
+
+const normalizeQuestionOptions = (options = []) =>
+  Array.isArray(options)
+    ? options.map((option) => normalizeQuestionText(option))
+    : [];
+
+const hasDeprecatedQuestionArtifact = (text = "") => {
+  const normalizedText = normalizeQuestionText(text);
+  return /description:/i.test(normalizedText) || /\]$/.test(normalizedText);
+};
+
+const areQuestionCoreFieldsEqual = (currentQuestion = {}, seededQuestion = {}) =>
+  normalizeQuestionText(currentQuestion.text) ===
+    normalizeQuestionText(seededQuestion.text) &&
+  String(currentQuestion.type || "").trim() ===
+    String(seededQuestion.type || "").trim() &&
+  String(currentQuestion.correctOption || "").trim() ===
+    String(seededQuestion.correctOption || "").trim() &&
+  JSON.stringify(normalizeQuestionOptions(currentQuestion.options)) ===
+    JSON.stringify(normalizeQuestionOptions(seededQuestion.options));
+
+const shouldReplaceAptitudeBatteryQuestions = (
+  existingSection = {},
+  seededSection = {}
+) => {
+  if (Number(existingSection.sectionId) !== APTITUDE_BATTERY_SECTION_ID) {
+    return false;
+  }
+
+  const existingQuestions = Array.isArray(existingSection.questions)
+    ? existingSection.questions
+    : [];
+  const seededQuestions = Array.isArray(seededSection.questions)
+    ? seededSection.questions
+    : [];
+
+  if (!existingQuestions.length) {
+    return seededQuestions.length > 0;
+  }
+
+  if (
+    existingQuestions.some((question) =>
+      hasDeprecatedQuestionArtifact(question?.text)
+    )
+  ) {
+    return true;
+  }
+
+  if (existingQuestions.length !== seededQuestions.length) {
+    return true;
+  }
+
+  const existingIds = existingQuestions.map((question) =>
+    String(question?.questionId || "").trim()
+  );
+  const seededIds = seededQuestions.map((question) =>
+    String(question?.questionId || "").trim()
+  );
+
+  if (JSON.stringify(existingIds) !== JSON.stringify(seededIds)) {
+    return true;
+  }
+
+  const existingQuestionById = new Map(
+    existingQuestions.map((question) => [
+      String(question?.questionId || "").trim(),
+      question,
+    ])
+  );
+
+  return seededQuestions.some((seededQuestion) => {
+    const questionId = String(seededQuestion?.questionId || "").trim();
+    if (!SECTION_4_CANONICAL_SYNC_IDS.has(questionId)) {
+      return false;
+    }
+
+    const existingQuestion = existingQuestionById.get(questionId);
+    if (!existingQuestion) {
+      return true;
+    }
+
+    return !areQuestionCoreFieldsEqual(existingQuestion, seededQuestion);
+  });
+};
+
+const syncSeededSectionQuestions = (target = {}, seeded = {}) => {
+  if (!Array.isArray(target.sections) || !Array.isArray(seeded.sections)) {
+    return false;
+  }
+
+  let changed = false;
+  const seededSectionById = new Map(
+    seeded.sections.map((section) => [Number(section.sectionId), section])
+  );
+
+  target.sections = target.sections.map((existingSection) => {
+    const seededSection = seededSectionById.get(Number(existingSection.sectionId));
+    if (!seededSection) {
+      return existingSection;
+    }
+
+    if (shouldReplaceAptitudeBatteryQuestions(existingSection, seededSection)) {
+      existingSection.questions = seededSection.questions;
+      changed = true;
+    }
+
+    return existingSection;
+  });
+
+  return changed;
+};
 
 const mergeSeededPackage = (target, seeded) => {
   let changed = false;
@@ -320,6 +438,13 @@ const mergeSeededPackage = (target, seeded) => {
   }
   if (!Number.isFinite(Number(target.sortOrder)) && seeded.sortOrder != null) {
     target.sortOrder = seeded.sortOrder;
+    changed = true;
+  }
+
+  if (
+    target.id === PRIMARY_PACKAGE_ID &&
+    syncSeededSectionQuestions(target, seeded)
+  ) {
     changed = true;
   }
 

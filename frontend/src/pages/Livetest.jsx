@@ -9,6 +9,25 @@ import { useNavigate, useParams } from "react-router-dom";
 import { CheckCircle2, Clock3, Pause, Save } from "lucide-react";
 import api from "../api/api";
 import { getApiV1Url } from "../config/env";
+import {
+  getClericalQuestionOptions,
+  isClericalQuestionId,
+  parseClericalQuestionText,
+} from "../data/clericalQuestionData";
+import {
+  isAbstractQuestionId,
+  getAbstractPromptSrc,
+} from "../data/abstractQuestionMedia";
+import {
+  isMechanicalQuestionId,
+  getMechanicalStimulusSrc,
+} from "../data/mechanicalQuestionMedia";
+import {
+  getSpatialOptionSrc,
+  getSpatialQuestionNumber,
+  getSpatialStimulusSrc,
+  isSpatialQuestionId,
+} from "../data/spatialQuestionMedia";
 
 const LIKERT_OPTIONS = [
   { label: "Strongly Disagree", value: 1 },
@@ -16,6 +35,14 @@ const LIKERT_OPTIONS = [
   { label: "Neutral", value: 3 },
   { label: "Agree", value: 4 },
   { label: "Strongly Agree", value: 5 },
+];
+
+const INTEREST_ASSESSMENT_OPTIONS = [
+  { label: "1 - No Interest", value: 1 },
+  { label: "2 - Little Interest", value: 2 },
+  { label: "3 - Moderate Interest", value: 3 },
+  { label: "4 - Strong Interest", value: 4 },
+  { label: "5 - Very Strong Interest", value: 5 },
 ];
 
 const formatTime = (seconds) => {
@@ -37,6 +64,110 @@ const clampQuestionIndex = (index, totalQuestions) => {
   if (!Number.isFinite(Number(index))) return 0;
   return Math.max(0, Math.min(Number(index), Math.max(totalQuestions - 1, 0)));
 };
+
+const SPATIAL_OPTION_LETTERS = ["A", "B", "C", "D"];
+
+const getQuestionText = (question, fallbackText = "") => {
+  const candidates = [
+    question?.questionText,
+    question?.text,
+    question?.prompt,
+    question?.question,
+  ];
+
+  return (
+    candidates
+      .map((value) => String(value || "").trim())
+      .find(Boolean) || fallbackText
+  );
+};
+
+const getSpatialStimulusSource = (question, questionId) => {
+  const candidates = [
+    question?.stimulusImage,
+    question?.stimulusSrc,
+    question?.media?.stimulus,
+    question?.image,
+    getSpatialStimulusSrc(questionId),
+  ];
+
+  return (
+    candidates
+      .map((value) => String(value || "").trim())
+      .find(Boolean) || null
+  );
+};
+
+const getSpatialOptionSource = (question, questionId, optionLetter) => {
+  const optionEntry = Array.isArray(question?.options)
+    ? question.options.find((option, optionIndex) => {
+        if (!option || typeof option === "string") return false;
+
+        const optionKey = String(
+          option.value ||
+            option.label ||
+            option.id ||
+            String.fromCharCode(65 + optionIndex)
+        )
+          .trim()
+          .toUpperCase()
+          .replace(/\)$/, "");
+
+        return optionKey === optionLetter;
+      })
+    : null;
+
+  const candidates = [
+    question?.optionImages?.[optionLetter],
+    question?.optionImageMap?.[optionLetter],
+    question?.media?.options?.[optionLetter],
+    optionEntry?.image,
+    optionEntry?.src,
+    optionEntry?.imageUrl,
+    getSpatialOptionSrc(questionId, optionLetter),
+  ];
+
+  return (
+    candidates
+      .map((value) => String(value || "").trim())
+      .find(Boolean) || null
+  );
+};
+
+function SpatialAssetFigure({
+  src,
+  placeholderText,
+  className = "",
+  imgClassName = "",
+}) {
+  const normalizedSrc = String(src || "").trim();
+  const [failedSrc, setFailedSrc] = useState("");
+  const failed = !normalizedSrc || failedSrc === normalizedSrc;
+
+  if (failed) {
+    return (
+      <div className={className}>
+        <div
+          className="flex h-full w-full items-center justify-center rounded-2xl border border-dashed border-[#B7DDE3] bg-[#F8FCFC] px-4 py-6 text-center text-sm leading-6 text-[#65758B]"
+        >
+          {placeholderText}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={className}>
+      <img
+        src={normalizedSrc}
+        alt=""
+        aria-hidden="true"
+        onError={() => setFailedSrc(normalizedSrc)}
+        className={imgClassName}
+      />
+    </div>
+  );
+}
 
 export default function Livetest() {
   const { sectionId: sectionIdParam } = useParams();
@@ -111,6 +242,7 @@ export default function Livetest() {
       ? orderedSections[currentSectionIndex + 1] || null
       : null;
   const totalQuestions = questions.length;
+  const showInterestInstructionHeading = sectionId === 3 && totalQuestions > 0;
 
   const answeredCount = useMemo(
     () =>
@@ -522,64 +654,77 @@ export default function Livetest() {
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       <div className="sticky top-0 z-30 border-b border-[#E1E7EF] bg-[#FAFAFA]/95 backdrop-blur">
-        <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 md:px-8">
-          <div className="overflow-hidden rounded-[26px] border border-[#E1E7EF] bg-white shadow-sm">
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E1E7EF] px-5 py-4 sm:px-6">
+        <div className="mx-auto max-w-6xl px-2 py-2 sm:px-4 sm:py-2.5 md:px-8">
+          <div className="overflow-hidden rounded-[16px] border border-[#E1E7EF] bg-white shadow-sm sm:rounded-[22px]">
+            <div className="flex flex-wrap items-start justify-between gap-2 border-b border-[#E1E7EF] px-3 py-2.5 sm:items-center sm:px-5 sm:py-3">
               <div>
-                <h1 className="text-lg font-bold text-[#0F1729] sm:text-[26px]">
+                <h1 className="text-[15px] font-bold leading-tight text-[#0F1729] sm:text-[20px] md:text-[24px]">
                   Section {section.sectionId}: {section.title}
                 </h1>
-                <p className="mt-1 text-sm text-[#65758B]">
+                <p className="mt-0.5 text-[11px] text-[#65758B] sm:mt-1 sm:text-sm">
                   Section {Math.max(currentSectionIndex + 1, 1)} of{" "}
                   {Math.max(orderedSections.length, 1)}
                 </p>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#E1E7EF] px-4 py-2 text-sm font-semibold text-[#0F1729]">
-                  <Clock3 className="h-4 w-4 text-[#188B8B]" />
+              <div className="grid w-full grid-cols-2 gap-1.5 sm:w-auto sm:flex sm:items-center sm:gap-3">
+                <div className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[#E1E7EF] px-2.5 py-1.5 text-[11px] font-semibold text-[#0F1729] sm:px-4 sm:py-2 sm:text-sm">
+                  <Clock3 className="h-3.5 w-3.5 text-[#188B8B] sm:h-4 sm:w-4" />
                   {timerLabel}
                 </div>
                 <button
                   type="button"
                   onClick={handlePauseTest}
                   disabled={saving || pauseSaving}
-                  className="inline-flex items-center gap-2 rounded-full border border-[#188B8B] px-4 py-2 text-sm font-semibold text-[#188B8B] transition hover:bg-teal-50 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[#188B8B] px-2.5 py-1.5 text-[11px] font-semibold text-[#188B8B] transition hover:bg-teal-50 disabled:cursor-not-allowed disabled:opacity-70 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
                 >
-                  <Pause className="h-4 w-4" />
+                  <Pause className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   {pauseSaving ? "Pausing..." : "Pause Test"}
                 </button>
               </div>
             </div>
 
-            <div className="grid gap-3 px-5 py-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:px-6">
-              <div className="inline-flex items-center gap-2 text-sm font-medium text-[#0F1729]">
-                <Save className="h-4 w-4 text-[#65758B]" />
+            <div className="grid gap-2 px-3 py-2.5 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:px-5 sm:py-3">
+              <div className="flex items-center justify-between gap-3 sm:contents">
+                <div className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#0F1729] sm:gap-2 sm:text-sm">
+                  <Save className="h-3.5 w-3.5 text-[#65758B] sm:h-4 sm:w-4" />
+                  {saveState === "saving"
+                    ? "Saving..."
+                    : saveState === "error"
+                      ? "Save pending"
+                      : "Auto-saved"}
+                </div>
+
+                <div className="text-[11px] font-semibold text-[#0F1729] sm:hidden">
+                  {answeredCount}/{totalQuestions}
+                </div>
+              </div>
+
+              <div className="text-[11px] leading-4 text-[#65758B] sm:hidden">
+                Progress auto-saves. Pause and continue later.
+              </div>
+
+              <div className="hidden rounded-2xl bg-[#E8F9F8] px-4 py-2.5 text-center text-sm text-[#65758B] sm:block">
                 {saveState === "saving"
-                  ? "Saving..."
+                  ? "Your latest answer is being saved."
                   : saveState === "error"
-                    ? "Save pending"
-                    : "Auto-saved"}
+                    ? "Saving is delayed. Keep going and we will retry."
+                    : "Your progress is automatically saved. You can pause the section and return later."}
               </div>
 
-              <div className="rounded-2xl bg-[#E8F9F8] px-4 py-3 text-center text-sm text-[#65758B]">
-                Your progress is automatically saved. You can pause the section
-                and return later.
-              </div>
-
-              <div className="text-sm font-semibold text-[#0F1729] sm:text-right">
+              <div className="hidden text-xs font-semibold text-[#0F1729] sm:block sm:text-right sm:text-sm">
                 {answeredCount}/{totalQuestions} answered
               </div>
             </div>
 
-            <div className="px-5 pb-4 sm:px-6">
-              <div className="h-2 rounded-full bg-[#E1E7EF]">
+            <div className="px-3 pb-2.5 sm:px-5 sm:pb-4">
+              <div className="h-1 rounded-full bg-[#E1E7EF] sm:h-2">
                 <div
-                  className="h-2 rounded-full bg-[#188B8B] transition-all duration-300"
+                  className="h-1 rounded-full bg-[#188B8B] transition-all duration-300 sm:h-2"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
-              <p className="mt-2 text-right text-xs font-semibold text-[#65758B]">
+              <p className="mt-1 text-right text-[10px] font-semibold text-[#65758B] sm:mt-2 sm:text-xs">
                 {progressPercent}% complete
               </p>
             </div>
@@ -587,68 +732,241 @@ export default function Livetest() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 md:px-8">
+      <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6">
         <div className="space-y-4">
+          {showInterestInstructionHeading ? (
+            <section className="rounded-[26px] border border-[#B7DDE3] bg-[#F1FDFF] p-5 shadow-sm sm:p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#188B8B]">
+                Interest Assessment Instruction
+              </p>
+              <h2 className="mt-3 text-lg font-semibold leading-8 text-[#0F1729] sm:text-[22px]">
+                Instruction: Rate your interest in each activity from 1 (No Interest) to 5 (Very Strong Interest)
+              </h2>
+            </section>
+          ) : null}
+
           {questions.map((question, index) => {
             const currentAnswer = progress.answers?.[answerKey(index)];
+            const numericQuestionId = Number(question.questionId);
+            const isSpatialImageQuestion =
+              sectionId === 4 &&
+              (question.type === "image" || isSpatialQuestionId(numericQuestionId));
+            const spatialQuestionNumber = isSpatialImageQuestion
+              ? getSpatialQuestionNumber(numericQuestionId)
+              : null;
+
+            // Abstract Reasoning (Q341-Q365) — each has a prompt.png
+            const isAbstractImageQuestion =
+              sectionId === 4 && isAbstractQuestionId(numericQuestionId);
+            const abstractPromptSrc = isAbstractImageQuestion
+              ? getAbstractPromptSrc(numericQuestionId)
+              : null;
+
+            // Mechanical Reasoning (Q391-Q410) — some have stimulus diagrams
+            const isMechanicalImageQuestion =
+              sectionId === 4 && isMechanicalQuestionId(numericQuestionId);
+            const mechanicalStimulusSrc = isMechanicalImageQuestion
+              ? getMechanicalStimulusSrc(numericQuestionId)
+              : null;
+
+            const questionText = getQuestionText(
+              question,
+              isSpatialImageQuestion
+                ? "Study the figure and choose the correct answer."
+                : isAbstractImageQuestion
+                  ? "Study the pattern and choose the correct answer."
+                  : isMechanicalImageQuestion && mechanicalStimulusSrc
+                    ? "Study the diagram and choose the correct answer."
+                    : `Question ${index + 1}`
+            );
+            const spatialStimulusSrc = isSpatialImageQuestion
+              ? getSpatialStimulusSource(question, numericQuestionId)
+              : null;
+            const useInterestAssessmentOptions =
+              sectionId === 3 && index < 54 && question.type !== "single";
+            const showInterestGroupInstructionHeading =
+              sectionId === 3 && index === 54;
+            const isClericalPairsQuestion =
+              sectionId === 4 &&
+              question.type === "single" &&
+              isClericalQuestionId(numericQuestionId);
+            const clericalPrompt = isClericalPairsQuestion
+              ? parseClericalQuestionText(questionText)
+              : null;
             const options =
               question.type === "single"
-                ? question.options || []
-                : LIKERT_OPTIONS;
+                ? isClericalPairsQuestion
+                  ? getClericalQuestionOptions(
+                      numericQuestionId,
+                      question.options || []
+                    )
+                  : question.options || []
+                : useInterestAssessmentOptions
+                  ? INTEREST_ASSESSMENT_OPTIONS
+                  : LIKERT_OPTIONS;
             const useTwoColumns =
-              question.type === "single" && options.length >= 4;
+              question.type === "single" &&
+              options.length >= 4 &&
+              !isClericalPairsQuestion;
 
             return (
-              <section
-                key={question.questionId || index}
-                id={`question-card-${index}`}
-                className="rounded-[26px] border border-[#E1E7EF] bg-white p-5 shadow-sm sm:p-6"
-              >
-                <h2 className="whitespace-pre-line text-lg font-semibold leading-8 text-[#0F1729] sm:text-[22px]">
-                  {index + 1}. {question.text}
-                </h2>
+              <React.Fragment key={question.questionId || index}>
+                {showInterestGroupInstructionHeading ? (
+                  <section className="rounded-[26px] border border-[#B7DDE3] bg-[#F1FDFF] p-5 shadow-sm sm:p-6">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#188B8B]">
+                      Interest Assessment Instruction
+                    </p>
+                    <h2 className="mt-3 text-lg font-semibold leading-8 text-[#0F1729] sm:text-[22px]">
+                      Instructions: Choose the activity you would most prefer in each group
+                    </h2>
+                  </section>
+                ) : null}
 
-                <div
-                  className={`mt-5 grid gap-3 ${
-                    useTwoColumns ? "md:grid-cols-2" : ""
-                  }`}
+                <section
+                  id={`question-card-${index}`}
+                  className="rounded-[26px] border border-[#E1E7EF] bg-white p-5 shadow-sm sm:p-6"
                 >
-                  {options.map((option, optionIndex) => {
-                    const value =
-                      question.type === "single"
-                        ? String.fromCharCode(65 + optionIndex)
-                        : option.value;
-                    const label =
-                      question.type === "single" ? option : option.label;
-                    const selected =
-                      question.type === "single"
-                        ? String(currentAnswer) === String(value)
-                        : Number(currentAnswer) === Number(value);
+                  <h2 className="whitespace-pre-line text-lg font-semibold leading-8 text-[#0F1729] sm:text-[22px]">
+                    {index + 1}.{" "}
+                    {isClericalPairsQuestion && clericalPrompt?.instruction
+                      ? clericalPrompt.instruction
+                      : questionText}
+                  </h2>
 
-                    return (
-                      <label
-                        key={`${index}-${value}`}
-                        className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition ${
-                          selected
-                            ? "border-[#20B6C7] bg-[#F1FDFF]"
-                            : "border-[#E1E7EF] bg-white hover:border-[#B7DDE3]"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name={`question-${index}`}
-                          checked={selected}
-                          onChange={() => handleAnswer(index, value)}
-                          className="h-4 w-4 shrink-0 border-gray-300 text-[#20B6C7] focus:ring-[#20B6C7]"
+                  {isClericalPairsQuestion && clericalPrompt?.pairs?.length ? (
+                    <div className="mt-5 rounded-2xl border border-[#E1E7EF] bg-[#FAFCFE] px-4 py-4 sm:px-5">
+                      <ol className="space-y-3">
+                        {clericalPrompt.pairs.map((pair) => (
+                          <li
+                            key={`${numericQuestionId}-${pair.number}`}
+                            className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 font-mono text-sm leading-6 text-[#0F1729] sm:text-[15px]"
+                          >
+                            <span className="font-semibold tabular-nums text-[#188B8B]">
+                              {pair.number}.
+                            </span>
+                            <span className="break-words">{pair.text}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  ) : null}
+
+                  {/* ── Mechanical Reasoning stimulus (diagram above text options) ── */}
+                  {isMechanicalImageQuestion && mechanicalStimulusSrc ? (
+                    <div className="mt-5 rounded-2xl border border-[#E1E7EF] bg-[#FAFCFE] p-4 sm:p-5">
+                      <SpatialAssetFigure
+                        src={mechanicalStimulusSrc}
+                        placeholderText={`[Image pending for Mechanical Q${numericQuestionId}]`}
+                        className="flex min-h-[180px] items-center justify-center"
+                        imgClassName="mx-auto h-auto max-h-[300px] w-auto max-w-full object-contain"
+                      />
+                    </div>
+                  ) : null}
+
+                  {isSpatialImageQuestion ? (
+                    <>
+                      <div className="mt-5 rounded-2xl border border-[#E1E7EF] bg-[#FAFCFE] p-4 sm:p-5">
+                        <SpatialAssetFigure
+                          src={spatialStimulusSrc}
+                          placeholderText={`[Image pending for Q${spatialQuestionNumber} - Stimulus]`}
+                          className="flex min-h-[220px] items-center justify-center"
+                          imgClassName="mx-auto h-auto max-h-[300px] w-auto max-w-full object-contain"
                         />
-                        <span className="whitespace-pre-line text-sm text-[#0F1729]">
-                          {label}
-                        </span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </section>
+                      </div>
+
+                      <div className="mt-5 grid gap-3 min-[500px]:grid-cols-2">
+                        {SPATIAL_OPTION_LETTERS.map((optionLetter) => {
+                          const selected =
+                            String(currentAnswer) === String(optionLetter);
+                          const spatialOptionSrc = getSpatialOptionSource(
+                            question,
+                            numericQuestionId,
+                            optionLetter
+                          );
+
+                          return (
+                            <label
+                              key={`${index}-${optionLetter}`}
+                              className={`cursor-pointer rounded-2xl border p-4 transition ${
+                                selected
+                                  ? "border-[#20B6C7] bg-[#F1FDFF]"
+                                  : "border-[#E1E7EF] bg-white hover:border-[#B7DDE3]"
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name={`question-${index}`}
+                                checked={selected}
+                                onChange={() => handleAnswer(index, optionLetter)}
+                                aria-label={`Option ${optionLetter}`}
+                                className="sr-only"
+                              />
+
+                              <div className="flex items-center gap-2 text-sm font-semibold tracking-[0.12em] text-[#0F1729]">
+                                <span>{optionLetter})</span>
+                              </div>
+
+                              <div className="mt-3 rounded-xl border border-[#E1E7EF] bg-[#FAFCFE] p-3">
+                                <SpatialAssetFigure
+                                  src={spatialOptionSrc}
+                                  placeholderText={`[Image pending for Q${spatialQuestionNumber} - Option ${optionLetter}]`}
+                                  className="flex min-h-[170px] w-full items-center justify-center"
+                                  imgClassName="mx-auto h-auto max-h-[170px] w-auto max-w-full object-contain"
+                                />
+                              </div>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </>
+                  ) : (
+                    <div
+                      className={`mt-5 grid gap-3 ${
+                        isClericalPairsQuestion
+                          ? "grid-cols-1"
+                          : useTwoColumns
+                            ? "md:grid-cols-2"
+                            : ""
+                      }`}
+                    >
+                      {options.map((option, optionIndex) => {
+                        const value =
+                          question.type === "single"
+                            ? String.fromCharCode(65 + optionIndex)
+                            : option.value;
+                        const label =
+                          question.type === "single" ? option : option.label;
+                        const selected =
+                          question.type === "single"
+                            ? String(currentAnswer) === String(value)
+                            : Number(currentAnswer) === Number(value);
+
+                        return (
+                          <label
+                            key={`${index}-${value}`}
+                            className={`flex w-full cursor-pointer gap-3 rounded-2xl border px-4 py-3 text-sm transition ${
+                              selected
+                                ? "border-[#20B6C7] bg-[#F1FDFF]"
+                                : "border-[#E1E7EF] bg-white hover:border-[#B7DDE3]"
+                            } ${isClericalPairsQuestion ? "items-start py-4" : "items-center"}`}
+                          >
+                            <input
+                              type="radio"
+                              name={`question-${index}`}
+                              checked={selected}
+                              onChange={() => handleAnswer(index, value)}
+                              className="h-4 w-4 shrink-0 border-gray-300 text-[#20B6C7] focus:ring-[#20B6C7]"
+                            />
+                            <span className="whitespace-pre-line text-sm leading-6 text-[#0F1729]">
+                              {label}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+                </section>
+              </React.Fragment>
             );
           })}
         </div>
