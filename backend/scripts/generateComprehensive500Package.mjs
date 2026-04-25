@@ -585,14 +585,9 @@ const buildSection4Questions = (aptitudeLines, answerKeyLines) => {
       correctOption: "C",
     },
     {
-      text:
-        "What happens to the current passing through the main branch in the circuit shown in the figure if one of the bulbs smashes?",
-      options: [
-        "It becomes zero",
-        "It doubles",
-        "It decreases by a factor of 1.5",
-      ],
-      correctOption: "C",
+      text: "What value does the ammeter in the circuit shown in the figure read?",
+      options: ["0.25 A", "0 A", "4 A"],
+      correctOption: "B",
     },
     {
       text:
@@ -615,13 +610,9 @@ const buildSection4Questions = (aptitudeLines, answerKeyLines) => {
       correctOption: "A",
     },
     {
-      text: "Which statement about levers is CORRECT?",
-      options: [
-        "All levers have the same value of mechanical advantage",
-        "A lever is a kind of simple machine",
-        "Crowbar is an example of third class levers",
-      ],
-      correctOption: "B",
+      text: "What kind of lever is the hydraulic crane shown in the figure?",
+      options: ["First class lever", "Second class lever", "Third class lever"],
+      correctOption: "C",
     },
     {
       text:

@@ -28,7 +28,7 @@ const MECHANICAL_QUESTION_ID_END = 410;
 
 // Question IDs that are purely text-based and have no diagram/figure.
 const TEXT_ONLY_MECHANICAL_IDS = new Set([
-  393, 395, 396, 397, 398, 399, 403, 404, 405, 407, 408, 409,
+  393, 395, 396, 397, 398, 399, 403, 404, 407, 408, 409,
 ]);
 
 export const isMechanicalQuestionId = (questionId) => {

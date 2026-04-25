@@ -5018,14 +5018,14 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "401",
-          "text": "What happens to the current passing through the main branch in the circuit shown in the figure if one of the bulbs smashes?",
+          "text": "What value does the ammeter in the circuit shown in the figure read?",
           "type": "single",
           "options": [
-            "It becomes zero",
-            "It doubles",
-            "It decreases by a factor of 1.5"
+            "0.25 A",
+            "0 A",
+            "4 A"
           ],
-          "correctOption": "C",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 1
         },
@@ -5070,14 +5070,14 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "405",
-          "text": "Which statement about levers is CORRECT?",
+          "text": "What kind of lever is the hydraulic crane shown in the figure?",
           "type": "single",
           "options": [
-            "All levers have the same value of mechanical advantage",
-            "A lever is a kind of simple machine",
-            "Crowbar is an example of third class levers"
+            "First class lever",
+            "Second class lever",
+            "Third class lever"
           ],
-          "correctOption": "B",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 1
         },

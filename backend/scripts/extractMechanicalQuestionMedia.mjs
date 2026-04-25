@@ -67,9 +67,9 @@ const QUESTION_CROPS = {
   400: {
     stimulus: { page: 26, x: 160, y: 760, w: 480, h: 310 },
   },
-  // PDF Q11 = questionId 401 — Circuit with battery and bulbs (pages 26-27)
+  // PDF Q26 = questionId 401 — Circuit diagram (page 31)
   401: {
-    stimulus: { page: 27, x: 80, y: 60, w: 460, h: 270 },
+    stimulus: { page: 31, x: 100, y: 920, w: 500, h: 480 },
   },
   // PDF Q12 = questionId 402 — Gear train A, B, C, D + answer arrows (page 27)
   402: {
@@ -82,6 +82,10 @@ const QUESTION_CROPS = {
   // PDF Q20 = questionId 410 — Atmosphere/Earth diagram (pages 29-30)
   410: {
     stimulus: { page: 30, x: 130, y: 50, w: 560, h: 620 },
+  },
+  // PDF Q31 = questionId 405 — Hydraulic crane (page 33)
+  405: {
+    stimulus: { page: 33, x: 50, y: 230, w: 900, h: 510 },
   },
 };
 
