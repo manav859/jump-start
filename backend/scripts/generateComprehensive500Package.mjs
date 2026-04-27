@@ -454,7 +454,7 @@ const buildSection4Questions = (aptitudeLines, answerKeyLines) => {
     String(value).replace(
       /\b(\d{1,2})\s+(\d{2})\s*(AM|PM)\b/gi,
       (_match, hours, minutes, meridiem) =>
-        `${hours}:${minutes} ${String(meridiem).toUpperCase()}`
+        `${hours}:${minutes}${String(meridiem).toUpperCase()}`
     );
   const normalizeQuestionTimes = (question = {}) => ({
     ...question,
@@ -585,9 +585,9 @@ const buildSection4Questions = (aptitudeLines, answerKeyLines) => {
       correctOption: "C",
     },
     {
-      text: "What value does the ammeter in the circuit shown in the figure read?",
-      options: ["0.25 A", "0 A", "4 A"],
-      correctOption: "B",
+      text: "What happens to the current passing through the main branch in the circuit shown in the figure if one the bulbs smashes?",
+      options: ["It becomes zero", "It doubles", "It decreases by a factor of 1.5"],
+      correctOption: "C",
     },
     {
       text:

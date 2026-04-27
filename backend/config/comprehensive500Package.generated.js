@@ -4468,7 +4468,7 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "381",
-          "text": "Which figure is the rotation of object?",
+          "text": "Which figure is the rotation of the object?",
           "type": "single",
           "options": [
             "Circle",
@@ -4476,13 +4476,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Triangle",
             "Rectangle"
           ],
-          "correctOption": "B",
+          "correctOption": "D",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "382",
-          "text": "Which figure is the rotation of the object?",
+          "text": "Which of the 4 figures presented (A, B, C, D) is a rotation of the first?",
           "type": "single",
           "options": [
             "6",
@@ -4490,13 +4490,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "10",
             "12"
           ],
-          "correctOption": "D",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "383",
-          "text": "Which of the 4 figures presented (A, B, C, D) is a rotation of the first?",
+          "text": "Which piece corresponds to the given solid?",
           "type": "single",
           "options": [
             "View A",
@@ -4518,13 +4518,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Result C",
             "Result D"
           ],
-          "correctOption": "C",
+          "correctOption": "D",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "385",
-          "text": "Which piece corresponds to the given solid?",
+          "text": "Which object can be made by folding the given shape?",
           "type": "single",
           "options": [
             "Turn left 90°",
@@ -4532,13 +4532,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Turn 180°",
             "Don't turn"
           ],
-          "correctOption": "D",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "386",
-          "text": "Which object can be made by folding the given shape?",
+          "text": "Which figure can be formed using 2D rotation?",
           "type": "single",
           "options": [
             "6",
@@ -4546,13 +4546,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "10",
             "12"
           ],
-          "correctOption": "C",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "387",
-          "text": "Which figure can be formed using 2D rotation?",
+          "text": "Which figure can be formed with the given pieces?",
           "type": "single",
           "options": [
             "Pattern A",
@@ -4560,13 +4560,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Pattern C",
             "Pattern D"
           ],
-          "correctOption": "A",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "388",
-          "text": "Which figure can be formed with the given pieces?",
+          "text": "To which object does the given top view correspond?",
           "type": "single",
           "options": [
             "Position A",
@@ -4574,13 +4574,13 @@ const COMPREHENSIVE_500_PACKAGE = {
             "Position C",
             "Position D"
           ],
-          "correctOption": "C",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 0.1
         },
         {
           "questionId": "389",
-          "text": "To which object does the given top view correspond?",
+          "text": "Which figure is a vertical reflection across the x axis?",
           "type": "single",
           "options": [
             "Cone",
@@ -4594,7 +4594,7 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "390",
-          "text": "Which figure is a vertical reflection across the x axis?",
+          "text": "Which cube can be formed by folding the given shape?",
           "type": "single",
           "options": [
             "1",
@@ -4602,7 +4602,7 @@ const COMPREHENSIVE_500_PACKAGE = {
             "3",
             "6"
           ],
-          "correctOption": "A",
+          "correctOption": "D",
           "reverseScored": false,
           "weight": 0.1
         },
@@ -4748,7 +4748,7 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "421",
-          "text": "Mark identical times. 1. 10:45 AM / 10:45 AM 2. 02:30 PM / 02:30 PM 3. 08:15 AM / 08:51 AM 4. 11:20 PM / 11:20 PM",
+          "text": "Mark identical times. 1. 10:45AM / 10:45AM 2. 02:30PM / 02:30PM 3. 08:15AM / 08:51AM 4. 11:20PM / 11:20PM",
           "type": "single",
           "options": [
             "Pairs 1 and 3 are identical.",
@@ -5018,14 +5018,14 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "401",
-          "text": "What value does the ammeter in the circuit shown in the figure read?",
+          "text": "What happens to the current passing through the main branch in the circuit shown in the figure if one the bulbs smashes?",
           "type": "single",
           "options": [
-            "0.25 A",
-            "0 A",
-            "4 A"
+            "It becomes zero",
+            "It doubles",
+            "It decreases by a factor of 1.5"
           ],
-          "correctOption": "B",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 1
         },
@@ -5330,13 +5330,13 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "444",
-          "text": "A clock shows the correct time at noon. If it runs fast by 2 minutes every hour, what time will it show when the actual time is 6:00 PM?",
+          "text": "A clock shows the correct time at noon. If it runs fast by 2 minutes every hour, what time will it show when the actual time is 6:00PM?",
           "type": "single",
           "options": [
-            "6:10 PM",
-            "6:12 PM",
-            "6:14 PM",
-            "6:16 PM"
+            "6:10PM",
+            "6:12PM",
+            "6:14PM",
+            "6:16PM"
           ],
           "correctOption": "B",
           "reverseScored": false,
@@ -5414,13 +5414,13 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "450",
-          "text": "A train leaves New York at 3:00 PM traveling 60 mph. Another train leaves Boston at 4:00 PM traveling 80 mph toward New York. If the cities are 200 miles apart, when will the trains meet?",
+          "text": "A train leaves New York at 3:00PM traveling 60 mph. Another train leaves Boston at 4:00PM traveling 80 mph toward New York. If the cities are 200 miles apart, when will the trains meet?",
           "type": "single",
           "options": [
-            "5:00 PM",
-            "5:30 PM",
-            "6:00 PM",
-            "6:30 PM"
+            "5:00PM",
+            "5:30PM",
+            "6:00PM",
+            "6:30PM"
           ],
           "correctOption": "A",
           "reverseScored": false,

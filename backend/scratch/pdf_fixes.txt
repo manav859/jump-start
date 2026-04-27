@@ -1,0 +1,35 @@
+In Section 3 : Interest Assessment, need to put the following instruction as a heading
+before all questions start. Question No:1-54
+Instruction: Rate your interest in each activity from 1(No Interest) to 5(Very
+Strong Interest)
+And change the options to match.
+1: No Interest
+2: Little Interest
+3: Moderate Interest
+4: Strong Interest
+5: Very Strong Interest
+Section 3 : Before Question 55 begins, put the following instruction as a heading
+Instrutcions: Choose the activity you would most prefer in each group
+Section 4: Mathematical questions have some signs missing in equations, please refer
+to the aptitude test pdf to correct
+Section 4: Questions 76 to 100 : Spatial Aptitude, change the questions from the pdf
+provided. Answer is denoted after the question (do not display within the final test),
+need to alter within the algorithm to signify the correct answer.
+Section 4: In all the Clerical Aptitude Questions from Q100 to Q120. Align the options
+within the questions vertically for better legibility.
+
+-- 1 of 2 --
+
+For example: Mark matching email addresses.
+1. xxxxxx@gmail.com/xxxxx@gmail.com
+2. yyyyy@gmail.com/yy@gmail.com
+3. xxxxx@service.net/yyyyy@service.net
+4. zzzzz@hotsinger.com/xxxy@hotnsiger.com
+Section 4: Questions 121 to 139 : Mechanical Aptitude, change the questions from the
+pdf provided. Answer is denoted after the question (do not display within the final test),
+need to alter within the algorithm to signify the correct answer.
+Add semicolon to the times denoted in the questions and answers, i.e. 3:00PM/
+4:00PM
+
+-- 2 of 2 --
+

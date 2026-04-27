@@ -56,5 +56,5 @@ export const getMechanicalStimulusSrc = (questionId) => {
   // Text-only questions have no stimulus image
   if (TEXT_ONLY_MECHANICAL_IDS.has(numericId)) return null;
 
-  return `/question-media/mechanical/q${String(numericId).padStart(3, "0")}/stimulus.png`;
+  return `/question-media/mechanical/q${String(numericId).padStart(3, "0")}/stimulus.png?v=2`;
 };

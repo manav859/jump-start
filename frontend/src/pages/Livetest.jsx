@@ -38,11 +38,11 @@ const LIKERT_OPTIONS = [
 ];
 
 const INTEREST_ASSESSMENT_OPTIONS = [
-  { label: "1 - No Interest", value: 1 },
-  { label: "2 - Little Interest", value: 2 },
-  { label: "3 - Moderate Interest", value: 3 },
-  { label: "4 - Strong Interest", value: 4 },
-  { label: "5 - Very Strong Interest", value: 5 },
+  { label: "1: No Interest", value: 1 },
+  { label: "2: Little Interest", value: 2 },
+  { label: "3: Moderate Interest", value: 3 },
+  { label: "4: Strong Interest", value: 4 },
+  { label: "5: Very Strong Interest", value: 5 },
 ];
 
 const formatTime = (seconds) => {

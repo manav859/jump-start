@@ -3,7 +3,7 @@ const SPATIAL_QUESTION_ID_END = 390;
 
 // The source PDF for local Q91 only contains the answer panel, not a separate
 // stimulus figure, so the UI intentionally falls back to a visible placeholder.
-const MISSING_SPATIAL_STIMULUS_IDS = new Set([381]);
+const MISSING_SPATIAL_STIMULUS_IDS = new Set([]);
 
 export const isSpatialQuestionId = (questionId) => {
   const numericId = Number(questionId);
@@ -39,7 +39,7 @@ export const getSpatialStimulusSrc = (questionId) => {
   }
 
   const folder = getSpatialQuestionFolder(questionId);
-  return folder ? `${folder}/stimulus.png` : null;
+  return folder ? `${folder}/stimulus.png?v=2` : null;
 };
 
 export const getSpatialOptionSrc = (questionId, optionLetter) => {
@@ -47,5 +47,5 @@ export const getSpatialOptionSrc = (questionId, optionLetter) => {
   const normalizedLetter = String(optionLetter || "").toUpperCase();
   if (!folder || !normalizedLetter) return null;
 
-  return `${folder}/option-${normalizedLetter}.png`;
+  return `${folder}/option-${normalizedLetter}.png?v=2`;
 };

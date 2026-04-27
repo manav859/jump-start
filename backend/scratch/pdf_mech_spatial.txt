@@ -1,0 +1,270 @@
+SPATIAL QUESTIONS
+1. When put together, what 3-dimensional shape will you get? “B”
+2. When folded, what pattern is possible? “C”
+3. Which figure represents the assembly of the following pieces? “D”
+
+-- 1 of 33 --
+
+4. Which cube is obtained by folding the shape below? “D”
+
+-- 2 of 33 --
+
+5. Which cube is obtained by folding the shape below? “D”
+
+-- 3 of 33 --
+
+6 . Which cube cannot be made based on the unfolded cube? “B”
+
+-- 4 of 33 --
+
+7.Which cube cannot be made based on the unfolded cube? “B”
+
+-- 5 of 33 --
+
+8. Which figure is a rotation of the object? “D”
+9. Which figure is a rotation of the object? “A”
+
+-- 6 of 33 --
+
+10. Which figure is a rotation of the given object? “C”
+
+-- 7 of 33 --
+
+11. Which figure is a top-down view of the given shape? “B”
+12. Which figure fits the given object, in order to make a cube? “A”
+
+-- 8 of 33 --
+
+13. Which figure fits the given object using rotation only, in order to make a
+square? “D”
+
+-- 9 of 33 --
+
+14. Which cube cannot be made based on the unfolded cube?”D”
+
+-- 10 of 33 --
+
+15. Which piece corresponds to the given solid? “C”
+
+-- 11 of 33 --
+
+16. Which figure is the rotation of object? “B”
+
+-- 12 of 33 --
+
+17. Which figure is the rotation of the object? “D”
+
+-- 13 of 33 --
+
+18. Which of the 4 figures presented (A, B, C, D) is a rotation of the first? “C”
+
+-- 14 of 33 --
+
+19. Which piece corresponds to the given solid? “C”
+
+-- 15 of 33 --
+
+20. Which piece corresponds to the given solid? “D”
+
+-- 16 of 33 --
+
+21. Which object can be made by folding the given shape? “C”
+
+-- 17 of 33 --
+
+22. Which figure can be formed using 2D rotation ?”A”
+
+-- 18 of 33 --
+
+22. Which figure can be formed with the given pieces? “C”
+
+-- 19 of 33 --
+
+23. To which object does the given top view correspond? “A”
+
+-- 20 of 33 --
+
+24. Which figure is a vertical reflection across the x axis? “A”
+
+-- 21 of 33 --
+
+25. Which cube can be formed by folding the given shape?
+“D”
+
+-- 22 of 33 --
+
+26. Which of these images is the top view of the given object? “B”
+
+-- 23 of 33 --
+
+Mechanical questions
+1. If the weight of each pulley is equal to the load, what is the ratio between the
+pulling force F and the load L? (F / L = ?) “c”
+A) 1/4
+B)1/8
+C)1
+2.How many revolutions does the wheel M make when K completes 4 revolutions?”a”
+a)1
+b) 2
+C)4
+3.Which statement is WRONG about springs?”A”
+a)Springs are a kind of simple machines
+b)Springs can be used as energy stores
+c)Springs constant depends on the properties of material they are made of
+
+-- 24 of 33 --
+
+4.How many inches must one pull the rope down in order to lift the load in the figure by
+28 inches? “C”
+A)14 in
+B)28 in
+c)56 in
+5)Electrons in a circuit flow from a place where there are __?__ electrons to a place
+where there are __?__ electrons.”C”
+a)Less, More
+b)Many, No
+c)More, Less
+6.We use __?__ to measure a specific gas pressure “c”
+a) Barometer
+
+-- 25 of 33 --
+
+b)Thermometer
+c) Manometer
+7.Which term is NOT related to gears?”C”
+a)Cogwheel
+b)Pinion
+c)Rack
+8.A screw is a combination of:”
+A) Nail and wedge
+b) Inclined plane and wedge
+c)Inclined plane and cylinder
+9.Which of the following materials can become a magnet?”C”
+a)Aluminum
+b)Copper
+c)Zinc
+10.If the big wheel (A) turns 3 times at clockwise direction, how many times and in
+which direction does the small one (B) turn?”C”
+a)3 times counter-clockwise
+b)6 times counter-clockwise
+c)6 times clockwise
+11.What happens to the current passing through the main branch in the circuit shown
+in the figure if one the bulbs smashes?”C”
+
+-- 26 of 33 --
+
+a) It becomes zero
+b)It doubles
+c)It decreases by a factor of 1.5
+12.If gear A rotates in the clockwise direction, what will the direction of wheels B, C
+and D be?”B”
+12.Which of the following does NOT use magnetism to operate?”C”
+a)Compass
+b)NMR apparatus
+
+-- 27 of 33 --
+
+c)Vehicle
+13.Belts usually are made from materials that __?__ friction.”A”
+a)Increase
+b)Reduce
+c)Don’t change
+14.Which statement about levers is CORRECT?”B”
+a)All levers have the same value of mechanical advantage
+B)A lever is a kind of simple machine
+c)Crowbar is an example of third class levers
+15.What would happen to the distance Earth-Sun if one year became 400 days without
+any change in the gravitational force? “B”
+a)Distance would increase
+b)Distance would decrease
+c)Distance would remain the same
+16.Centripetal force is proportional to… “A”
+
+-- 28 of 33 --
+
+a) Radius of curvature
+b)Mass of the rotating object
+c)Speed of rotation
+17.Which statement is CORRECT?
+a) Linear motion is a special case of circular motion
+b)Circular motion is a special case of linear motion
+c)When linear motion stops, circular motion begins
+18..Which statement below is WRONG about springs?”A”
+a) Springs are simple machines as they make the object move
+b)The extension or compression of springs always occur in the direction of the
+applied force
+c)To increase the elasticity of a system of springs, we must combine them in
+series
+19.In which direction does the 4th wheel rotate if the first wheel rotates clockwise?”B”
+a) Clockwise
+b)Anticlockwise
+c)It will stop moving
+20.Why can we not use the equation P = ρ · g · h for calculating the air pressure at a
+height h taking as a reference level the upper part of the atmosphere?”B”
+
+-- 29 of 33 --
+
+a) Because the atmosphere is very thick
+B)Because the density of the atmosphere is not uniform
+c)Because the atmosphere is not a fluid
+21.Which statement regarding magnets is CORRECT?”A”
+A) When a magnet is divided in two pieces two magnets with a single pole each
+are formed
+b)Magnetic field lines are closed lines
+c)A magnet can attract or repel all materials around
+22.The advantage/s of a series circuit to a parallel one is that…. “C”
+A)It is easier to build up
+b)all circuit elements operate at full capacity
+
+-- 30 of 33 --
+
+C) Both A and B
+23.If a liquid becomes twice denser and the depth of an immersed object in this liquid
+halves, the liquid’s pressure: “c”
+A) Quadruples
+b)Reduces by a factor of 4
+c) Doesn’t change
+24.An electric iron gets hotter but the cable carrying the current to the iron is cool.
+This, because:”C”
+a) Cables have coolers inside them
+b) Electric iron converts electricity into heat
+c) Cables do not carry any electricity when iron is operating
+25.What class of levers does the inclined plane represent?”A”
+A)First class
+b)Second class
+c) Third class
+26.What value does the voltmeter in the circuit shown in the figure read? “B”
+A) 0.25A b) 0A c)4A
+
+-- 31 of 33 --
+
+27. What is the main difference between a cell and a capacitor? “A”
+A)A cell provides the force needed to make charges flow through the circuit,
+while a capacitor accumulate charges on its plates
+b)A cell produce electricity while a capacitor stores it
+c) A cell stores electricity in the form of chemical energy while a capacitor
+consumes this electricity
+28.Which statement is CORRECT about air pressure? “B”
+a)At 100 km above the ground, air pressure is about 1atm
+b)At 100 km above the ground, air pressure is less than 1atm
+c) At 100 km above the ground, air pressure is more than 1atm
+29.Which statement is WRONG about circular motion?”B”
+a)Circular motion is a special case of linear motion
+b)Linear motion is a special case of circular motion
+c) Linear motion and circular motion have not any relationship between them at
+all
+30.we must put a __?__ before an expensive circuit component to prevent it from
+burning by the excessive current.”B”
+a)Resistor
+b)Fuse
+c) Bulb
+
+-- 32 of 33 --
+
+31.What kind of lever is the hydraulic crane shown in the figure? “C”
+a)First class lever
+b)Second class lever
+c) Third class lever
+
+-- 33 of 33 --
+
