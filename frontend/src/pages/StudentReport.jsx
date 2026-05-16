@@ -105,6 +105,20 @@ export default function StudentReport() {
   return (
     <div className="report-print-page bg-[#F7F8FA]">
       <div className="report-print-root mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+        {report?.isDemo ? (
+          <div className="mb-6 flex items-start gap-3 rounded-[18px] border border-[#F5D9A6] bg-[#FFF9EE] px-5 py-4 text-[#8C5A00] sm:rounded-[22px] sm:px-6">
+            <Sparkles className="mt-1 h-5 w-5 shrink-0 text-[#F59F0A]" />
+            <div>
+              <p className="text-sm font-semibold text-[#0F1729]">
+                Demo result — based on 50 questions.
+              </p>
+              <p className="mt-1 text-sm leading-6">
+                Purchase the full 500-question assessment for a complete profile.
+              </p>
+            </div>
+          </div>
+        ) : null}
+
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <Link
@@ -281,6 +295,107 @@ export default function StudentReport() {
             </section>
           </div>
         </div>
+
+        <section className="surface-card report-print-card mt-6 rounded-[22px] p-5 sm:rounded-[30px] sm:p-7">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h2 className="text-[20px] font-bold leading-8 text-[#0F1729] sm:text-2xl">
+                Top Career Recommendations
+              </h2>
+              <p className="mt-1 text-[13px] leading-6 text-[#65758B] sm:text-sm">
+                Career fits ranked by weighted match across your Holland code,
+                intelligences, aptitudes, and EQ.
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 space-y-3 sm:mt-5 sm:space-y-4">
+            {(report?.careerRecommendations || []).length ? (
+              report.careerRecommendations.map((career, index) => {
+                const matchValue =
+                  career.score != null
+                    ? career.score
+                    : career.matchPercent != null
+                      ? career.matchPercent
+                      : 0;
+                const reasons = career.matchReasons || {};
+                const hasReasons =
+                  reasons.holland ||
+                  reasons.intelligence ||
+                  reasons.aptitude ||
+                  reasons.eq;
+                return (
+                  <div
+                    key={`${career.title}-${index}`}
+                    className="rounded-[14px] border border-[#E1E7EF] bg-white px-4 py-3.5 sm:rounded-[18px] sm:px-5 sm:py-4"
+                  >
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <h3 className="text-[15px] font-semibold leading-6 text-[#0F1729] sm:text-base">
+                        {career.title}
+                      </h3>
+                      <span className="rounded-full bg-[#E2F8F7] px-2.5 py-0.5 text-[10px] font-semibold text-[#188B8B]">
+                        {Math.round(matchValue)}% Match
+                      </span>
+                      {career.category ? (
+                        <span className="rounded-full border border-[#D9E5EC] px-2.5 py-0.5 text-[10px] font-semibold text-[#4E5D72]">
+                          {career.category}
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#E6EEF2]">
+                      <div
+                        className="h-1.5 rounded-full bg-[#188B8B]"
+                        style={{
+                          width: `${Math.min(100, Math.max(0, matchValue))}%`,
+                        }}
+                      />
+                    </div>
+                    {hasReasons ? (
+                      <ul className="mt-3 space-y-1.5 text-[12px] leading-5 text-[#4E5D72] sm:text-[13px]">
+                        {reasons.holland ? (
+                          <li>
+                            <span className="font-semibold text-[#0F1729]">
+                              Interests:
+                            </span>{" "}
+                            {reasons.holland}
+                          </li>
+                        ) : null}
+                        {reasons.intelligence ? (
+                          <li>
+                            <span className="font-semibold text-[#0F1729]">
+                              Intelligence:
+                            </span>{" "}
+                            {reasons.intelligence}
+                          </li>
+                        ) : null}
+                        {reasons.aptitude ? (
+                          <li>
+                            <span className="font-semibold text-[#0F1729]">
+                              Aptitude:
+                            </span>{" "}
+                            {reasons.aptitude}
+                          </li>
+                        ) : null}
+                        {reasons.eq ? (
+                          <li>
+                            <span className="font-semibold text-[#0F1729]">
+                              EQ:
+                            </span>{" "}
+                            {reasons.eq}
+                          </li>
+                        ) : null}
+                      </ul>
+                    ) : null}
+                  </div>
+                );
+              })
+            ) : (
+              <div className="rounded-[18px] bg-[#F8FAFC] px-4 py-4 text-[13px] text-[#65758B] sm:text-sm">
+                Career recommendations were not available when this report was
+                generated.
+              </div>
+            )}
+          </div>
+        </section>
 
         <section className="surface-card report-print-card mt-6 rounded-[22px] p-5 sm:rounded-[30px] sm:p-7">
           <h2 className="text-[20px] font-bold leading-8 text-[#0F1729] sm:text-2xl">

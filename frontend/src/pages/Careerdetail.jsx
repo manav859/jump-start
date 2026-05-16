@@ -128,10 +128,41 @@ export default function Careerdetail() {
               <h1 className="text-4xl font-bold leading-tight text-[#0F1729] sm:text-[2.7rem]">
                 {detail.title}
               </h1>
-              <span className="rounded-full bg-[#E2F8F7] px-4 py-2 text-sm font-semibold text-[#188B8B]">
-                {detail.matchPercent}% Match
+              <span
+                className="rounded-full bg-[#E2F8F7] px-4 py-2 text-sm font-semibold text-[#188B8B]"
+                title={
+                  detail.score != null
+                    ? `Your weighted match score: ${detail.score}/100`
+                    : undefined
+                }
+              >
+                {detail.score != null
+                  ? `${Math.round(detail.score)}% Match`
+                  : `${detail.matchPercent}% Match`}
               </span>
+              {detail.category ? (
+                <span className="rounded-full border border-[#D9E5EC] bg-white px-3 py-1.5 text-xs font-semibold text-[#4E5D72]">
+                  {detail.category}
+                </span>
+              ) : null}
             </div>
+
+            {detail.score != null ? (
+              <div className="mt-3 max-w-md">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-[#E6EEF2]">
+                  <div
+                    className="h-2 rounded-full bg-[#188B8B]"
+                    style={{
+                      width: `${Math.min(100, Math.max(0, detail.score))}%`,
+                    }}
+                  />
+                </div>
+                <p className="mt-1.5 text-xs text-[#7D8CA2]">
+                  Compatibility based on your Holland code, intelligences,
+                  aptitudes, and EQ.
+                </p>
+              </div>
+            ) : null}
 
             <p className="mt-4 max-w-4xl text-base leading-8 text-[#65758B]">
               {detail.description}
@@ -172,6 +203,107 @@ export default function Careerdetail() {
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_340px]">
           <div className="space-y-6">
+            {detail.matchReasons &&
+            (detail.matchReasons.holland ||
+              detail.matchReasons.intelligence ||
+              detail.matchReasons.aptitude ||
+              detail.matchReasons.eq) ? (
+              <section className="surface-card rounded-[26px] border border-[#D4EBEE] bg-[linear-gradient(180deg,#F7FDFD_0%,#FFFFFF_100%)] p-6">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-2xl bg-[#EAFBFB] p-3 text-[#188B8B]">
+                    <Sparkles className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-[#0F1729]">
+                      Why this matched you
+                    </h2>
+                    <p className="mt-1 text-sm text-[#7D8CA2]">
+                      Weighted signals from your assessment that lifted this
+                      career to the top.
+                    </p>
+                  </div>
+                </div>
+                <ul className="mt-5 space-y-3 text-sm leading-7 text-[#4E5D72]">
+                  {detail.matchReasons.holland ? (
+                    <li className="flex gap-3">
+                      <span className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-[#188B8B]" />
+                      <span>
+                        <span className="font-semibold text-[#0F1729]">
+                          Interests:
+                        </span>{" "}
+                        {detail.matchReasons.holland}
+                      </span>
+                    </li>
+                  ) : null}
+                  {detail.matchReasons.intelligence ? (
+                    <li className="flex gap-3">
+                      <span className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-[#188B8B]" />
+                      <span>
+                        <span className="font-semibold text-[#0F1729]">
+                          Intelligence:
+                        </span>{" "}
+                        {detail.matchReasons.intelligence}
+                      </span>
+                    </li>
+                  ) : null}
+                  {detail.matchReasons.aptitude ? (
+                    <li className="flex gap-3">
+                      <span className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-[#188B8B]" />
+                      <span>
+                        <span className="font-semibold text-[#0F1729]">
+                          Aptitude:
+                        </span>{" "}
+                        {detail.matchReasons.aptitude}
+                      </span>
+                    </li>
+                  ) : null}
+                  {detail.matchReasons.eq ? (
+                    <li className="flex gap-3">
+                      <span className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-[#188B8B]" />
+                      <span>
+                        <span className="font-semibold text-[#0F1729]">
+                          EQ:
+                        </span>{" "}
+                        {detail.matchReasons.eq}
+                      </span>
+                    </li>
+                  ) : null}
+                </ul>
+                {detail.breakdown ? (
+                  <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    {[
+                      {
+                        label: "Holland",
+                        value: detail.breakdown.hollandMatch,
+                      },
+                      {
+                        label: "Intelligence",
+                        value: detail.breakdown.intelligenceMatch,
+                      },
+                      {
+                        label: "Aptitude",
+                        value: detail.breakdown.aptitudeMatch,
+                      },
+                      { label: "EQ", value: detail.breakdown.eqMatch },
+                    ].map((item) => (
+                      <div
+                        key={item.label}
+                        className="rounded-[14px] bg-white px-3 py-2.5 text-center shadow-[0_2px_8px_rgba(15,23,41,0.04)]"
+                      >
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8A94A6]">
+                          {item.label}
+                        </p>
+                        <p className="mt-1 text-lg font-bold text-[#188B8B]">
+                          {item.value != null ? Math.round(item.value) : "--"}
+                          {item.value != null ? "%" : ""}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </section>
+            ) : null}
+
             <section className="surface-card rounded-[26px] p-6">
               <div className="flex items-center gap-3">
                 <div className="rounded-2xl bg-[#EAFBFB] p-3 text-[#188B8B]">

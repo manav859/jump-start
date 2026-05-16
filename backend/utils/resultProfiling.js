@@ -1,4 +1,5 @@
 import { getPersonalityAxisForQuestion } from "./personalityQuestionMetadata.js";
+import { matchCareers } from "./scoring/careerMatcher.js";
 
 const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
@@ -1433,7 +1434,57 @@ export const computeResultFromAnswers = (answers, sections) => {
   };
 
   const strengths = buildStrengths(flattenedSignals);
-  const careerRecommendations = buildCareerRecommendations(flattenedSignals);
+
+  // Build the named profile buckets the weighted careerMatcher expects.
+  // Generic packages may not surface every signal, so values default to 50.
+  const namedProfileForMatcher = {
+    hollandProfile: {
+      R: flattenedSignals.realistic ?? 50,
+      I: flattenedSignals.investigative ?? 50,
+      A: flattenedSignals.artistic ?? 50,
+      S: flattenedSignals.social ?? 50,
+      E: flattenedSignals.enterprising ?? 50,
+      C: flattenedSignals.conventional ?? 50,
+    },
+    multipleIntelligences: {
+      "Logical-Math": flattenedSignals.logicalMathematical ?? 50,
+      Linguistic: flattenedSignals.linguistic ?? 50,
+      Spatial: flattenedSignals.visualSpatial ?? 50,
+      Musical: flattenedSignals.musical ?? 50,
+      "Bodily-Kinesthetic": flattenedSignals.bodilyKinesthetic ?? 50,
+      Interpersonal: flattenedSignals.interpersonal ?? 50,
+      Intrapersonal: flattenedSignals.intrapersonal ?? 50,
+      Naturalistic: flattenedSignals.naturalistic ?? 50,
+    },
+    aptitudeScores: {
+      Verbal: aptitudeMap.verbalReasoning ?? 50,
+      Numerical: aptitudeMap.numericalAbility ?? 50,
+      Abstract: aptitudeMap.abstractReasoning ?? 50,
+      "Spatial Relations": aptitudeMap.spatialRelations ?? 50,
+      Mechanical: aptitudeMap.mechanicalReasoning ?? 50,
+      Clerical: aptitudeMap.clericalAccuracy ?? 50,
+      "Critical Thinking": aptitudeMap.criticalThinking ?? 50,
+      "Problem Solving": aptitudeMap.problemSolving ?? 50,
+    },
+    eqProfile: {
+      "Self-Awareness": eqMap.selfAwareness ?? 50,
+      "Self-Regulation": eqMap.selfRegulation ?? 50,
+      Motivation: eqMap.motivation ?? 50,
+      Empathy: eqMap.empathy ?? 50,
+      "Social Skills": eqMap.socialSkills ?? 50,
+    },
+  };
+
+  // Use the weighted matcher when the Holland bucket carries real signal
+  // (any value diverges from the neutral 50 default). Otherwise fall back
+  // to the legacy heuristic so non-500q packages still get recommendations.
+  const hasHollandSignal = Object.values(
+    namedProfileForMatcher.hollandProfile
+  ).some((value) => Number(value) !== 50);
+  const careerRecommendations = hasHollandSignal
+    ? matchCareers(namedProfileForMatcher, 10)
+    : buildCareerRecommendations(flattenedSignals);
+
   const overallScore = Math.round(average(testResults.map((item) => item.score)));
   const sectionBreakdown = buildSectionBreakdown({
     scoredSections,
@@ -1457,11 +1508,15 @@ export const computeResultFromAnswers = (answers, sections) => {
     overallPercentile: `Top ${Math.max(8, 100 - overallScore)}% profile strength`,
     completedTestsCount: testResults.length,
     totalTestsCount: enabledSections.length,
-    careerPathwaysCount: CAREER_ARCHETYPES.length,
+    careerPathwaysCount: careerRecommendations.length,
     testResults,
     sectionBreakdown,
     strengths,
     careerRecommendations,
+    hollandProfile: namedProfileForMatcher.hollandProfile,
+    multipleIntelligences: namedProfileForMatcher.multipleIntelligences,
+    aptitudeScores: namedProfileForMatcher.aptitudeScores,
+    eqProfile: namedProfileForMatcher.eqProfile,
     personalityType: personalityType
       ? {
           code: personalityType.code,

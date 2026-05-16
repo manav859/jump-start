@@ -13,6 +13,8 @@ import {
   getCurrentPackage,
   getProfile,
   updateProfile,
+  getStudentProfile,
+  updateStudentProfile,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -20,6 +22,8 @@ const router = express.Router();
 router.get("/init", protect, init);
 router.get("/profile", protect, getProfile);
 router.patch("/profile", protect, updateProfile);
+router.get("/profile/student", protect, getStudentProfile);
+router.put("/profile/student", protect, updateStudentProfile);
 router.get("/package/current", protect, getCurrentPackage);
 router.post("/package/purchase", protect, purchasePackage);
 router.patch("/package/select", protect, selectPackage);

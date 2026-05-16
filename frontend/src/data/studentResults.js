@@ -70,7 +70,9 @@ export const normalizeStudentResultsPayload = (raw = {}) => ({
     ? raw.careerRecommendations
     : [],
   personalityType: raw.personalityType || null,
-  tests: Array.isArray(raw.tests) ? raw.tests : [],
+  tests: Array.isArray(raw.tests)
+    ? raw.tests.map((test) => ({ ...test, isDemo: Boolean(test?.isDemo) }))
+    : [],
   testsSummary: raw.testsSummary || {
     totalPurchased: 0,
     attemptedCount: 0,
@@ -87,7 +89,9 @@ export const normalizeStudentReportPayload = (raw = {}) => ({
   submittedAt: raw.submittedAt || null,
   approvedAt: raw.approvedAt || null,
   estimatedReadyHours: raw.estimatedReadyHours ?? null,
-  report: raw.report || null,
+  report: raw.report
+    ? { ...raw.report, isDemo: Boolean(raw.report.isDemo) }
+    : null,
 });
 
 export const getResultMeta = (group, key) =>

@@ -405,9 +405,30 @@ export const getCareerDetailContent = (career = null) => {
     ...(detail.extraSkills || []),
   ]).slice(0, 8);
 
+  const score =
+    career?.score != null
+      ? Number(career.score)
+      : career?.matchPercent != null
+        ? Number(career.matchPercent)
+        : null;
+
   return {
     title,
-    matchPercent: career?.matchPercent ?? 82,
+    matchPercent: career?.matchPercent ?? Math.round(score ?? 82),
+    score: score != null ? Math.round(score * 10) / 10 : null,
+    category: career?.category || "",
+    matchReasons: career?.matchReasons || null,
+    breakdown: career?.breakdown || null,
+    hollandCodes: Array.isArray(career?.hollandCodes) ? career.hollandCodes : [],
+    intelligenceTypes: Array.isArray(career?.intelligenceTypes)
+      ? career.intelligenceTypes
+      : [],
+    aptitudeStrengths: Array.isArray(career?.aptitudeStrengths)
+      ? career.aptitudeStrengths
+      : [],
+    eqCompetencies: Array.isArray(career?.eqCompetencies)
+      ? career.eqCompetencies
+      : [],
     description:
       career?.description ||
       detail.overview ||

@@ -182,6 +182,18 @@ export default function Result() {
     return title.toLowerCase().startsWith("the ") ? title : `The ${title}`;
   }, [data.personalityType?.title]);
 
+  // Show the demo banner when the user's only published result is from the
+  // demo package (so the upsell is relevant); hide it once they've also
+  // completed the full 500-question test.
+  const showDemoBanner = useMemo(() => {
+    const tests = Array.isArray(data.tests) ? data.tests : [];
+    const publishedTests = tests.filter(
+      (test) => test?.resultState === "approved"
+    );
+    if (!publishedTests.length) return false;
+    return publishedTests.every((test) => test?.isDemo === true);
+  }, [data.tests]);
+
   const handleCardAction = async (test) => {
     if (!test) return;
 
@@ -313,6 +325,20 @@ export default function Result() {
               ) : null}
             </div>
           </div>
+
+          {showDemoBanner ? (
+            <div className="report-print-hidden mt-6 flex items-start gap-3 rounded-[16px] border border-[#F5D9A6] bg-[#FFF9EE] px-5 py-4 text-[#8C5A00]">
+              <Sparkles className="mt-1 h-5 w-5 shrink-0 text-[#F59F0A]" />
+              <div>
+                <p className="text-sm font-semibold text-[#0F1729]">
+                  Demo result — based on 50 questions.
+                </p>
+                <p className="mt-1 text-sm leading-6">
+                  Purchase the full 500-question assessment for a complete profile.
+                </p>
+              </div>
+            </div>
+          ) : null}
 
           <section
             className={`${resultCardClass} report-print-card mt-8 min-h-[144px] overflow-hidden rounded-[16px] bg-[radial-gradient(circle_at_10%_0%,rgba(232,249,250,0.75),transparent_36%),linear-gradient(180deg,#FFFFFF_0%,#FCFEFF_100%)] px-6 py-[26px]`}
@@ -504,51 +530,132 @@ export default function Result() {
 
                 <div className="mt-6 space-y-4">
                   {visibleCareers.length ? (
-                    visibleCareers.map((career, index) => (
-                      <div
-                        key={career.title}
-                        className={`rounded-[12px] border px-[17px] py-[18px] ${
-                          index < 2
-                            ? "border-[#D4EBEE] bg-[linear-gradient(180deg,#F7FDFD_0%,#FFFFFF_100%)]"
-                            : "border-[#E1E7EF] bg-white"
-                        } ${index === 2 ? "min-h-[152px]" : "min-h-[154px]"}`}
-                      >
-                        <div className="flex flex-wrap items-center gap-2.5">
-                          <h3 className="text-[18px] font-semibold leading-7 text-[#0F1729]">
-                            {career.title}
-                          </h3>
-                          <span className="rounded-full bg-[#E2F8F7] px-[11px] py-[3px] text-[10px] font-semibold leading-[15px] text-[#188B8B]">
-                            {career.matchPercent ?? 0}% Match
-                          </span>
-                        </div>
-                        <p className="mt-1 text-[14px] leading-5 text-[#65758B]">
-                          {career.description}
-                        </p>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {(career.skills || []).slice(0, 4).map((skill) => (
+                    visibleCareers.map((career, index) => {
+                      const matchValue =
+                        career.score != null
+                          ? career.score
+                          : career.matchPercent != null
+                            ? career.matchPercent
+                            : 0;
+                      const reasons = career.matchReasons || {};
+                      const hasReasons =
+                        reasons.holland ||
+                        reasons.intelligence ||
+                        reasons.aptitude ||
+                        reasons.eq;
+                      return (
+                        <div
+                          key={career.title}
+                          className={`rounded-[12px] border px-[17px] py-[18px] ${
+                            index < 2
+                              ? "border-[#D4EBEE] bg-[linear-gradient(180deg,#F7FDFD_0%,#FFFFFF_100%)]"
+                              : "border-[#E1E7EF] bg-white"
+                          }`}
+                        >
+                          <div className="flex flex-wrap items-center gap-2.5">
+                            <h3 className="text-[18px] font-semibold leading-7 text-[#0F1729]">
+                              {career.title}
+                            </h3>
                             <span
-                              key={skill}
-                              className="rounded-full bg-[#157A7A] px-[11px] py-[3px] text-[10px] font-semibold leading-[15px] text-white"
+                              className="rounded-full bg-[#E2F8F7] px-[11px] py-[3px] text-[10px] font-semibold leading-[15px] text-[#188B8B]"
+                              title={`Compatibility score: ${matchValue}/100`}
                             >
-                              {skill}
+                              {Math.round(matchValue)}% Match
                             </span>
-                          ))}
-                        </div>
-                        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                          <p className="text-[12px] leading-5 text-[#7A8AA0]">
-                            {career.salaryRange || "Salary range unavailable"}
-                          </p>
-                          <Link
-                            to={`/careerdetail?career=${encodeURIComponent(career.title || "")}`}
-                            state={{ career }}
-                            className="report-print-hidden inline-flex items-center gap-1.5 text-[13px] font-medium text-[#188B8B] hover:underline"
+                            {career.category ? (
+                              <span className="rounded-full border border-[#D9E5EC] px-[11px] py-[3px] text-[10px] font-semibold leading-[15px] text-[#4E5D72]">
+                                {career.category}
+                              </span>
+                            ) : null}
+                          </div>
+                          <div
+                            className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#E6EEF2]"
+                            aria-hidden="true"
                           >
-                            View Details
-                            <ArrowRight className="h-4 w-4" />
-                          </Link>
+                            <div
+                              className="h-1.5 rounded-full bg-[#188B8B]"
+                              style={{
+                                width: `${Math.min(100, Math.max(0, matchValue))}%`,
+                              }}
+                            />
+                          </div>
+                          {career.description ? (
+                            <p className="mt-2 text-[14px] leading-5 text-[#65758B]">
+                              {career.description}
+                            </p>
+                          ) : null}
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {(career.skills || []).slice(0, 4).map((skill) => (
+                              <span
+                                key={skill}
+                                className="rounded-full bg-[#157A7A] px-[11px] py-[3px] text-[10px] font-semibold leading-[15px] text-white"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                          {hasReasons ? (
+                            <details className="report-print-hidden mt-3 group">
+                              <summary className="cursor-pointer list-none text-[12px] font-semibold text-[#188B8B] hover:underline">
+                                <span className="group-open:hidden">
+                                  Why this career matched you ▾
+                                </span>
+                                <span className="hidden group-open:inline">
+                                  Hide match details ▴
+                                </span>
+                              </summary>
+                              <ul className="mt-2 space-y-1.5 rounded-[10px] bg-[#F6FDFC] px-3 py-2.5 text-[12px] leading-5 text-[#4E5D72]">
+                                {reasons.holland ? (
+                                  <li>
+                                    <span className="font-semibold text-[#0F1729]">
+                                      Interests:
+                                    </span>{" "}
+                                    {reasons.holland}
+                                  </li>
+                                ) : null}
+                                {reasons.intelligence ? (
+                                  <li>
+                                    <span className="font-semibold text-[#0F1729]">
+                                      Intelligence:
+                                    </span>{" "}
+                                    {reasons.intelligence}
+                                  </li>
+                                ) : null}
+                                {reasons.aptitude ? (
+                                  <li>
+                                    <span className="font-semibold text-[#0F1729]">
+                                      Aptitude:
+                                    </span>{" "}
+                                    {reasons.aptitude}
+                                  </li>
+                                ) : null}
+                                {reasons.eq ? (
+                                  <li>
+                                    <span className="font-semibold text-[#0F1729]">
+                                      EQ:
+                                    </span>{" "}
+                                    {reasons.eq}
+                                  </li>
+                                ) : null}
+                              </ul>
+                            </details>
+                          ) : null}
+                          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <p className="text-[12px] leading-5 text-[#7A8AA0]">
+                              {career.salaryRange || ""}
+                            </p>
+                            <Link
+                              to={`/careerdetail?career=${encodeURIComponent(career.title || "")}`}
+                              state={{ career }}
+                              className="report-print-hidden inline-flex items-center gap-1.5 text-[13px] font-medium text-[#188B8B] hover:underline"
+                            >
+                              View Details
+                              <ArrowRight className="h-4 w-4" />
+                            </Link>
+                          </div>
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   ) : (
                     <div className="rounded-[16px] bg-[#F8FAFC] px-4 py-5 text-sm text-[#65758B]">
                       Career recommendations will appear after a published result is available.

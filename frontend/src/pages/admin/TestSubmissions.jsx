@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  AlertTriangle,
   CheckCircle2,
   ChevronDown,
   ExternalLink,
@@ -204,12 +205,43 @@ export default function TestSubmissions() {
                         </div>
                       </td>
                       <td className="px-6 py-5 text-sm font-medium text-[#4E5D72]">
-                        {row.type}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span>{row.type}</span>
+                          {row.isDemo ? (
+                            <span className="inline-flex items-center rounded-full border border-[#F4DCA8] bg-[#FFF9EE] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#B86D00]">
+                              Demo
+                            </span>
+                          ) : null}
+                        </div>
                       </td>
                       <td className="px-6 py-5 text-sm text-[#4E5D72]">{row.date}</td>
                       <td className="px-6 py-5 text-sm text-[#4E5D72]">{row.duration}</td>
                       <td className="px-6 py-5">
-                        <ResultStatusBadge status={row.status} />
+                        <div className="flex flex-wrap items-center gap-2">
+                          <ResultStatusBadge status={row.status} />
+                          {row.completionStatus ? (
+                            <ResultStatusBadge status={row.completionStatus} />
+                          ) : null}
+                          {Number.isFinite(Number(row.completedSections)) &&
+                          Number.isFinite(Number(row.totalSections)) &&
+                          Number(row.totalSections) > 0 ? (
+                            <span
+                              className="inline-flex items-center rounded-full border border-[#D7E4EA] bg-[#F8FBFC] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#4E5D72]"
+                              title="Completed sections out of assigned total"
+                            >
+                              {row.completedSections}/{row.totalSections} Sections
+                            </span>
+                          ) : null}
+                          {row.hasUnreviewedItems ? (
+                            <span
+                              className="inline-flex items-center gap-1 rounded-full border border-[#F4DCA8] bg-[#FFF1D3] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#B86D00]"
+                              title="One or more Section 4 questions need manual review before approval"
+                            >
+                              <AlertTriangle className="h-3 w-3" />
+                              Review Required
+                            </span>
+                          ) : null}
+                        </div>
                       </td>
                       <td className="px-6 py-5">
                         <div className="flex flex-wrap justify-end gap-2">

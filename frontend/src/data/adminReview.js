@@ -14,6 +14,13 @@ export const ADMIN_RESULT_STATUS_META = {
     badgeClass: "border-[#BEE7D1] bg-[#F1FCF5] text-[#1D7D46]",
     dotClass: "bg-[#22C55E]",
   },
+  // The scorer (Prompt-5) emits "Complete" (no trailing "d"). Kept
+  // "Completed" alongside as an alias for legacy reports.
+  Complete: {
+    label: "Complete",
+    badgeClass: "border-[#BEE7D1] bg-[#F1FCF5] text-[#1D7D46]",
+    dotClass: "bg-[#22C55E]",
+  },
   Completed: {
     label: "Completed",
     badgeClass: "border-[#BEE7D1] bg-[#F1FCF5] text-[#1D7D46]",
@@ -29,10 +36,18 @@ export const ADMIN_RESULT_STATUS_META = {
     badgeClass: "border-[#F5D0D0] bg-[#FFF5F5] text-[#B42318]",
     dotClass: "bg-[#EF4444]",
   },
+  // Section-4 image questions flagged for admin manual review (Prompt-4).
+  // Amber, distinct from the generic blue "Review Required" so the
+  // reviewer can tell at a glance which subsections need attention.
+  "Manual Review": {
+    label: "Manual Review",
+    badgeClass: "border-[#F4DCA8] bg-[#FFF9EE] text-[#B86D00]",
+    dotClass: "bg-[#F59F0A]",
+  },
   "Review Required": {
-    label: "Review Required",
-    badgeClass: "border-[#D7E4EA] bg-[#F5F8FB] text-[#1D4ED8]",
-    dotClass: "bg-[#2563EB]",
+    label: "Manual Review",
+    badgeClass: "border-[#F4DCA8] bg-[#FFF9EE] text-[#B86D00]",
+    dotClass: "bg-[#F59F0A]",
   },
 };
 

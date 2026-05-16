@@ -2,38 +2,70 @@ import { CheckCircle2, ClipboardCheck, Percent, Trophy } from "lucide-react";
 import { formatScoreValue } from "../../data/adminReview";
 import ResultStatusBadge from "./ResultStatusBadge";
 
-const summaryItems = (summary = {}) => [
-  {
-    key: "overallScore",
-    label: "Overall Score",
-    value: `${formatScoreValue(summary.overallScore)} / ${formatScoreValue(
-      summary.maxScore
-    )}`,
-    icon: Trophy,
-    accent: "bg-[#EAFBFB] text-[#188B8B]",
-  },
-  {
-    key: "percentage",
-    label: "Percentage",
-    value: `${formatScoreValue(summary.percentage)}%`,
-    icon: Percent,
-    accent: "bg-[#FFF6DF] text-[#F59F0A]",
-  },
-  {
-    key: "completionStatus",
-    label: "Completion Status",
-    value: summary.completionStatus || "Pending",
-    icon: ClipboardCheck,
-    accent: "bg-[#F4F8FF] text-[#3B82F6]",
-  },
-  {
-    key: "completedSections",
-    label: "Completed Sections",
-    value: `${summary.completedSections ?? 0} / ${summary.totalSections ?? 0}`,
-    icon: CheckCircle2,
-    accent: "bg-[#F1FCF5] text-[#16A34A]",
-  },
-];
+// Prompt-6 fix: derive the completion-status chip styling from the
+// scorer's literal value ("Complete" | "Incomplete") rather than
+// reading a separate flag — green when Complete, red when Incomplete,
+// neutral otherwise.
+const COMPLETION_CHIP_STYLES = {
+  Complete: "bg-[#F1FCF5] text-[#1D7D46]",
+  Completed: "bg-[#F1FCF5] text-[#1D7D46]",
+  Incomplete: "bg-[#FFF5F5] text-[#B42318]",
+};
+
+const isCompleteStatus = (status) =>
+  String(status || "").trim().toLowerCase().startsWith("complete");
+
+const summaryItems = (summary = {}) => {
+  const completionStatus = summary.completionStatus || "Pending";
+  const completionChipClass =
+    COMPLETION_CHIP_STYLES[completionStatus] || "bg-[#F4F8FF] text-[#3B82F6]";
+  // The scorer's overallScore is already 0-100, and maxScore is always 100
+  // for the post-Prompt-5 scoring pipeline. If the API still ships a
+  // separate maxScore field we honour it; otherwise default to 100 so the
+  // demo doesn't read "47 / 0".
+  const maxScore =
+    summary.maxScore != null && Number.isFinite(Number(summary.maxScore))
+      ? summary.maxScore
+      : 100;
+  const overallScoreSuffix = summary.isDemo ? " (Demo)" : "";
+
+  return [
+    {
+      key: "overallScore",
+      label: "Overall Score",
+      value: `${formatScoreValue(summary.overallScore)} / ${formatScoreValue(
+        maxScore
+      )}${overallScoreSuffix}`,
+      icon: Trophy,
+      accent: "bg-[#EAFBFB] text-[#188B8B]",
+    },
+    {
+      key: "percentage",
+      label: "Percentage",
+      value: `${formatScoreValue(
+        summary.percentage != null ? summary.percentage : summary.overallScore
+      )}%`,
+      icon: Percent,
+      accent: "bg-[#FFF6DF] text-[#F59F0A]",
+    },
+    {
+      key: "completionStatus",
+      label: "Completion Status",
+      value: completionStatus,
+      icon: ClipboardCheck,
+      accent: completionChipClass,
+    },
+    {
+      key: "completedSections",
+      label: "Completed Sections",
+      value: `${summary.completedSections ?? 0} / ${summary.totalSections ?? 0}`,
+      icon: CheckCircle2,
+      accent: isCompleteStatus(completionStatus)
+        ? "bg-[#F1FCF5] text-[#16A34A]"
+        : "bg-[#FFF5F5] text-[#B42318]",
+    },
+  ];
+};
 
 export default function OverallScoreSummaryCard({ summary }) {
   return (

@@ -202,48 +202,45 @@ const parseQuestionRangeCount = (questionRangeLabel) => {
   return total > 0 ? total : null;
 };
 
+// Prompt-6 fix: trust the scorer's authoritative answeredCount /
+// totalQuestions fields. The previous fallback chain (derived from
+// questionNumbers / questionRangeLabel / status) was the bug that
+// produced "3/30 incomplete" for fully-answered demo subsections.
+// Fall back to the questionNumbers count only when the scorer didn't
+// emit a numeric totalQuestions at all (legacy reports).
 const getQuestionProgressCounts = (subsection) => {
-  const explicitAnsweredCount = Number(subsection?.answeredCount);
-  const explicitTotalQuestions = Number(subsection?.totalQuestions);
-  const hasExplicitAnsweredCount =
-    Number.isFinite(explicitAnsweredCount) && explicitAnsweredCount >= 0;
-  const derivedTotalQuestions =
-    (Number.isFinite(explicitTotalQuestions) && explicitTotalQuestions > 0
-      ? explicitTotalQuestions
-      : 0) ||
+  const rawAnswered = Number(subsection?.answeredCount);
+  const rawTotal = Number(subsection?.totalQuestions);
+
+  const hasScorerTotal = Number.isFinite(rawTotal) && rawTotal >= 0;
+  const hasScorerAnswered = Number.isFinite(rawAnswered) && rawAnswered >= 0;
+
+  if (hasScorerTotal) {
+    const answeredCount = hasScorerAnswered ? rawAnswered : 0;
+    return {
+      answeredCount: Math.min(answeredCount, rawTotal),
+      totalQuestions: rawTotal,
+    };
+  }
+
+  // Legacy fallback for reports persisted before the scorer fix.
+  const fallbackTotal =
     getUniqueQuestionCount(subsection?.questionNumbers) ||
     parseQuestionRangeCount(subsection?.questionRangeLabel) ||
     0;
 
-  if (!derivedTotalQuestions) {
-    return null;
-  }
-
-  if (hasExplicitAnsweredCount && explicitAnsweredCount > 0) {
+  if (!fallbackTotal) return null;
+  if (hasScorerAnswered) {
     return {
-      answeredCount: Math.min(explicitAnsweredCount, derivedTotalQuestions),
-      totalQuestions: derivedTotalQuestions,
+      answeredCount: Math.min(rawAnswered, fallbackTotal),
+      totalQuestions: fallbackTotal,
     };
   }
-
-  if (hasExplicitAnsweredCount && explicitAnsweredCount === 0 && subsection?.status === "incomplete") {
-    return {
-      answeredCount: 0,
-      totalQuestions: derivedTotalQuestions,
-    };
-  }
-
-  if (subsection?.status !== "incomplete") {
-    return {
-      answeredCount: derivedTotalQuestions,
-      totalQuestions: derivedTotalQuestions,
-    };
-  }
-
-  return {
-    answeredCount: 0,
-    totalQuestions: derivedTotalQuestions,
-  };
+  // No explicit answered count and no scorer total — assume complete if
+  // the subsection isn't marked incomplete, otherwise show 0/total.
+  return subsection?.status !== "incomplete"
+    ? { answeredCount: fallbackTotal, totalQuestions: fallbackTotal }
+    : { answeredCount: 0, totalQuestions: fallbackTotal };
 };
 
 const getQuestionProgressValue = (subsection) => {
@@ -283,10 +280,26 @@ const getNormalizedScorePercent = (subsection) => {
   return null;
 };
 
+// Prompt-6 fix: stale "Insufficient data" messages persisted by older
+// reports (built before the scorer denominator fix in Prompt 5) can
+// still appear on subsections that are now correctly marked
+// "completed". Filter them out so the admin doesn't see contradictory
+// text next to a green Complete badge.
+const isStaleInsufficientMessage = (item = {}) =>
+  /insufficient (data|answered)/i.test(String(item.heading || "")) ||
+  /insufficient (data|answered)/i.test(String(item.body || "")) ||
+  /only \d+\/\d+\s*questions? were answered/i.test(String(item.body || ""));
+
+const stripStaleCoverageMessages = (subsection, items) => {
+  if (!Array.isArray(items)) return items;
+  if (subsection?.status === "incomplete") return items;
+  return items.filter((item) => !isStaleInsufficientMessage(item));
+};
+
 const buildInterpretationItems = (subsection) => {
   const configuredItems = getConfiguredInterpretationItems(subsection);
   if (configuredItems.length) {
-    return configuredItems;
+    return stripStaleCoverageMessages(subsection, configuredItems);
   }
 
   const factorResults = Array.isArray(subsection?.factorResults)
@@ -328,17 +341,18 @@ const buildInterpretationItems = (subsection) => {
   });
 
   if (legacyItems.length) {
-    return legacyItems;
+    return stripStaleCoverageMessages(subsection, legacyItems);
   }
 
   if (String(subsection?.interpretation || "").trim()) {
-    return [
+    const inferred = [
       {
         key: subsection.id || subsection.key || subsection.label || "summary",
         heading: String(subsection.interpretation).trim(),
         body: String(subsection.careerImplication || "").trim(),
       },
     ];
+    return stripStaleCoverageMessages(subsection, inferred);
   }
 
   return [];
@@ -438,11 +452,29 @@ export default function SubsectionBreakdownList({
                   ) : null}
                 </div>
 
-                {subsection.questionRangeLabel ? (
-                  <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8A94A6] sm:mt-2 sm:text-xs sm:tracking-[0.12em]">
-                    Question Pool: {subsection.questionRangeLabel}
-                  </p>
-                ) : null}
+                {(() => {
+                  // Prompt-6 fix: show "Questions Assigned: N" using the
+                  // scorer's dynamic totalQuestions rather than the old
+                  // "Question Pool: 1-30" range label, which read off the
+                  // full-bank spec range and was confusing for the demo
+                  // (where only 3 of 30 OCEAN items are assigned).
+                  const totalAssigned = Number(subsection?.totalQuestions);
+                  if (Number.isFinite(totalAssigned) && totalAssigned > 0) {
+                    return (
+                      <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8A94A6] sm:mt-2 sm:text-xs sm:tracking-[0.12em]">
+                        Questions Assigned: {totalAssigned}
+                      </p>
+                    );
+                  }
+                  if (subsection.questionRangeLabel) {
+                    return (
+                      <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8A94A6] sm:mt-2 sm:text-xs sm:tracking-[0.12em]">
+                        Question Pool: {subsection.questionRangeLabel}
+                      </p>
+                    );
+                  }
+                  return null;
+                })()}
 
                 <div className="mt-2.5 space-y-2.5 sm:mt-3 sm:space-y-3">
                   <div>

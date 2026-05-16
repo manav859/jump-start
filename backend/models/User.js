@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import { cloneResultProfile } from "../utils/assessmentReports.js";
+import {
+  cloneResultProfile,
+  cloneManualReviewItems,
+  computeHasUnreviewedItems,
+} from "../utils/assessmentReports.js";
 
 const toPlainObject = (value) => {
   const plain = value?.toObject ? value.toObject() : value;
@@ -42,10 +46,15 @@ const sanitizeAssessmentReports = (reports = []) =>
   Array.isArray(reports)
     ? reports.map((report) => {
         const rawReport = toPlainObject(report);
+        const items = cloneManualReviewItems(rawReport.manualReviewItems);
         return {
           ...rawReport,
           attemptNumber: toNumberOrFallback(rawReport.attemptNumber, 1),
           profile: cloneResultProfile(rawReport.profile),
+          manualReviewItems: items,
+          // Keep the persisted flag in sync with the items — preventing the
+          // approval gate from misfiring if the items are edited directly.
+          hasUnreviewedItems: computeHasUnreviewedItems(items),
         };
       })
     : [];
@@ -169,14 +178,42 @@ const strengthSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const careerMatchReasonsSchema = new mongoose.Schema(
+  {
+    holland: { type: String, default: "" },
+    intelligence: { type: String, default: "" },
+    aptitude: { type: String, default: "" },
+    eq: { type: String, default: "" },
+  },
+  { _id: false }
+);
+
+const careerMatchBreakdownSchema = new mongoose.Schema(
+  {
+    hollandMatch: { type: Number, default: null },
+    intelligenceMatch: { type: Number, default: null },
+    aptitudeMatch: { type: Number, default: null },
+    eqMatch: { type: Number, default: null },
+  },
+  { _id: false }
+);
+
 const careerRecommendationSchema = new mongoose.Schema(
   {
     title: { type: String, default: "" },
+    category: { type: String, default: "" },
+    score: { type: Number, default: null },
     matchPercent: { type: Number, default: null },
     description: { type: String, default: "" },
     skills: { type: [String], default: [] },
     salaryRange: { type: String, default: "" },
     link: { type: String, default: "" },
+    hollandCodes: { type: [String], default: [] },
+    intelligenceTypes: { type: [String], default: [] },
+    aptitudeStrengths: { type: [String], default: [] },
+    eqCompetencies: { type: [String], default: [] },
+    matchReasons: { type: careerMatchReasonsSchema, default: () => ({}) },
+    breakdown: { type: careerMatchBreakdownSchema, default: () => ({}) },
   },
   { _id: false }
 );
@@ -224,6 +261,13 @@ const resultProfileSchema = new mongoose.Schema(
   {
     overallScore: { type: Number, default: null },
     overallPercentile: { type: String, default: "" },
+    // Prompt-6 fix: persist the scorer's completion-state fields so the
+    // admin payload doesn't have to re-derive them on every read. The
+    // scorer (Prompt-5) emits these explicitly; without schema entries,
+    // Mongoose silently dropped them during save.
+    completionStatus: { type: String, default: "" },
+    completedSections: { type: Number, default: null },
+    totalSections: { type: Number, default: null },
     completedTestsCount: { type: Number, default: 0 },
     totalTestsCount: { type: Number, default: 0 },
     careerPathwaysCount: { type: Number, default: 0 },
@@ -231,6 +275,13 @@ const resultProfileSchema = new mongoose.Schema(
     sectionBreakdown: { type: [sectionBreakdownSchema], default: [] },
     strengths: { type: [strengthSchema], default: [] },
     careerRecommendations: { type: [careerRecommendationSchema], default: [] },
+    // Named profile buckets consumed by the careerMatcher. Stored as
+    // open key/number maps so display-name keys ("Logical-Math") survive
+    // the round-trip without per-key schema declarations.
+    hollandProfile: { type: mongoose.Schema.Types.Mixed, default: () => ({}) },
+    multipleIntelligences: { type: mongoose.Schema.Types.Mixed, default: () => ({}) },
+    aptitudeScores: { type: mongoose.Schema.Types.Mixed, default: () => ({}) },
+    eqProfile: { type: mongoose.Schema.Types.Mixed, default: () => ({}) },
     personalityType: { type: personalityTypeSchema, default: () => ({}) },
     reviewSummary: { type: reviewSummarySchema, default: () => ({}) },
     metadata: { type: resultMetadataSchema, default: () => ({}) },
@@ -263,12 +314,88 @@ const purchaseHistorySchema = new mongoose.Schema(
   { _id: false }
 );
 
+export const STUDENT_PROFILE_REQUIRED_FIELDS = Object.freeze([
+  "dateOfBirth",
+  "gender",
+  "schoolOrCollege",
+  "classOrGrade",
+  "city",
+  "state",
+]);
+
+const studentProfileSchema = new mongoose.Schema(
+  {
+    dateOfBirth: { type: Date, default: null },
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Other", "Prefer not to say", ""],
+      default: "",
+    },
+    phone: { type: String, trim: true, default: "" },
+    schoolOrCollege: { type: String, trim: true, default: "" },
+    classOrGrade: { type: String, trim: true, default: "" },
+    stream: {
+      type: String,
+      enum: ["Science", "Commerce", "Arts", "Not Applicable", "Other", ""],
+      default: "",
+    },
+    board: { type: String, trim: true, default: "" },
+    city: { type: String, trim: true, default: "" },
+    state: { type: String, trim: true, default: "" },
+    isComplete: { type: Boolean, default: false },
+  },
+  { _id: false }
+);
+
+const isFieldFilled = (profile, key) => {
+  const value = profile?.[key];
+  if (key === "dateOfBirth") {
+    if (!value) return false;
+    const date = value instanceof Date ? value : new Date(value);
+    return !Number.isNaN(date.getTime());
+  }
+  return Boolean(value && String(value).trim());
+};
+
+const computeStudentProfileComplete = (profile = {}) =>
+  STUDENT_PROFILE_REQUIRED_FIELDS.every((key) => isFieldFilled(profile, key));
+
+const manualReviewItemSchema = new mongoose.Schema(
+  {
+    questionId: { type: String, default: "" },
+    questionText: { type: String, default: "" },
+    mediaUrl: { type: String, default: null },
+    studentAnswer: { type: String, default: "" },
+    correctAnswer: { type: String, default: "" },
+    autoMarkedCorrect: { type: Boolean, default: false },
+    requiresManualReview: { type: Boolean, default: false },
+    adminDecision: {
+      type: String,
+      enum: ["correct", "incorrect", null],
+      default: null,
+    },
+    adminNote: { type: String, default: null },
+    // Aptitude subsection key (abstract_reasoning / spatial_relations /
+    // mechanical_reasoning) — used by the finalize handler to recompute
+    // the right subsection without re-parsing question ranges.
+    subsectionKey: { type: String, default: "" },
+  },
+  { _id: false }
+);
+
 const assessmentReportSchema = new mongoose.Schema({
   packageId: { type: String, default: "" },
   packageTitle: { type: String, default: "" },
   attemptNumber: { type: Number, default: 1 },
+  isDemo: { type: Boolean, default: false },
   profile: { type: resultProfileSchema, default: () => ({}) },
   publication: { type: resultPublicationSchema, default: () => ({}) },
+  // Section 4 manual review queue. Populated at submit time by the scorer
+  // and updated by admin decisions; once all flagged items have a non-null
+  // adminDecision the report becomes eligible for approval.
+  manualReviewItems: { type: [manualReviewItemSchema], default: [] },
+  hasUnreviewedItems: { type: Boolean, default: false },
+  manualReviewCompletedAt: { type: Date, default: null },
   createdAt: { type: Date, default: null },
   updatedAt: { type: Date, default: null },
 });
@@ -343,6 +470,12 @@ const userSchema = new mongoose.Schema(
     // Scalable result history for multiple purchased tests and repeated attempts.
     assessmentReports: { type: [assessmentReportSchema], default: [] },
 
+    // Structured student-profile sub-document (the mandatory form a student
+    // must complete before starting any test). Distinct from legacy
+    // top-level fields like `city`, `schoolName`, `dateOfBirth` (those stay
+    // for auth/back-compat); this is the source of truth for the gate.
+    studentProfile: { type: studentProfileSchema, default: () => ({}) },
+
     // Livetest progress (section, question index, answers, time left)
     testProgress: {
       sectionId: { type: Number, default: 1 },
@@ -375,11 +508,27 @@ userSchema.pre("validate", function (next) {
   next();
 });
 
+// Keep studentProfile.isComplete in sync with the required-field check on
+// every save. Centralising this avoids the gate going stale if a future
+// code path writes to studentProfile without setting isComplete explicitly.
+userSchema.pre("save", function (next) {
+  if (this.studentProfile) {
+    this.studentProfile.isComplete = computeStudentProfileComplete(
+      this.studentProfile
+    );
+  }
+  next();
+});
+
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password") || !this.password) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
+
+userSchema.methods.isStudentProfileComplete = function () {
+  return computeStudentProfileComplete(this.studentProfile);
+};
 
 userSchema.methods.comparePassword = function (candidate) {
   if (!this.password) return false;
@@ -402,7 +551,12 @@ userSchema.methods.toAuthJSON = function () {
     isSuspended: this.isSuspended || false,
     lastLoginAt: this.lastLoginAt || null,
     selectedPackageId: this.selectedPackageId || "",
+    studentProfile: {
+      isComplete: Boolean(this.studentProfile?.isComplete),
+    },
   };
 };
+
+export { computeStudentProfileComplete };
 
 export default mongoose.model("User", userSchema);

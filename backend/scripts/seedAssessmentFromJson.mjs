@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { ensureRequiredEnv } from "../config/env.js";
 import AssessmentConfig from "../models/AssessmentConfig.js";
 import COMPREHENSIVE_500_PACKAGE from "../config/comprehensive500Package.generated.js";
+import { buildDemoPackageDoc } from "../utils/scoring/configs/career500qDemo.config.js";
 
 const DUMMY_TEST_PACKAGE = {
   id: "dummy-test",
@@ -101,6 +102,11 @@ async function run() {
       ...JSON.parse(JSON.stringify(COMPREHENSIVE_500_PACKAGE)),
       active: true,
       sortOrder: 1,
+    },
+    {
+      ...buildDemoPackageDoc(COMPREHENSIVE_500_PACKAGE),
+      active: true,
+      sortOrder: 0,
     },
     DUMMY_TEST_PACKAGE,
   ];

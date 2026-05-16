@@ -1,6 +1,5 @@
 import {
   PERSONALITY_ARCHETYPES,
-  buildCareerRecommendations,
   buildReviewSummary,
   buildStrengths,
 } from "../../resultProfiling.js";
@@ -12,7 +11,13 @@ import {
   resolveInterpretationBand,
 } from "../interpreters/bandInterpreter.js";
 import { buildSubsectionInterpretation } from "../interpreters/subsectionInterpretationRegistry.js";
-import { resolveCareer500QSubsectionSpec } from "../specs/career500qEvaluationSpec.js";
+import {
+  resolveCareer500QSubsectionSpec,
+  getQuestionMediaUrl,
+  getAptitudeSubsectionKeyForQuestionId,
+  isManualReviewRequired,
+} from "../specs/career500qEvaluationSpec.js";
+import { matchCareers } from "../careerMatcher.js";
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -123,6 +128,75 @@ const summarizeStatus = (answeredCount, totalQuestions, fallback = "completed") 
   return answeredCount >= totalQuestions ? "completed" : "incomplete";
 };
 
+// Prompt-5 fix: percentage-based objective aptitude bands applied
+// uniformly to both demo and full 500Q scoring. Previous behavior used
+// raw-count bands from the config ("23-25 correct = Excellent") which
+// only worked for the canonical 25-question full-test set — any
+// partial set degraded to Developing.
+const OBJECTIVE_PERCENTAGE_BANDS = [
+  { label: "Excellent", min: 80, max: 100 },
+  { label: "Good", min: 60, max: 79 },
+  { label: "Average", min: 40, max: 59 },
+  { label: "Developing", min: 0, max: 39 },
+];
+
+const resolveAptitudeBandByPercentage = (percentage, configBands = []) => {
+  const numeric = Number(percentage);
+  if (!Number.isFinite(numeric)) return null;
+  const baseBand = OBJECTIVE_PERCENTAGE_BANDS.find(
+    (band) => numeric >= band.min && numeric <= band.max
+  );
+  if (!baseBand) return null;
+  // Pull the rich interpretation + careerImplication text from the
+  // config band whose label matches (each subsection has its own
+  // language — "Strong verbal reasoning", "Excellent abstract pattern
+  // recognition", etc.). Fall back to a generic line if not present.
+  const enriched = (configBands || []).find(
+    (band) => band.label === baseBand.label
+  );
+  return {
+    label: baseBand.label,
+    min: baseBand.min,
+    max: baseBand.max,
+    interpretation:
+      enriched?.interpretation ||
+      `${baseBand.label} band for this aptitude block.`,
+    careerImplication: enriched?.careerImplication || "",
+  };
+};
+
+// Prompt-5 fix: weighted overall-score formula. Section 4 (Aptitude
+// Battery) is the heaviest weight because it's objective. Sections with
+// no signal (null percentage) drop out and the remaining weights are
+// renormalised — a partial completion is not penalised by being missing.
+const SECTION_WEIGHTS = {
+  1: 0.2, // Personality Assessment
+  2: 0.2, // Multiple Intelligence Assessment
+  3: 0.15, // Interest Assessment
+  4: 0.3, // Aptitude Battery
+  5: 0.15, // Emotional Intelligence Assessment
+};
+
+const computeWeightedOverallScore = (sectionBreakdown = []) => {
+  const present = (Array.isArray(sectionBreakdown) ? sectionBreakdown : [])
+    .filter((section) => Number.isFinite(Number(section?.percentage)));
+  if (!present.length) return 0;
+
+  let weightedSum = 0;
+  let totalWeight = 0;
+  for (const section of present) {
+    const weight = SECTION_WEIGHTS[Number(section.sectionId)] ?? 0;
+    if (weight === 0) continue;
+    weightedSum += Number(section.percentage) * weight;
+    totalWeight += weight;
+  }
+
+  if (totalWeight === 0) {
+    return roundPercent(average(present.map((s) => Number(s.percentage))));
+  }
+  return Math.round(weightedSum / totalWeight);
+};
+
 const uniqueQuestionCount = (questionNumbers = []) =>
   new Set(questionNumbers.map((value) => Number(value)).filter(Number.isFinite)).size;
 
@@ -156,21 +230,31 @@ const computeLikertMetrics = (questionNumbers = [], questionMap, reverseQuestion
   const reverseSet = new Set(reverseQuestions.map(Number));
   const values = [];
   let answeredCount = 0;
+  // Prompt-5 fix: the denominator must reflect the questions actually
+  // ASSIGNED to the active package (e.g., 3 OCEAN questions in the demo)
+  // — not the full 500-question bank's spec range (30 for OCEAN). Without
+  // this, completion math falsely reported "3/30 incomplete" for fully
+  // answered demo subsections.
+  const assignedQuestionNumbers = [];
 
   questionNumbers.forEach((questionNumber) => {
     const entry = questionMap.get(Number(questionNumber));
     if (!entry) return;
+    assignedQuestionNumbers.push(Number(questionNumber));
     const numeric = getLikertValue(entry.rawAnswer, reverseSet.has(Number(questionNumber)));
     if (numeric == null) return;
     values.push(numeric);
     answeredCount += 1;
   });
 
-  const totalQuestions = uniqueQuestionCount(questionNumbers);
+  const totalQuestions = assignedQuestionNumbers.length;
   const rawScore = values.length
     ? roundTo(values.reduce((sum, value) => sum + value, 0), 2)
     : null;
   const maxScore = totalQuestions * 5;
+  // Average is sum(answered) / answeredCount — unanswered items are
+  // excluded from both numerator and denominator (scale-invariant, valid
+  // even at N=1 in the demo).
   const averageScore = values.length ? roundTo(average(values), 2) : null;
   const percentage = averageScore == null ? null : likertToPercent(averageScore);
 
@@ -181,6 +265,7 @@ const computeLikertMetrics = (questionNumbers = [], questionMap, reverseQuestion
     percentage,
     answeredCount,
     totalQuestions,
+    assignedQuestionNumbers,
     status: summarizeStatus(answeredCount, totalQuestions),
   };
 };
@@ -189,22 +274,40 @@ const computeObjectiveMetrics = (questionNumbers = [], questionMap) => {
   let correctCount = 0;
   let scorableCount = 0;
   let answeredCount = 0;
+  // Prompt-5 fix: same denominator correction as computeLikertMetrics —
+  // count questions assigned to the active package, not the full bank.
+  // Unanswered items are skipped from both correctCount and scorableCount,
+  // never counted as incorrect.
+  const assignedQuestionNumbers = [];
 
   questionNumbers.forEach((questionNumber) => {
     const entry = questionMap.get(Number(questionNumber));
     if (!entry) return;
+    assignedQuestionNumbers.push(Number(questionNumber));
     const rawAnswer = normalizeAnswerLetter(entry.rawAnswer);
     const correctOption = normalizeAnswerLetter(entry.question?.correctOption);
     if (rawAnswer) answeredCount += 1;
-    if (!correctOption) return;
+    // Prompt-7: questions whose answer key is missing/ambiguous (i.e.,
+    // isManualReviewRequired === true) are excluded from BOTH the
+    // numerator and the scorable denominator. They neither help nor
+    // hurt the subsection score until the admin makes a decision via
+    // the manual-review flow. `correctOption` being empty is the
+    // primary signal; isManualReviewRequired is the canonical name.
+    if (!correctOption || isManualReviewRequired(entry.question)) return;
     scorableCount += 1;
     if (rawAnswer && rawAnswer === correctOption) correctCount += 1;
   });
 
-  const totalQuestions = uniqueQuestionCount(questionNumbers);
+  const totalQuestions = assignedQuestionNumbers.length;
   const percentage =
     scorableCount > 0 ? roundPercent((correctCount / scorableCount) * 100) : null;
 
+  // Prompt-7: when totalQuestions is 0 (subsection not assigned in the
+  // active package) status is "completed" — there's nothing to grade.
+  // When questions are assigned but answer keys are missing, those
+  // questions flow into manualReviewItems instead of dragging the
+  // subsection into "review_required". The subsection status now
+  // reflects answering progress only.
   return {
     rawScore: scorableCount > 0 ? correctCount : null,
     maxScore: scorableCount > 0 ? scorableCount : totalQuestions,
@@ -212,8 +315,9 @@ const computeObjectiveMetrics = (questionNumbers = [], questionMap) => {
     percentage,
     answeredCount,
     totalQuestions,
+    assignedQuestionNumbers,
     scorableCount,
-    status: summarizeStatus(answeredCount, totalQuestions, scorableCount > 0 ? "completed" : "review_required"),
+    status: summarizeStatus(answeredCount, totalQuestions),
   };
 };
 
@@ -369,15 +473,24 @@ const scoreCategoricalProfile = (subsectionConfig, questionMap, rules = []) => {
   const hasDirectAnswerMapping = Object.keys(profileDictionary).some((key) =>
     /^[A-Z]$/.test(String(key || "").trim())
   );
-  const requiresExplicitOptions = !rules.length && !hasDirectAnswerMapping;
-  const missingOptionMetadata = subsectionConfig.questionNumbers.some((questionNumber) => {
+  // Prompt-5 fix: only check explicit-option presence against questions
+  // ACTUALLY in the current package. Without this the demo (which assigns
+  // 0 questions to subject/activity/environment subsections) was being
+  // evaluated against the full bank's missing metadata and returning
+  // "incomplete" for not-applicable subsections.
+  const assignedQuestionNumbers = subsectionConfig.questionNumbers.filter(
+    (questionNumber) => questionMap.has(Number(questionNumber))
+  );
+  const rules_has = rules.length;
+  const requiresExplicitOptions = !rules_has && !hasDirectAnswerMapping;
+  const missingOptionMetadata = assignedQuestionNumbers.some((questionNumber) => {
     const entry = questionMap.get(Number(questionNumber));
     return !Array.isArray(entry?.question?.options) || entry.question.options.length < 3;
   });
 
   if (requiresExplicitOptions && missingOptionMetadata) {
-    const totalQuestions = uniqueQuestionCount(subsectionConfig.questionNumbers);
-    const answeredCount = subsectionConfig.questionNumbers.reduce((count, questionNumber) => {
+    const totalQuestions = assignedQuestionNumbers.length;
+    const answeredCount = assignedQuestionNumbers.reduce((count, questionNumber) => {
       const entry = questionMap.get(Number(questionNumber));
       return count + (entry?.rawAnswer != null && `${entry.rawAnswer}` !== "" ? 1 : 0);
     }, 0);
@@ -396,9 +509,17 @@ const scoreCategoricalProfile = (subsectionConfig, questionMap, rules = []) => {
       interpretation:
         "The stored package does not include the A/B/C option set required by the PDF scoring guide for this subsection, so interpretation is flagged for review instead of inferred.",
       careerImplication: "",
-      questionNumbers: subsectionConfig.questionNumbers,
-      questionRangeLabel: buildQuestionRangeLabel(subsectionConfig.questionNumbers),
-      status: answeredCount ? "review_required" : "incomplete",
+      questionNumbers: assignedQuestionNumbers,
+      questionRangeLabel: buildQuestionRangeLabel(assignedQuestionNumbers),
+      // Prompt-5 fix: 0 assigned questions => "completed" (nothing to
+      // grade), not "incomplete" (which would block the section).
+      status: totalQuestions === 0
+        ? "completed"
+        : answeredCount
+          ? "review_required"
+          : "incomplete",
+      answeredCount,
+      totalQuestions,
       description:
         "The stored package does not include the A/B/C option set required by the PDF scoring guide for this subsection, so interpretation is flagged for review instead of inferred.",
     };
@@ -447,6 +568,10 @@ const scoreCategoricalProfile = (subsectionConfig, questionMap, rules = []) => {
     ? roundPercent((dominantCount / answeredCount) * 100)
     : null;
 
+  // Prompt-5 fix: totalQuestions = assignedQuestionNumbers.length, not the
+  // full-bank count. status falls through to "completed" when nothing
+  // was assigned (subsection not in active package).
+  const totalQuestions = assignedQuestionNumbers.length;
   return {
     key: subsectionConfig.key,
     label: subsectionConfig.label,
@@ -454,7 +579,7 @@ const scoreCategoricalProfile = (subsectionConfig, questionMap, rules = []) => {
     scoreType: subsectionConfig.scoreType,
     score: dominantCount || null,
     rawScore: dominantCount || null,
-    maxScore: answeredCount || uniqueQuestionCount(subsectionConfig.questionNumbers),
+    maxScore: answeredCount || totalQuestions,
     average: null,
     percentage: consistency,
     band: dominantProfile?.label || "",
@@ -462,14 +587,11 @@ const scoreCategoricalProfile = (subsectionConfig, questionMap, rules = []) => {
       dominantProfile?.interpretation ||
       "No dominant preference pattern could be resolved from the answered options.",
     careerImplication: dominantProfile?.careerImplication || "",
-    questionNumbers: subsectionConfig.questionNumbers,
-    questionRangeLabel: buildQuestionRangeLabel(subsectionConfig.questionNumbers),
-    status: summarizeStatus(
-      answeredCount,
-      uniqueQuestionCount(subsectionConfig.questionNumbers)
-    ),
+    questionNumbers: assignedQuestionNumbers,
+    questionRangeLabel: buildQuestionRangeLabel(assignedQuestionNumbers),
+    status: summarizeStatus(answeredCount, totalQuestions),
     answeredCount,
-    totalQuestions: uniqueQuestionCount(subsectionConfig.questionNumbers),
+    totalQuestions,
     description:
       dominantProfile?.interpretation ||
       "No dominant preference pattern could be resolved from the answered options.",
@@ -775,6 +897,14 @@ const scoreSubjectClusterProfile = (subsectionConfig, questionMap) => {
     combinationMatch?.careerImplication ||
     (topSubjects[0]?.label ? `Leading subject preference: ${topSubjects[0].label}` : "");
 
+  // Prompt-5 fix: assignedCount + dynamic totalQuestions, matching the
+  // helper-function fixes above. Not having any questions in the active
+  // package falls through to status="completed" (nothing to grade)
+  // rather than blocking the section as "incomplete".
+  const assignedQuestionNumbersSubject = subsectionConfig.questionNumbers.filter(
+    (questionNumber) => questionMap.has(Number(questionNumber))
+  );
+  const totalQuestionsSubject = assignedQuestionNumbersSubject.length;
   return {
     key: subsectionConfig.key,
     label: subsectionConfig.label,
@@ -793,11 +923,11 @@ const scoreSubjectClusterProfile = (subsectionConfig, questionMap) => {
     bandRangeLabel: "",
     interpretation,
     careerImplication,
-    questionNumbers: subsectionConfig.questionNumbers,
-    questionRangeLabel: buildQuestionRangeLabel(subsectionConfig.questionNumbers),
-    status: summarizeStatus(questionScores.length, uniqueQuestionCount(subsectionConfig.questionNumbers)),
+    questionNumbers: assignedQuestionNumbersSubject,
+    questionRangeLabel: buildQuestionRangeLabel(assignedQuestionNumbersSubject),
+    status: summarizeStatus(questionScores.length, totalQuestionsSubject),
     answeredCount: questionScores.length,
-    totalQuestions: uniqueQuestionCount(subsectionConfig.questionNumbers),
+    totalQuestions: totalQuestionsSubject,
     description: interpretation,
     clusterResults,
     topSubjects,
@@ -836,7 +966,20 @@ const scoreObjectiveSubsection = (subsectionConfig, questionMap) => {
   }
 
   const metrics = computeObjectiveMetrics(subsectionConfig.questionNumbers, questionMap);
-  const band = resolveInterpretationBand(metrics.rawScore, subsectionConfig.bands || []);
+  // Prompt-5 fix: pick the band from the percentage (0-100), not the
+  // raw-correct count. Previously a perfect demo set (2/2) would map to
+  // the "Developing 0-16" band because the config bands are tuned for
+  // the 25-question full-test version. resolveAptitudeBandByPercentage
+  // returns a label by percentage AND enriches it with the
+  // per-subsection interpretation text from the config.
+  const band = resolveAptitudeBandByPercentage(
+    metrics.percentage,
+    subsectionConfig.bands || []
+  );
+  const assignedQuestionNumbers =
+    metrics.assignedQuestionNumbers && metrics.assignedQuestionNumbers.length
+      ? metrics.assignedQuestionNumbers
+      : subsectionConfig.questionNumbers;
 
   return {
     key: subsectionConfig.key,
@@ -848,18 +991,20 @@ const scoreObjectiveSubsection = (subsectionConfig, questionMap) => {
     maxScore: metrics.maxScore,
     average: null,
     percentage: metrics.percentage,
-    band: getBandLabel(band),
+    band: band?.label || "",
     bandMin: band?.min == null ? null : Number(band.min),
     bandMax: band?.max == null ? null : Number(band.max),
-    bandRangeLabel: buildBandRangeLabel(band, "score"),
+    bandRangeLabel: band ? `${band.min}-${band.max}%` : "",
     interpretation:
-      getBandInterpretation(band) || "Interpretation unavailable for this aptitude block.",
-    careerImplication: getBandCareerImplication(band),
-    questionNumbers: subsectionConfig.questionNumbers,
-    questionRangeLabel: buildQuestionRangeLabel(subsectionConfig.questionNumbers),
+      band?.interpretation ||
+      "Interpretation unavailable for this aptitude block.",
+    careerImplication: band?.careerImplication || "",
+    questionNumbers: assignedQuestionNumbers,
+    questionRangeLabel: buildQuestionRangeLabel(assignedQuestionNumbers),
     status: metrics.status,
     description:
-      getBandInterpretation(band) || "Interpretation unavailable for this aptitude block.",
+      band?.interpretation ||
+      "Interpretation unavailable for this aptitude block.",
     answeredCount: metrics.answeredCount,
     totalQuestions: metrics.totalQuestions,
   };
@@ -974,7 +1119,15 @@ const buildSectionResult = (sectionConfig, questionMap) => {
       )
     ),
   ];
-  const totalQuestions = uniqueQuestionCount(questionNumbers);
+  // Prompt-5 fix: section totalQuestions sums the per-subsection assigned
+  // counts (which are now accurate to the active package). Previously
+  // this used uniqueQuestionCount(questionNumbers) — i.e., the full
+  // bank's union of spec ranges — and produced "0/120" style nonsense
+  // for any partial package.
+  const totalQuestions = subsectionResults.reduce(
+    (sum, item) => sum + Number(item.totalQuestions || 0),
+    0
+  );
   const percentage = percentageValues.length
     ? roundPercent(average(percentageValues))
     : null;
@@ -1246,6 +1399,129 @@ const buildSpecialObservations = ({ sectionBreakdown = [], personalityType, flat
   return observations.filter(Boolean);
 };
 
+// Prompt-7 rewrite: build manualReviewItems ONLY for Section 4 objective
+// questions that the algorithm cannot grade — i.e., the answer key is
+// missing/ambiguous or the evaluation type isn't supported.
+// Questions with a valid answer key are graded automatically by the
+// existing objective scoring loop (computeObjectiveMetrics) and never
+// appear here. Image-based questions with a valid answer key are NOT
+// flagged — image rendering is a UI concern, not a grading concern.
+const buildManualReviewItems = ({ sections = [], questionMap }) => {
+  const items = [];
+
+  sections.forEach((section) => {
+    if (Number(section?.sectionId) !== 4) return;
+    const questions = Array.isArray(section?.questions) ? section.questions : [];
+    questions.forEach((question, questionIndex) => {
+      const questionId = Number(
+        question?.questionId || question?.question_id || questionIndex + 1
+      );
+      if (!Number.isFinite(questionId)) return;
+
+      // The new gate: only flag if the algorithm cannot decide.
+      if (!isManualReviewRequired(question)) return;
+
+      const entry = questionMap.get(questionId);
+      const rawAnswer = String(entry?.rawAnswer || "").trim().toUpperCase();
+      const correctAnswer = String(question?.correctOption || "").trim().toUpperCase();
+      const mediaUrl = getQuestionMediaUrl(questionId);
+
+      items.push({
+        questionId: String(questionId),
+        questionText: String(question?.text || "").trim(),
+        mediaUrl: mediaUrl || null,
+        studentAnswer: rawAnswer || "",
+        // correctAnswer is null when the answer key is missing — that's
+        // the whole reason this item is in the review list.
+        correctAnswer: correctAnswer || null,
+        // Cannot auto-grade. That's why this item is here.
+        autoMarkedCorrect: false,
+        requiresManualReview: true,
+        adminDecision: null,
+        adminNote: null,
+        subsectionKey: getAptitudeSubsectionKeyForQuestionId(questionId) || "",
+      });
+    });
+  });
+
+  items.sort(
+    (a, b) => Number(a.questionId || 0) - Number(b.questionId || 0)
+  );
+
+  // hasUnreviewedItems is true only when at least one item is flagged
+  // AND still awaiting an admin decision. When manualReviewItems is
+  // empty (the common case now that all 160 Section-4 questions have
+  // valid answer keys), this is false and the admin can approve
+  // immediately with no review step.
+  const hasUnreviewedItems = items.some(
+    (item) => item.requiresManualReview && item.adminDecision == null
+  );
+
+  return { items, hasUnreviewedItems };
+};
+
+// Build the four named profile buckets the careerMatcher consumes. Keys
+// match the careerMappingData display names (e.g. "Logical-Math") so the
+// matcher can look up directly. Falls back to 50 (neutral) per the
+// flattenedSignals defaults when a subsection produced no usable signal.
+const buildNamedProfileObjects = ({ sectionBreakdown = [], flattenedSignals = {} }) => {
+  const aptitudeSection = getSectionByKey(sectionBreakdown, "aptitude");
+  const aptitudeByKey = new Map(
+    (aptitudeSection?.subsections || []).map((sub) => [sub.key, sub])
+  );
+  const eqSection = getSectionByKey(sectionBreakdown, "emotional_intelligence");
+  const eqByKey = new Map(
+    (eqSection?.subsections || []).map((sub) => [sub.key, sub])
+  );
+
+  const aptitudePercentage = (key) => {
+    const pct = aptitudeByKey.get(key)?.percentage;
+    return Number.isFinite(pct) ? pct : 50;
+  };
+  const eqPercentage = (key) => {
+    const pct = eqByKey.get(key)?.percentage;
+    return Number.isFinite(pct) ? pct : 50;
+  };
+
+  return {
+    hollandProfile: {
+      R: flattenedSignals.realistic ?? 50,
+      I: flattenedSignals.investigative ?? 50,
+      A: flattenedSignals.artistic ?? 50,
+      S: flattenedSignals.social ?? 50,
+      E: flattenedSignals.enterprising ?? 50,
+      C: flattenedSignals.conventional ?? 50,
+    },
+    multipleIntelligences: {
+      "Logical-Math": flattenedSignals.logicalMathematical ?? 50,
+      Linguistic: flattenedSignals.linguistic ?? 50,
+      Spatial: flattenedSignals.visualSpatial ?? 50,
+      Musical: flattenedSignals.musical ?? 50,
+      "Bodily-Kinesthetic": flattenedSignals.bodilyKinesthetic ?? 50,
+      Interpersonal: flattenedSignals.interpersonal ?? 50,
+      Intrapersonal: flattenedSignals.intrapersonal ?? 50,
+      Naturalistic: flattenedSignals.naturalistic ?? 50,
+    },
+    aptitudeScores: {
+      Verbal: aptitudePercentage("verbal_reasoning"),
+      Numerical: aptitudePercentage("numerical_ability"),
+      Abstract: aptitudePercentage("abstract_reasoning"),
+      "Spatial Relations": aptitudePercentage("spatial_relations"),
+      Mechanical: aptitudePercentage("mechanical_reasoning"),
+      Clerical: aptitudePercentage("clerical_accuracy"),
+      "Critical Thinking": aptitudePercentage("critical_thinking"),
+      "Problem Solving": aptitudePercentage("problem_solving"),
+    },
+    eqProfile: {
+      "Self-Awareness": eqPercentage("self_awareness"),
+      "Self-Regulation": eqPercentage("self_regulation"),
+      Motivation: eqPercentage("motivation"),
+      Empathy: eqPercentage("empathy"),
+      "Social Skills": eqPercentage("social_skills"),
+    },
+  };
+};
+
 export const scoreCareer500QPackage = (answers = {}, sections = []) => {
   if (!answers || typeof answers !== "object") return null;
   const questionMap = buildQuestionContextMap(sections, answers);
@@ -1267,15 +1543,29 @@ export const scoreCareer500QPackage = (answers = {}, sections = []) => {
     sectionBreakdown,
     personalityType,
   });
+  const namedProfile = buildNamedProfileObjects({
+    sectionBreakdown,
+    flattenedSignals,
+  });
+  const { items: manualReviewItems, hasUnreviewedItems } =
+    buildManualReviewItems({ sections, questionMap });
   const strengths = buildStrengths(flattenedSignals);
-  const careerRecommendations = buildCareerRecommendations(flattenedSignals);
-  const overallScore = roundPercent(
-    average(
-      sectionBreakdown
-        .map((section) => section.percentage)
-        .filter((value) => Number.isFinite(value))
-    )
-  );
+  // Career recommendations now flow through the matchCareers engine
+  // (backend/utils/scoring/careerMatcher.js) — weighted Holland +
+  // intelligence + aptitude + EQ scoring against the 125-career source.
+  const careerRecommendations = matchCareers(namedProfile, 10);
+  // Prompt-5 fix: overall is a WEIGHTED average per section weight, not
+  // a plain mean. Sections with null percentages drop out and remaining
+  // weights are renormalised so partial completions aren't penalised.
+  const overallScore = computeWeightedOverallScore(sectionBreakdown);
+  const completedSections = sectionBreakdown.filter(
+    (section) => section.status !== "incomplete"
+  ).length;
+  const totalSectionsCount = sectionBreakdown.length;
+  const completionStatus =
+    totalSectionsCount > 0 && completedSections >= totalSectionsCount
+      ? "Complete"
+      : "Incomplete";
   const testResults = sectionBreakdown.map((section) => ({
     sectionId: section.sectionId,
     sectionName: section.title,
@@ -1305,11 +1595,28 @@ export const scoreCareer500QPackage = (answers = {}, sections = []) => {
     overallPercentile: `Top ${Math.max(8, 100 - Number(overallScore || 0))}% profile strength`,
     completedTestsCount: testResults.length,
     totalTestsCount: CAREER_500Q_CONFIG.sections.length,
+    // Prompt-5 fix: surface explicit completion-state fields at the top
+    // level so the admin payload doesn't have to re-derive them (and so
+    // the demo wrapper can overwrite them after re-banding).
+    completedSections,
+    totalSections: totalSectionsCount,
+    completionStatus,
     careerPathwaysCount: careerRecommendations.length,
     testResults,
     sectionBreakdown,
     strengths,
     careerRecommendations,
+    // Named profile buckets exposed for downstream consumers — the demo
+    // scorer inherits them via spread, and matchCareers can be re-run on a
+    // stored profile without re-deriving from sectionBreakdown.
+    hollandProfile: namedProfile.hollandProfile,
+    multipleIntelligences: namedProfile.multipleIntelligences,
+    aptitudeScores: namedProfile.aptitudeScores,
+    eqProfile: namedProfile.eqProfile,
+    // Section 4 manual-review queue. Persisted on the report (not the
+    // profile) once the user submits — see createAssessmentReportEntry.
+    manualReviewItems,
+    hasUnreviewedItems,
     personalityType: {
       code: personalityType.code,
       title: personalityType.title,

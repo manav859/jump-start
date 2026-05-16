@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 import COMPREHENSIVE_500_PACKAGE from "../config/comprehensive500Package.generated.js";
+import {
+  DEMO_PACKAGE_ID,
+  buildDemoPackageDoc,
+} from "../utils/scoring/configs/career500qDemo.config.js";
 
 const packageSchema = new mongoose.Schema(
   {
@@ -93,6 +97,7 @@ const assessmentConfigSchema = new mongoose.Schema(
 
 export const PRIMARY_PACKAGE_ID = COMPREHENSIVE_500_PACKAGE.id;
 export const DUMMY_TEST_PACKAGE_ID = "dummy-test";
+export const DEMO_TEST_PACKAGE_ID = DEMO_PACKAGE_ID;
 
 const createDummyPackage = () => ({
   id: DUMMY_TEST_PACKAGE_ID,
@@ -186,7 +191,17 @@ const createPrimaryPackage = () => ({
   sortOrder: 1,
 });
 
-const createDefaultPackages = () => [createPrimaryPackage(), createDummyPackage()];
+const createDemoPackage = () => ({
+  ...buildDemoPackageDoc(COMPREHENSIVE_500_PACKAGE),
+  active: true,
+  sortOrder: 0,
+});
+
+const createDefaultPackages = () => [
+  createPrimaryPackage(),
+  createDemoPackage(),
+  createDummyPackage(),
+];
 
 const createDefaultSupportPages = () => ({
   privacyPolicy: {

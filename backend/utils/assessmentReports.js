@@ -8,6 +8,18 @@ import {
 const cloneArray = (items = [], mapItem) =>
   Array.isArray(items) ? items.map((item) => mapItem(item || {})) : [];
 
+// Preserve open key/number maps (hollandProfile etc.) through the
+// sanitize hook. Non-finite values are dropped.
+const cloneScoreMap = (source) => {
+  if (!source || typeof source !== "object") return {};
+  const out = {};
+  for (const [key, raw] of Object.entries(source)) {
+    const numeric = Number(raw);
+    if (Number.isFinite(numeric)) out[key] = numeric;
+  }
+  return out;
+};
+
 const toNullableNumber = (value) => {
   if (value == null || value === "") return null;
   const numeric = Number(value);
@@ -128,6 +140,12 @@ export const createEmptyResultPublication = () => ({
 export const cloneResultProfile = (profile = {}) => ({
   overallScore: toNullableNumber(profile?.overallScore),
   overallPercentile: String(profile?.overallPercentile || ""),
+  // Prompt-6 fix: preserve the scorer's completion-state fields through
+  // the sanitize hook. Without this, every save would zero them out
+  // even though the schema now allows them.
+  completionStatus: String(profile?.completionStatus || ""),
+  completedSections: toNullableNumber(profile?.completedSections),
+  totalSections: toNullableNumber(profile?.totalSections),
   completedTestsCount: toNumberOrFallback(profile?.completedTestsCount, 0),
   totalTestsCount: toNumberOrFallback(profile?.totalTestsCount, 0),
   careerPathwaysCount: toNumberOrFallback(profile?.careerPathwaysCount, 0),
@@ -169,12 +187,42 @@ export const cloneResultProfile = (profile = {}) => ({
   })),
   careerRecommendations: cloneArray(profile?.careerRecommendations, (career) => ({
     title: career.title || "",
-    matchPercent: toNullableNumber(career.matchPercent),
+    category: career.category || "",
+    score: toNullableNumber(career.score),
+    matchPercent: toNullableNumber(
+      career.matchPercent != null ? career.matchPercent : career.score
+    ),
     description: career.description || "",
     skills: Array.isArray(career.skills) ? career.skills : [],
     salaryRange: career.salaryRange || "",
     link: career.link || "",
+    hollandCodes: Array.isArray(career.hollandCodes) ? career.hollandCodes : [],
+    intelligenceTypes: Array.isArray(career.intelligenceTypes)
+      ? career.intelligenceTypes
+      : [],
+    aptitudeStrengths: Array.isArray(career.aptitudeStrengths)
+      ? career.aptitudeStrengths
+      : [],
+    eqCompetencies: Array.isArray(career.eqCompetencies)
+      ? career.eqCompetencies
+      : [],
+    matchReasons: {
+      holland: career?.matchReasons?.holland || "",
+      intelligence: career?.matchReasons?.intelligence || "",
+      aptitude: career?.matchReasons?.aptitude || "",
+      eq: career?.matchReasons?.eq || "",
+    },
+    breakdown: {
+      hollandMatch: toNullableNumber(career?.breakdown?.hollandMatch),
+      intelligenceMatch: toNullableNumber(career?.breakdown?.intelligenceMatch),
+      aptitudeMatch: toNullableNumber(career?.breakdown?.aptitudeMatch),
+      eqMatch: toNullableNumber(career?.breakdown?.eqMatch),
+    },
   })),
+  hollandProfile: cloneScoreMap(profile?.hollandProfile),
+  multipleIntelligences: cloneScoreMap(profile?.multipleIntelligences),
+  aptitudeScores: cloneScoreMap(profile?.aptitudeScores),
+  eqProfile: cloneScoreMap(profile?.eqProfile),
   personalityType: {
     code: profile?.personalityType?.code || "",
     title: profile?.personalityType?.title || "",
@@ -244,8 +292,12 @@ export const buildLegacyAssessmentReport = (user = {}, packageLookup) => {
       user?.selectedPackageId
     ),
     attemptNumber: Math.max(1, Number(user?.testsCompleted || 1)),
+    isDemo: false,
     profile: cloneResultProfile(user?.resultProfile || {}),
     publication: cloneResultPublication(publication),
+    manualReviewItems: [],
+    hasUnreviewedItems: false,
+    manualReviewCompletedAt: null,
     createdAt:
       publication.submittedAt || user?.updatedAt || user?.createdAt || null,
     updatedAt: user?.updatedAt || publication.approvedAt || null,
@@ -266,6 +318,10 @@ export const normalizeAssessmentReport = (report = {}, packageLookup) => {
     return null;
   }
 
+  const clonedManualReviewItems = cloneManualReviewItems(
+    Array.isArray(report?.manualReviewItems) ? report.manualReviewItems : []
+  );
+
   return {
     _id: String(report?._id || ""),
     packageId: String(report?.packageId || ""),
@@ -275,6 +331,7 @@ export const normalizeAssessmentReport = (report = {}, packageLookup) => {
       report?.packageTitle
     ),
     attemptNumber: Math.max(1, Number(report?.attemptNumber || 1)),
+    isDemo: Boolean(report?.isDemo),
     profile,
     publication: {
       ...publication,
@@ -283,6 +340,11 @@ export const normalizeAssessmentReport = (report = {}, packageLookup) => {
       approvedAt: state.approvedAt,
       approvedByName: state.approvedByName,
     },
+    manualReviewItems: clonedManualReviewItems,
+    // Recompute on read rather than trusting a stale stored value — the
+    // queue and the flag can drift if an admin edits items directly.
+    hasUnreviewedItems: computeHasUnreviewedItems(clonedManualReviewItems),
+    manualReviewCompletedAt: report?.manualReviewCompletedAt || null,
     createdAt: report?.createdAt || state.submittedAt || null,
     updatedAt: report?.updatedAt || state.approvedAt || state.submittedAt || null,
     isLegacyFallback: report?.isLegacyFallback === true,
@@ -322,24 +384,64 @@ export const getLatestApprovedAssessmentReport = (user = {}, packageLookup) =>
       report.publication.status === RESULT_PUBLICATION_STATUS.APPROVED
   ) || null;
 
+const cloneManualReviewItem = (raw = {}) => ({
+  questionId: String(raw?.questionId || ""),
+  questionText: String(raw?.questionText || ""),
+  mediaUrl: raw?.mediaUrl || null,
+  studentAnswer: String(raw?.studentAnswer || ""),
+  correctAnswer: String(raw?.correctAnswer || ""),
+  autoMarkedCorrect: Boolean(raw?.autoMarkedCorrect),
+  requiresManualReview: Boolean(raw?.requiresManualReview),
+  adminDecision:
+    raw?.adminDecision === "correct" || raw?.adminDecision === "incorrect"
+      ? raw.adminDecision
+      : null,
+  adminNote: raw?.adminNote || null,
+  subsectionKey: String(raw?.subsectionKey || ""),
+});
+
+export const cloneManualReviewItems = (items = []) =>
+  Array.isArray(items) ? items.map(cloneManualReviewItem) : [];
+
+export const computeHasUnreviewedItems = (items = []) =>
+  Array.isArray(items) &&
+  items.some(
+    (item) => item?.requiresManualReview && item?.adminDecision == null
+  );
+
 export const createAssessmentReportEntry = ({
   user = {},
   packageId = "",
   packageTitle = "",
   profile = {},
   publication = {},
+  isDemo = false,
+  manualReviewItems = null,
 }) => {
   const previousAttempts = getStoredAssessmentReports(user).filter(
     (report) => String(report.packageId || "") === String(packageId || "")
   ).length;
   const now = publication?.submittedAt || new Date();
+  // Prefer the explicit `manualReviewItems` arg, but fall back to whatever
+  // the scorer parked on the profile object so the report still captures
+  // the queue if a caller forgets to pass it through.
+  const itemsSource = Array.isArray(manualReviewItems)
+    ? manualReviewItems
+    : Array.isArray(profile?.manualReviewItems)
+      ? profile.manualReviewItems
+      : [];
+  const clonedItems = cloneManualReviewItems(itemsSource);
 
   return {
     packageId: String(packageId || ""),
     packageTitle: String(packageTitle || packageId || "Assessment"),
     attemptNumber: previousAttempts + 1,
+    isDemo: Boolean(isDemo),
     profile: cloneResultProfile(profile),
     publication: cloneResultPublication(publication),
+    manualReviewItems: clonedItems,
+    hasUnreviewedItems: computeHasUnreviewedItems(clonedItems),
+    manualReviewCompletedAt: null,
     createdAt: now,
     updatedAt: now,
   };

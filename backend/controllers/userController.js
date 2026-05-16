@@ -1,6 +1,9 @@
-import User from "../models/User.js";
+import User, {
+  STUDENT_PROFILE_REQUIRED_FIELDS,
+} from "../models/User.js";
 import AssessmentConfig from "../models/AssessmentConfig.js";
 import { computeAssessmentResult } from "../utils/scoring/index.js";
+import { DEMO_PACKAGE_ID } from "../utils/scoring/configs/career500qDemo.config.js";
 import {
   getResultPublicationState,
   RESULT_PUBLICATION_STATUS,
@@ -11,6 +14,129 @@ import {
   getStoredAssessmentReports,
   syncLegacyStateFromReports,
 } from "../utils/assessmentReports.js";
+
+const isDemoPackageId = (id = "") =>
+  String(id || "").trim() === DEMO_PACKAGE_ID;
+
+const STUDENT_PROFILE_GENDER_VALUES = [
+  "Male",
+  "Female",
+  "Other",
+  "Prefer not to say",
+];
+
+const STUDENT_PROFILE_STREAM_VALUES = [
+  "Science",
+  "Commerce",
+  "Arts",
+  "Not Applicable",
+  "Other",
+];
+
+// Serialise a studentProfile sub-doc into the wire shape the frontend
+// expects. dateOfBirth is converted to YYYY-MM-DD because the HTML
+// <input type="date"> field requires that format on read-back.
+const formatDateOnly = (date) => {
+  if (!date) return "";
+  const dt = date instanceof Date ? date : new Date(date);
+  if (Number.isNaN(dt.getTime())) return "";
+  const year = dt.getUTCFullYear();
+  const month = String(dt.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(dt.getUTCDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const serializeStudentProfile = (profile = {}) => {
+  const plain = profile?.toObject ? profile.toObject() : profile;
+  return {
+    dateOfBirth: formatDateOnly(plain?.dateOfBirth),
+    gender: plain?.gender || "",
+    phone: plain?.phone || "",
+    schoolOrCollege: plain?.schoolOrCollege || "",
+    classOrGrade: plain?.classOrGrade || "",
+    stream: plain?.stream || "",
+    board: plain?.board || "",
+    city: plain?.city || "",
+    state: plain?.state || "",
+    isComplete: Boolean(plain?.isComplete),
+  };
+};
+
+const sanitizePhone = (value) =>
+  String(value || "").replace(/\D/g, "").slice(0, 15);
+
+const trimField = (value, max = 200) =>
+  String(value == null ? "" : value).trim().slice(0, max);
+
+// Validate a single incoming studentProfile update. Returns a normalized
+// patch + a field-level error map so the frontend can render inline errors.
+const validateStudentProfilePayload = (raw = {}) => {
+  const patch = {};
+  const errors = {};
+
+  if ("dateOfBirth" in raw) {
+    const value = String(raw.dateOfBirth || "").trim();
+    if (!value) {
+      patch.dateOfBirth = null;
+    } else {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) {
+        errors.dateOfBirth = "Enter a valid date of birth.";
+      } else {
+        const now = new Date();
+        if (date.getTime() > now.getTime()) {
+          errors.dateOfBirth = "Date of birth cannot be in the future.";
+        } else {
+          patch.dateOfBirth = date;
+        }
+      }
+    }
+  }
+
+  if ("gender" in raw) {
+    const value = trimField(raw.gender, 30);
+    if (value && !STUDENT_PROFILE_GENDER_VALUES.includes(value)) {
+      errors.gender = "Choose a valid gender option.";
+    } else {
+      patch.gender = value;
+    }
+  }
+
+  if ("phone" in raw) {
+    patch.phone = sanitizePhone(raw.phone);
+  }
+
+  if ("schoolOrCollege" in raw) {
+    patch.schoolOrCollege = trimField(raw.schoolOrCollege, 160);
+  }
+
+  if ("classOrGrade" in raw) {
+    patch.classOrGrade = trimField(raw.classOrGrade, 80);
+  }
+
+  if ("stream" in raw) {
+    const value = trimField(raw.stream, 40);
+    if (value && !STUDENT_PROFILE_STREAM_VALUES.includes(value)) {
+      errors.stream = "Choose a valid stream option.";
+    } else {
+      patch.stream = value;
+    }
+  }
+
+  if ("board" in raw) {
+    patch.board = trimField(raw.board, 160);
+  }
+
+  if ("city" in raw) {
+    patch.city = trimField(raw.city, 120);
+  }
+
+  if ("state" in raw) {
+    patch.state = trimField(raw.state, 80);
+  }
+
+  return { patch, errors };
+};
 
 const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
@@ -57,15 +183,27 @@ const getOwnedPackages = (cfg, user) => {
   return getActivePackages(cfg).filter((pkg) => ownedIds.has(pkg.id));
 };
 
+const getPackageLookup = (cfg) =>
+  new Map((cfg?.packages || []).map((pkg) => [String(pkg.id), pkg]));
+
+const findPackageById = (cfg, packageId) =>
+  (cfg?.packages || []).find(
+    (pkg) => String(pkg.id) === String(packageId || "")
+  ) || null;
+
 const getSelectedPackage = (cfg, user) => {
+  // The demo is "always owned": any logged-in user can run it without a
+  // purchase record, so resolve it directly from the package list when it's
+  // the current selection.
+  if (isDemoPackageId(user?.selectedPackageId)) {
+    const demoPkg = findPackageById(cfg, DEMO_PACKAGE_ID);
+    if (demoPkg && demoPkg.active !== false) return demoPkg;
+  }
   const owned = getOwnedPackages(cfg, user);
   if (!owned.length) return null;
   const selected = owned.find((p) => p.id === user?.selectedPackageId);
   return selected || owned[0];
 };
-
-const getPackageLookup = (cfg) =>
-  new Map((cfg?.packages || []).map((pkg) => [String(pkg.id), pkg]));
 
 const groupReportsByPackage = (reports = []) =>
   reports.reduce((map, report) => {
@@ -151,6 +289,8 @@ const buildStudentResultHistory = (packages, user, packageLookup) => {
       latestReportId: latestReport?._id || "",
       publishedReportId: latestPublishedReport?._id || "",
       hasPublishedReport: Boolean(latestPublishedReport),
+      isDemo:
+        isDemoPackageId(packageId) || Boolean(latestReport?.isDemo),
       scorePreview: latestPublishedReport?.profile?.overallScore ?? null,
       percentagePreview:
         latestPublishedReport?.profile?.overallScore ?? null,
@@ -295,6 +435,7 @@ const buildStudentReportDetail = (report, user, packageLookup) => {
     submittedAt: report?.publication?.submittedAt || report?.createdAt || null,
     approvedAt: report?.publication?.approvedAt || null,
     attemptNumber: Number(report?.attemptNumber || 1),
+    isDemo: Boolean(report?.isDemo) || isDemoPackageId(packageId),
     student: {
       id: String(user?._id || ""),
       name: user?.name || "Student",
@@ -479,12 +620,27 @@ export const selectPackage = async (req, res) => {
     }
     const [cfg, user] = await Promise.all([AssessmentConfig.getOrCreateDefault(), User.findById(req.user.id)]);
     if (!user) return res.status(404).json({ success: false, msg: "User not found" });
+
+    // Mandatory student-profile gate. Applies to every package, including
+    // the free demo — demo users still have to complete the form first.
+    if (!user.studentProfile?.isComplete) {
+      return res.status(400).json({
+        success: false,
+        error: "PROFILE_INCOMPLETE",
+        message:
+          "Please complete your student profile before starting a test.",
+      });
+    }
+
     const pkg = getActivePackages(cfg).find((p) => p.id === packageId);
     if (!pkg) return res.status(404).json({ success: false, msg: "Package not found or inactive" });
+    const isDemo = isDemoPackageId(pkg.id);
     const alreadyPurchased = Array.isArray(user.purchasedPackages)
       ? user.purchasedPackages.includes(pkg.id)
       : false;
-    if (!alreadyPurchased) {
+    // The demo package is free for every logged-in user and bypasses the
+    // purchase gate; all other packages still require purchase first.
+    if (!alreadyPurchased && !isDemo) {
       return res.status(403).json({ success: false, msg: "Purchase this package before starting it" });
     }
 
@@ -590,13 +746,105 @@ export const getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
       .select(
-        "_id name email mobile city dateOfBirth schoolName schoolLocation residentialAddress subscription role isSuspended selectedPackageId createdAt"
+        "_id name email mobile city dateOfBirth schoolName schoolLocation residentialAddress subscription role isSuspended selectedPackageId studentProfile createdAt"
       )
       .lean();
     if (!user) return res.status(404).json({ success: false, msg: "User not found" });
-    return res.status(200).json({ success: true, data: { user } });
+    return res.status(200).json({
+      success: true,
+      data: {
+        user: {
+          ...user,
+          studentProfile: serializeStudentProfile(user.studentProfile),
+        },
+      },
+    });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message || "Failed to load profile" });
+  }
+};
+
+// GET /api/v1/user/profile/student
+export const getStudentProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id)
+      .select("studentProfile")
+      .lean();
+    if (!user) return res.status(404).json({ success: false, msg: "User not found" });
+    return res.status(200).json({
+      success: true,
+      data: {
+        studentProfile: serializeStudentProfile(user.studentProfile),
+        requiredFields: STUDENT_PROFILE_REQUIRED_FIELDS,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Failed to load student profile",
+    });
+  }
+};
+
+// PUT /api/v1/user/profile/student
+export const updateStudentProfile = async (req, res) => {
+  try {
+    const { patch, errors } = validateStudentProfilePayload(req.body || {});
+
+    if (Object.keys(errors).length) {
+      return res.status(400).json({
+        success: false,
+        msg: "Some fields need attention before saving your profile.",
+        errors,
+      });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ success: false, msg: "User not found" });
+
+    const currentProfile = user.studentProfile?.toObject
+      ? user.studentProfile.toObject()
+      : user.studentProfile || {};
+    const merged = { ...currentProfile, ...patch };
+
+    // Re-validate the merged profile against required fields and surface a
+    // single grouped error if anything mandatory is still missing. The
+    // pre-save hook also recomputes isComplete, so this guard exists only
+    // to return a 400 with a useful message instead of silently saving.
+    const missingRequired = STUDENT_PROFILE_REQUIRED_FIELDS.filter((field) => {
+      const value = merged[field];
+      if (value == null) return true;
+      if (value instanceof Date) return Number.isNaN(value.getTime());
+      return String(value).trim() === "";
+    });
+
+    if (missingRequired.length) {
+      const missingErrors = Object.fromEntries(
+        missingRequired.map((field) => [field, "This field is required."])
+      );
+      return res.status(400).json({
+        success: false,
+        msg: "Please fill in all required student profile fields.",
+        errors: missingErrors,
+        missingRequired,
+      });
+    }
+
+    user.studentProfile = merged;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        studentProfile: serializeStudentProfile(user.studentProfile),
+        isComplete: Boolean(user.studentProfile?.isComplete),
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Failed to update student profile",
+    });
   }
 };
 
@@ -707,13 +955,14 @@ export const init = async (req, res) => {
   try {
     const [user, cfg] = await Promise.all([
       User.findById(req.user.id)
-        .select("name email testsCompleted testsInProgress reportsReady counsellingSessions topCareers resultProfile resultPublication assessmentReports selectedPackageId purchasedPackages testProgress")
+        .select("name email testsCompleted testsInProgress reportsReady counsellingSessions topCareers resultProfile resultPublication assessmentReports selectedPackageId purchasedPackages testProgress studentProfile")
         .lean(),
       AssessmentConfig.getOrCreateDefault(),
     ]);
     if (!user) return res.status(404).json({ success: false, msg: "User not found" });
     const packageLookup = getPackageLookup(cfg);
     const pkg = getSelectedPackage(cfg, user);
+    const studentProfileSerialized = serializeStudentProfile(user.studentProfile);
     const ownedPackages = getOwnedPackages(cfg, user);
     const storedReports = getStoredAssessmentReports(user, packageLookup);
     const latestReport = storedReports[0] || null;
@@ -747,10 +996,33 @@ export const init = async (req, res) => {
       packageLookup
     );
 
+    const demoPackageDoc = findPackageById(cfg, DEMO_PACKAGE_ID);
+    const demoActive = Boolean(
+      demoPackageDoc && demoPackageDoc.active !== false
+    );
+    const demoReport = storedReports.find(
+      (report) => isDemoPackageId(report.packageId) || report.isDemo
+    );
+    const demoTotalQuestions = demoActive
+      ? (demoPackageDoc.sections || []).reduce(
+          (sum, section) =>
+            sum + (Array.isArray(section.questions) ? section.questions.length : 0),
+          0
+        )
+      : 0;
+
     return res.status(200).json({
       success: true,
       data: {
-        user: { id: user._id, name: user.name, email: user.email, selectedPackageId: pkg?.id || "" },
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          selectedPackageId: pkg?.id || "",
+          studentProfile: { isComplete: studentProfileSerialized.isComplete },
+        },
+        student_profile: studentProfileSerialized,
+        student_profile_complete: studentProfileSerialized.isComplete,
         tests_completed: user.testsCompleted ?? 0,
         tests_in_progress: user.testsInProgress ?? 0,
         reports_ready: resultHistory.summary.publishedCount,
@@ -773,6 +1045,28 @@ export const init = async (req, res) => {
         top_careers: topCareers,
         tests_history: resultHistory.tests,
         tests_history_summary: resultHistory.summary,
+        demo_test: demoActive
+          ? {
+              packageId: DEMO_PACKAGE_ID,
+              title: demoPackageDoc.title || "Client Demo Test",
+              totalQuestions: demoTotalQuestions,
+              totalDurationMinutes: (demoPackageDoc.sections || []).reduce(
+                (sum, section) => sum + Number(section.durationMinutes || 0),
+                0
+              ),
+              attempted: Boolean(demoReport),
+              latestReportId: demoReport?._id || "",
+              publishedReportId:
+                demoReport &&
+                demoReport.publication?.status ===
+                  RESULT_PUBLICATION_STATUS.APPROVED
+                  ? demoReport._id
+                  : "",
+              publicationStatus:
+                demoReport?.publication?.status ||
+                RESULT_PUBLICATION_STATUS.NOT_SUBMITTED,
+            }
+          : null,
       },
     });
   } catch (err) {
@@ -1070,6 +1364,10 @@ export const postTestSubmit = async (req, res) => {
       packageTitle: pkg.title,
       profile,
       publication,
+      isDemo: isDemoPackageId(pkg.id),
+      manualReviewItems: Array.isArray(profile?.manualReviewItems)
+        ? profile.manualReviewItems
+        : [],
     });
     user.assessmentReports = Array.isArray(user.assessmentReports)
       ? [...user.assessmentReports, nextReport]

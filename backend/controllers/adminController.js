@@ -5,9 +5,13 @@ import {
   RESULT_PUBLICATION_STATUS,
 } from "../utils/resultApproval.js";
 import {
+  cloneManualReviewItems,
+  computeHasUnreviewedItems,
   getStoredAssessmentReports,
   syncLegacyStateFromReports,
 } from "../utils/assessmentReports.js";
+import { matchCareers } from "../utils/scoring/careerMatcher.js";
+import { DEMO_APTITUDE_BANDS } from "../utils/scoring/configs/career500qDemo.config.js";
 
 const fmtCurrency = (n) =>
   new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(
@@ -221,6 +225,38 @@ const buildFallbackSectionBreakdown = (profile = {}) =>
     subsections: [],
   }));
 
+// Shape the studentProfile sub-doc into a snapshot the admin UI renders.
+// dateOfBirth is normalised to YYYY-MM-DD so the review block can display
+// it without re-parsing.
+const buildAdminStudentProfileSnapshot = (profile) => {
+  const plain = profile?.toObject ? profile.toObject() : profile || {};
+  let dateOfBirth = "";
+  if (plain.dateOfBirth) {
+    const dt =
+      plain.dateOfBirth instanceof Date
+        ? plain.dateOfBirth
+        : new Date(plain.dateOfBirth);
+    if (!Number.isNaN(dt.getTime())) {
+      const y = dt.getUTCFullYear();
+      const m = String(dt.getUTCMonth() + 1).padStart(2, "0");
+      const d = String(dt.getUTCDate()).padStart(2, "0");
+      dateOfBirth = `${y}-${m}-${d}`;
+    }
+  }
+  return {
+    dateOfBirth,
+    gender: plain.gender || "",
+    phone: plain.phone || "",
+    schoolOrCollege: plain.schoolOrCollege || "",
+    classOrGrade: plain.classOrGrade || "",
+    stream: plain.stream || "",
+    board: plain.board || "",
+    city: plain.city || "",
+    state: plain.state || "",
+    isComplete: Boolean(plain.isComplete),
+  };
+};
+
 const buildAdminReviewPayload = (user, cfg, reportOverride = null) => {
   const packageMap = getConfigLookup(cfg);
   const report =
@@ -270,11 +306,17 @@ const buildAdminReviewPayload = (user, cfg, reportOverride = null) => {
   const sectionBreakdown = [...storedBreakdown, ...pendingSections].sort(
     (a, b) => Number(a.sectionId || 0) - Number(b.sectionId || 0)
   );
-  const completedSections = sectionBreakdown.filter(
-    (section) => section.status !== "incomplete"
-  ).length;
-  const totalSections =
-    Number(profile.totalTestsCount || 0) || sectionBreakdown.length || 0;
+  // Prompt-5 fix: prefer the scorer's top-level completedSections /
+  // totalSections fields (which now reflect dynamic assigned counts).
+  // Fall back to deriving from section.status only when the report
+  // pre-dates the scorer fix and those fields aren't present.
+  const completedSections = Number.isFinite(Number(profile.completedSections))
+    ? Number(profile.completedSections)
+    : sectionBreakdown.filter((section) => section.status !== "incomplete")
+        .length;
+  const totalSections = Number.isFinite(Number(profile.totalSections))
+    ? Number(profile.totalSections)
+    : Number(profile.totalTestsCount || 0) || sectionBreakdown.length || 0;
   const scoreTotals = sectionBreakdown.reduce(
     (totals, section) => ({
       score: totals.score + toFiniteNumber(section.score, 0),
@@ -343,7 +385,7 @@ const buildAdminReviewPayload = (user, cfg, reportOverride = null) => {
       name: user.name || "Unknown",
       referenceId: `JS-${String(user._id).slice(-8).toUpperCase()}`,
       email: user.email || "",
-      phone: user.mobile || "",
+      phone: user.studentProfile?.phone || user.mobile || "",
       subscription: user.subscription || "Basic",
       testName:
         report.packageTitle ||
@@ -355,20 +397,45 @@ const buildAdminReviewPayload = (user, cfg, reportOverride = null) => {
       submittedAt:
         publication.submittedAt || report.updatedAt || user.updatedAt || user.createdAt,
       attemptLabel: `Attempt ${Math.max(1, Number(report.attemptNumber || user.testsCompleted || 1))}`,
+      // Student-profile snapshot for the reviewer. Pulled from the user
+      // record at review time, so the data shown matches what the student
+      // submitted in the StudentProfileForm.
+      profile: buildAdminStudentProfileSnapshot(user.studentProfile),
     },
+    // Prompt-6 fix: the scorer (Prompt-5) now emits authoritative
+    // completionStatus / completedSections / totalSections. The admin
+    // payload must read those directly rather than re-deriving them
+    // from section.status counts. Fall back to the count-derived value
+    // only when the report pre-dates the scorer fix and those fields
+    // aren't present.
     summary: {
       overallScore,
       maxScore,
       percentage,
       completionStatus:
-        completedSections >= totalSections && totalSections > 0
-          ? "Completed"
-          : "Incomplete",
+        profile.completionStatus ||
+        (completedSections >= totalSections && totalSections > 0
+          ? "Complete"
+          : "Incomplete"),
       completedSections,
       totalSections,
+      isDemo: Boolean(report.isDemo),
       statusLabel: getPublicationStatusLabel(publication.status),
       reportsReady: Number(user.reportsReady || 0),
     },
+    // Prompt-6 fix: top-level aliases so the frontend can read the scorer
+    // values without digging into `summary`. overallPercentage is an
+    // alias for overallScore (both are 0-100) for legacy reads.
+    isDemo: Boolean(report.isDemo),
+    completionStatus:
+      profile.completionStatus ||
+      (completedSections >= totalSections && totalSections > 0
+        ? "Complete"
+        : "Incomplete"),
+    completedSections,
+    totalSections,
+    overallScore,
+    overallPercentage: overallScore,
     sectionBreakdown,
     analysis: {
       reviewSummary: {
@@ -401,9 +468,26 @@ const buildAdminReviewPayload = (user, cfg, reportOverride = null) => {
       testResults: Array.isArray(profile.testResults) ? profile.testResults : [],
     },
     actions: {
-      canApprove: publication.status === RESULT_PUBLICATION_STATUS.PENDING_APPROVAL,
+      canApprove:
+        publication.status === RESULT_PUBLICATION_STATUS.PENDING_APPROVAL &&
+        !report.hasUnreviewedItems,
       canDelete: publication.status !== RESULT_PUBLICATION_STATUS.NOT_SUBMITTED,
-      canPublish: publication.status === RESULT_PUBLICATION_STATUS.PENDING_APPROVAL,
+      canPublish:
+        publication.status === RESULT_PUBLICATION_STATUS.PENDING_APPROVAL &&
+        !report.hasUnreviewedItems,
+    },
+    manualReview: {
+      hasUnreviewedItems: Boolean(report.hasUnreviewedItems),
+      completedAt: report.manualReviewCompletedAt || null,
+      totalItems: Array.isArray(report.manualReviewItems)
+        ? report.manualReviewItems.length
+        : 0,
+      pendingCount: Array.isArray(report.manualReviewItems)
+        ? report.manualReviewItems.filter(
+            (item) =>
+              item?.requiresManualReview && item?.adminDecision == null
+          ).length
+        : 0,
     },
   };
 };
@@ -760,25 +844,57 @@ export const getAdminSubmissions = async (req, res) => {
 
     const rows = users
       .flatMap((user) =>
-        getStoredAssessmentReports(user, packageMap).map((report) => ({
-          id: String(report._id),
-          userId: String(user._id),
-          name: user.name || "Unknown",
-          email: user.email || "",
-          initials: toInitials(user.name),
-          type:
-            report.packageTitle || report.packageId || user.subscription || "Assessment",
-          date:
-            report.publication.submittedAt ||
-            report.updatedAt ||
-            user.updatedAt ||
-            user.createdAt,
-          duration: "N/A",
-          status: getPublicationStatusLabel(report.publication.status),
-          canApprove:
-            report.publication.status ===
-            RESULT_PUBLICATION_STATUS.PENDING_APPROVAL,
-        }))
+        getStoredAssessmentReports(user, packageMap).map((report) => {
+          // Prompt-6 fix: surface the scorer's completion + isDemo
+          // fields on each list row so the badges render without a
+          // second API call.
+          const reportProfile = report?.profile || {};
+          const completedSectionsValue = Number.isFinite(
+            Number(reportProfile.completedSections)
+          )
+            ? Number(reportProfile.completedSections)
+            : null;
+          const totalSectionsValue = Number.isFinite(
+            Number(reportProfile.totalSections)
+          )
+            ? Number(reportProfile.totalSections)
+            : null;
+          return {
+            id: String(report._id),
+            userId: String(user._id),
+            name: user.name || "Unknown",
+            email: user.email || "",
+            initials: toInitials(user.name),
+            type:
+              report.packageTitle || report.packageId || user.subscription || "Assessment",
+            date:
+              report.publication.submittedAt ||
+              report.updatedAt ||
+              user.updatedAt ||
+              user.createdAt,
+            duration: "N/A",
+            status: getPublicationStatusLabel(report.publication.status),
+            canApprove:
+              report.publication.status ===
+                RESULT_PUBLICATION_STATUS.PENDING_APPROVAL &&
+              !report.hasUnreviewedItems,
+            hasUnreviewedItems: Boolean(report.hasUnreviewedItems),
+            isDemo: Boolean(report.isDemo),
+            completionStatus:
+              reportProfile.completionStatus ||
+              (completedSectionsValue != null &&
+              totalSectionsValue != null &&
+              completedSectionsValue >= totalSectionsValue &&
+              totalSectionsValue > 0
+                ? "Complete"
+                : "Incomplete"),
+            completedSections: completedSectionsValue,
+            totalSections: totalSectionsValue,
+            overallScore: Number.isFinite(Number(reportProfile.overallScore))
+              ? Number(reportProfile.overallScore)
+              : null,
+          };
+        })
       )
       .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
       .map((row) => ({
@@ -847,7 +963,7 @@ export const getAdminSubmissionDetail = async (req, res) => {
     const { user } = await getUserByReportId({
       reportId,
       select:
-        "name email mobile subscription selectedPackageId testsCompleted reportsReady resultProfile resultPublication assessmentReports updatedAt createdAt",
+        "name email mobile subscription selectedPackageId testsCompleted reportsReady resultProfile resultPublication assessmentReports studentProfile updatedAt createdAt",
       lean: true,
     });
 
@@ -907,6 +1023,18 @@ export const approveAdminResult = async (req, res) => {
       normalizedReport.publication || getResultPublicationState(user);
     if (!normalizedReport.profile) {
       return res.status(400).json({ success: false, msg: "No generated result available for approval" });
+    }
+
+    // Block approval while the manual-review queue still has pending items.
+    // The frontend disables its Approve button on the same flag; this guard
+    // protects against direct API calls or stale UI state.
+    if (!isLegacyFallback && normalizedReport.hasUnreviewedItems) {
+      return res.status(400).json({
+        success: false,
+        error: "MANUAL_REVIEW_PENDING",
+        message:
+          "Complete manual review of flagged questions before approving this report.",
+      });
     }
 
     const nextPublication = {
@@ -1004,6 +1132,332 @@ export const deleteAdminResult = async (req, res) => {
     });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message || "Failed to delete result" });
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Manual Review (Section 4 image/diagram questions)
+// ---------------------------------------------------------------------------
+
+const SUBSECTION_KEY_TO_APTITUDE_NAME = {
+  abstract_reasoning: "Abstract",
+  spatial_relations: "Spatial Relations",
+  mechanical_reasoning: "Mechanical",
+};
+
+const safePercentage = (correct, scorable) => {
+  if (!scorable) return null;
+  return Math.round((correct / scorable) * 100);
+};
+
+const safeAverage = (values = []) => {
+  const finite = values.filter((v) => Number.isFinite(v));
+  if (!finite.length) return null;
+  return finite.reduce((sum, v) => sum + v, 0) / finite.length;
+};
+
+// Recompute the three image-based aptitude subsections (abstract, spatial,
+// mechanical) from a report's manualReviewItems, applying admin overrides
+// where present. Mutates the report's profile in place so the caller can
+// just save the user document afterward.
+const recomputeReportWithManualDecisions = (report) => {
+  if (!report?.profile) return null;
+
+  const items = Array.isArray(report.manualReviewItems)
+    ? report.manualReviewItems
+    : [];
+
+  // Bucket items by subsection key.
+  const buckets = new Map();
+  items.forEach((item) => {
+    const key = String(item?.subsectionKey || "").trim();
+    if (!key) return;
+    if (!buckets.has(key)) buckets.set(key, []);
+    buckets.get(key).push(item);
+  });
+
+  // Recompute each affected subsection from its bucket.
+  const updatedSubsectionPercentages = {};
+  buckets.forEach((bucket, subsectionKey) => {
+    let scorable = 0;
+    let correct = 0;
+    bucket.forEach((item) => {
+      const hasKey = Boolean(String(item?.correctAnswer || "").trim());
+      if (!hasKey) return;
+      scorable += 1;
+      const effectiveCorrect =
+        item?.adminDecision === "correct"
+          ? true
+          : item?.adminDecision === "incorrect"
+            ? false
+            : Boolean(item?.autoMarkedCorrect);
+      if (effectiveCorrect) correct += 1;
+    });
+    const percentage = safePercentage(correct, scorable);
+    updatedSubsectionPercentages[subsectionKey] = percentage;
+
+    // Mutate the matching subsection inside section 4. Find by key, leave
+    // band/interpretation untouched — the admin sees the same labels they
+    // approved against. The numeric fields drive scoring and the careerMatcher.
+    const section4 = (report.profile.sectionBreakdown || []).find(
+      (section) =>
+        section?.key === "aptitude" || Number(section?.sectionId) === 4
+    );
+    if (!section4) return;
+    const sub = (section4.subsections || []).find(
+      (s) => s?.key === subsectionKey
+    );
+    if (!sub) return;
+
+    sub.rawScore = scorable ? correct : null;
+    sub.maxScore = scorable || sub.maxScore || null;
+    sub.percentage = percentage;
+    sub.answeredCount = scorable;
+    sub.totalQuestions = scorable || sub.totalQuestions || null;
+  });
+
+  // Recompute section 4's overall percentage as the average of its
+  // subsection percentages.
+  const section4 = (report.profile.sectionBreakdown || []).find(
+    (section) => section?.key === "aptitude" || Number(section?.sectionId) === 4
+  );
+  if (section4 && Array.isArray(section4.subsections)) {
+    const subAvg = safeAverage(
+      section4.subsections.map((s) => Number(s?.percentage))
+    );
+    section4.percentage = subAvg == null ? null : Math.round(subAvg);
+    section4.score = section4.percentage;
+  }
+
+  // Refresh the named aptitudeScores bucket the careerMatcher reads from.
+  const aptitudeScores = { ...(report.profile.aptitudeScores || {}) };
+  Object.entries(updatedSubsectionPercentages).forEach(([key, pct]) => {
+    const displayName = SUBSECTION_KEY_TO_APTITUDE_NAME[key];
+    if (displayName && pct != null) {
+      aptitudeScores[displayName] = pct;
+    }
+  });
+  report.profile.aptitudeScores = aptitudeScores;
+
+  // Recompute overall score as the average of section percentages.
+  const overallPercentages = (report.profile.sectionBreakdown || [])
+    .map((section) => Number(section?.percentage))
+    .filter((v) => Number.isFinite(v));
+  const overallAvg = safeAverage(overallPercentages);
+  if (overallAvg != null) {
+    report.profile.overallScore = Math.round(overallAvg);
+    report.profile.overallPercentile = `Top ${Math.max(
+      8,
+      100 - Math.round(overallAvg)
+    )}% profile strength`;
+  }
+
+  // Re-run career matching against the refreshed named profile. Demo
+  // reports return 6 careers (Prompt #1 contract), full reports return 10.
+  const topN = report.isDemo ? 6 : 10;
+  const refreshedCareers = matchCareers(
+    {
+      hollandProfile: report.profile.hollandProfile || {},
+      multipleIntelligences: report.profile.multipleIntelligences || {},
+      aptitudeScores,
+      eqProfile: report.profile.eqProfile || {},
+    },
+    topN
+  );
+  report.profile.careerRecommendations = refreshedCareers;
+  report.profile.careerPathwaysCount = refreshedCareers.length;
+
+  // Demo aptitude bands are percentage-bracketed (see Prompt #1) — re-apply
+  // them on the affected subsections so the band label matches the new %.
+  if (report.isDemo && section4) {
+    section4.subsections = (section4.subsections || []).map((sub) => {
+      if (!SUBSECTION_KEY_TO_APTITUDE_NAME[sub?.key]) return sub;
+      const pct = Number(sub?.percentage);
+      if (!Number.isFinite(pct)) return sub;
+      const band = DEMO_APTITUDE_BANDS.find(
+        (b) => pct >= Number(b.min) && pct <= Number(b.max)
+      );
+      if (!band) return sub;
+      return {
+        ...sub,
+        band: band.label,
+        bandMin: band.min,
+        bandMax: band.max,
+        bandRangeLabel: `${band.min}-${band.max}%`,
+        interpretation: band.interpretation,
+        description: band.interpretation,
+        careerImplication: band.careerImplication,
+      };
+    });
+  }
+
+  return refreshedCareers;
+};
+
+// GET /api/v1/admin/results/:reportId/manual-review
+export const getManualReviewItems = async (req, res) => {
+  try {
+    if (!ensureAdmin(req, res)) return;
+    const { reportId } = req.params;
+    const { user, isLegacyFallback } = await getUserByReportId({
+      reportId,
+      select:
+        "role assessmentReports resultProfile resultPublication",
+      lean: true,
+    });
+    if (!user || isLegacyFallback) {
+      return res.status(404).json({
+        success: false,
+        msg: "Submission not found or has no manual review queue",
+      });
+    }
+    const report = (user.assessmentReports || []).find(
+      (r) => String(r?._id || "") === String(reportId)
+    );
+    if (!report) {
+      return res.status(404).json({ success: false, msg: "Report not found" });
+    }
+    const items = cloneManualReviewItems(report.manualReviewItems || []);
+    return res.status(200).json({
+      success: true,
+      data: {
+        reportId: String(reportId),
+        manualReviewItems: items,
+        hasUnreviewedItems: computeHasUnreviewedItems(items),
+        manualReviewCompletedAt: report.manualReviewCompletedAt || null,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Failed to load manual review queue",
+    });
+  }
+};
+
+// PATCH /api/v1/admin/results/:reportId/manual-review/:questionId
+export const submitManualDecision = async (req, res) => {
+  try {
+    if (!ensureAdmin(req, res)) return;
+    const { reportId, questionId } = req.params;
+    const { decision, note } = req.body || {};
+
+    if (decision !== "correct" && decision !== "incorrect") {
+      return res.status(400).json({
+        success: false,
+        msg: 'decision must be "correct" or "incorrect"',
+      });
+    }
+
+    const { user } = await getUserByReportId({
+      reportId,
+      select: "role assessmentReports",
+      lean: false,
+    });
+    if (!user) {
+      return res.status(404).json({ success: false, msg: "Submission not found" });
+    }
+
+    const report = findMutableReportSubdocument(user, reportId);
+    if (!report) {
+      return res.status(404).json({ success: false, msg: "Report not found" });
+    }
+
+    const item = (report.manualReviewItems || []).find(
+      (entry) => String(entry?.questionId || "") === String(questionId)
+    );
+    if (!item) {
+      return res.status(404).json({
+        success: false,
+        msg: "Manual review item not found",
+      });
+    }
+
+    item.adminDecision = decision;
+    if (typeof note === "string") {
+      item.adminNote = note.trim().slice(0, 500) || null;
+    }
+    report.hasUnreviewedItems = computeHasUnreviewedItems(
+      report.manualReviewItems
+    );
+    report.updatedAt = new Date();
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        reportId: String(reportId),
+        questionId: String(questionId),
+        adminDecision: item.adminDecision,
+        adminNote: item.adminNote || null,
+        hasUnreviewedItems: report.hasUnreviewedItems,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Failed to record manual decision",
+    });
+  }
+};
+
+// POST /api/v1/admin/results/:reportId/manual-review/complete
+export const finalizeManualReview = async (req, res) => {
+  try {
+    if (!ensureAdmin(req, res)) return;
+    const { reportId } = req.params;
+
+    const { user } = await getUserByReportId({
+      reportId,
+      select: "role assessmentReports resultProfile resultPublication topCareers reportsReady",
+      lean: false,
+    });
+    if (!user) {
+      return res.status(404).json({ success: false, msg: "Submission not found" });
+    }
+
+    const report = findMutableReportSubdocument(user, reportId);
+    if (!report) {
+      return res.status(404).json({ success: false, msg: "Report not found" });
+    }
+
+    // Every flagged item must have a decision before we recompute scoring.
+    const pending = (report.manualReviewItems || []).filter(
+      (item) => item?.requiresManualReview && item?.adminDecision == null
+    );
+    if (pending.length) {
+      return res.status(400).json({
+        success: false,
+        error: "MANUAL_REVIEW_PENDING",
+        msg: `Resolve all ${pending.length} flagged questions before finalizing.`,
+        pendingQuestionIds: pending.map((p) => p.questionId),
+      });
+    }
+
+    const refreshedCareers = recomputeReportWithManualDecisions(report);
+    report.hasUnreviewedItems = false;
+    report.manualReviewCompletedAt = new Date();
+    report.updatedAt = new Date();
+    syncLegacyStateFromReports(user);
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        reportId: String(reportId),
+        overallScore: report.profile?.overallScore ?? null,
+        overallPercentile: report.profile?.overallPercentile || "",
+        aptitudeScores: report.profile?.aptitudeScores || {},
+        careerRecommendations: refreshedCareers,
+        manualReviewCompletedAt: report.manualReviewCompletedAt,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Failed to finalize manual review",
+    });
   }
 };
 

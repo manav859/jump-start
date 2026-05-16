@@ -23,6 +23,7 @@ const Livetest = lazy(() => import("./pages/Livetest"));
 const TestCompleted = lazy(() => import("./pages/TestCompleted"));
 const Profile = lazy(() => import("./pages/Profile"));
 const EditProfile = lazy(() => import("./pages/EditProfile"));
+const StudentProfileForm = lazy(() => import("./pages/StudentProfileForm"));
 const TestPaused = lazy(() => import("./pages/TestPaused"));
 const Admindashboard = lazy(() => import("./pages/admin/Admindashboard"));
 const TestSubmissions = lazy(() => import("./pages/admin/TestSubmissions"));
@@ -99,6 +100,7 @@ const router = createBrowserRouter([
       { path: "/dashboard", element: protectedPage(<Dashboard />) },
       { path: "/profile", element: protectedPage(<Profile />) },
       { path: "/profile/edit", element: protectedPage(<EditProfile />) },
+      { path: "/profile/student", element: protectedPage(<StudentProfileForm />) },
     ],
   },
   {

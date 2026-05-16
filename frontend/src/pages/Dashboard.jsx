@@ -11,9 +11,12 @@ import {
   CalendarDays,
   ArrowRight,
   Trophy,
+  Sparkles,
 } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 import api from "../api/api";
+
+const DEMO_PACKAGE_ID = "demo-aptitude-50q";
 
 const defaultState = {
   tests_completed: 0,
@@ -25,6 +28,8 @@ const defaultState = {
   purchased_packages: [],
   top_careers: [],
   result_status: "not_submitted",
+  demo_test: null,
+  student_profile_complete: false,
 };
 
 const getPackageStatusMeta = (status) => {
@@ -146,6 +151,11 @@ export default function Dashboard() {
           purchased_packages: data.purchased_packages || [],
           top_careers: data.top_careers || [],
           result_status: data.result_status || "not_submitted",
+          demo_test: data.demo_test || null,
+          student_profile_complete: Boolean(
+            data.student_profile_complete ??
+              data.user?.studentProfile?.isComplete
+          ),
         });
       })
       .catch((err) => {
@@ -206,6 +216,71 @@ export default function Dashboard() {
     }, 0);
   };
 
+  const redirectToStudentProfile = (pendingPackageId, returnTo = "/dashboard") => {
+    navigate("/profile/student", {
+      state: { returnTo, pendingPackageId },
+    });
+  };
+
+  const handleOpenDemo = async () => {
+    const demo = stats.demo_test;
+    if (!demo) return;
+
+    // If the demo is already submitted and approved, jump straight to the
+    // published report instead of starting a new attempt.
+    if (demo.publishedReportId) {
+      navigate(`/result/${demo.publishedReportId}`);
+      return;
+    }
+    if (demo.publicationStatus === "pending_approval") {
+      navigate("/test-completed");
+      return;
+    }
+
+    // Mandatory student-profile gate. The backend also enforces this in
+    // selectPackage; the client check just avoids a noisy round-trip.
+    if (!stats.student_profile_complete) {
+      redirectToStudentProfile(DEMO_PACKAGE_ID);
+      return;
+    }
+
+    setPackageError("");
+    setOpeningPackageId(DEMO_PACKAGE_ID);
+
+    try {
+      await api.patch("/v1/user/package/select", {
+        packageId: DEMO_PACKAGE_ID,
+        resetProgress: false,
+      });
+      setStats((prev) => ({
+        ...prev,
+        selected_package_id: DEMO_PACKAGE_ID,
+        user: prev.user
+          ? { ...prev.user, selectedPackageId: DEMO_PACKAGE_ID }
+          : prev.user,
+      }));
+      if (user) {
+        updateUser({ ...user, selectedPackageId: DEMO_PACKAGE_ID });
+      }
+      openAssessmentPath("/pretest");
+    } catch (err) {
+      // If the server returns PROFILE_INCOMPLETE (e.g., stale local
+      // student_profile_complete flag), redirect to the form rather than
+      // showing a generic error.
+      if (err?.response?.data?.error === "PROFILE_INCOMPLETE") {
+        redirectToStudentProfile(DEMO_PACKAGE_ID);
+        return;
+      }
+      setPackageError(
+        err?.response?.data?.msg ||
+          err?.message ||
+          "Failed to open the demo test."
+      );
+    } finally {
+      setOpeningPackageId("");
+    }
+  };
+
   const handleOpenPackage = async (pkg) => {
     const statusMeta = getPackageStatusMeta(pkg.status);
     const actionMeta = getPackageActionMeta(pkg);
@@ -218,6 +293,12 @@ export default function Dashboard() {
 
     if (actionMeta.mode === "results") {
       navigate(pkg.publishedReportId ? `/result/${pkg.publishedReportId}` : "/result");
+      return;
+    }
+
+    // Same student-profile gate as the demo CTA.
+    if (!stats.student_profile_complete) {
+      redirectToStudentProfile(pkg.id);
       return;
     }
 
@@ -244,6 +325,10 @@ export default function Dashboard() {
       openAssessmentPath("/pretest/sections");
     } catch (err) {
       console.error("Failed to open assessment package", err);
+      if (err?.response?.data?.error === "PROFILE_INCOMPLETE") {
+        redirectToStudentProfile(pkg.id);
+        return;
+      }
       setPackageError(
         err?.response?.data?.msg ||
           err?.message ||
@@ -332,6 +417,59 @@ export default function Dashboard() {
             );
           })}
         </div>
+
+        {stats.demo_test ? (
+          <section className="mt-8 overflow-hidden rounded-[26px] border border-[#F5D9A6] bg-[linear-gradient(135deg,#FFF6E0_0%,#FFFFFF_55%,#F6FDFC_100%)] p-6 shadow-[0_18px_36px_rgba(245,159,10,0.12)] sm:p-7">
+            <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+              <div className="max-w-2xl">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-[#FFF1D3] text-[#B86D00]">
+                    <Sparkles className="h-4 w-4" />
+                  </span>
+                  <span className="rounded-full bg-[#FFF1D3] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#B86D00]">
+                    Free Client Demo
+                  </span>
+                </div>
+                <h2 className="mt-4 text-2xl font-bold text-[#0F1729] sm:text-3xl">
+                  Try the {stats.demo_test.totalQuestions || 50}-Question Demo Test
+                </h2>
+                <p className="mt-2 text-sm leading-7 text-[#65758B] sm:text-base sm:leading-8">
+                  A short, curated subset of the full 500-question assessment.
+                  Same scoring engine — strengths, top careers, and personality
+                  profile — delivered in under{" "}
+                  {stats.demo_test.totalDurationMinutes || 25} minutes. No
+                  payment required.
+                </p>
+                {stats.demo_test.attempted ? (
+                  <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 text-xs font-semibold text-[#188B8B]">
+                    <CheckCircle2 className="h-4 w-4" />
+                    {stats.demo_test.publicationStatus === "approved"
+                      ? "Demo result published — open below."
+                      : stats.demo_test.publicationStatus === "pending_approval"
+                        ? "Demo submitted — awaiting admin approval."
+                        : "Demo attempt on file."}
+                  </p>
+                ) : null}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleOpenDemo}
+                disabled={openingPackageId === DEMO_PACKAGE_ID}
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#F59F0A] px-6 py-3 text-sm font-semibold text-[#0F1729] shadow-[0_14px_28px_rgba(245,159,10,0.25)] hover:bg-[#E89206] disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {openingPackageId === DEMO_PACKAGE_ID
+                  ? "Opening..."
+                  : stats.demo_test.publishedReportId
+                    ? "View Demo Result"
+                    : stats.demo_test.publicationStatus === "pending_approval"
+                      ? "View Submission Status"
+                      : "Try Demo Test (50 Questions)"}
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </section>
+        ) : null}
 
         <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.8fr)_minmax(280px,0.9fr)]">
           <section className="surface-card rounded-[30px] p-7">

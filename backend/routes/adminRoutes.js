@@ -13,6 +13,9 @@ import {
   getAdminAnalytics,
   approveAdminResult,
   deleteAdminResult,
+  getManualReviewItems,
+  submitManualDecision,
+  finalizeManualReview,
 } from "../controllers/adminController.js";
 
 const router = express.Router();
@@ -30,6 +33,18 @@ router.get("/submissions/:userId", getAdminSubmissionDetail);
 router.get("/results", getAdminResults);
 router.patch("/results/:userId/approve", approveAdminResult);
 router.delete("/results/:userId", deleteAdminResult);
+// Manual review queue for Section 4 image/diagram items. :reportId here is
+// the same value used by /submissions/:reportId and /results/:reportId — the
+// per-attempt assessmentReport sub-document id.
+router.get("/results/:reportId/manual-review", getManualReviewItems);
+router.patch(
+  "/results/:reportId/manual-review/:questionId",
+  submitManualDecision
+);
+router.post(
+  "/results/:reportId/manual-review/complete",
+  finalizeManualReview
+);
 router.get("/analytics", getAdminAnalytics);
 
 export default router;
