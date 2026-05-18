@@ -817,8 +817,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "73",
           "text": "I prefer to work:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Alone on independent projects",
+            "In small teams of 2-4 people",
+            "In large groups or teams"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -828,8 +832,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "74",
           "text": "My ideal work environment would be:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Quiet and structured",
+            "Collaborative and social",
+            "Dynamic and changing"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -839,8 +847,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "75",
           "text": "I prefer tasks that are:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Routine and predictable",
+            "Varied with some structure",
+            "Completely unpredictable and challenging"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -849,9 +861,13 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "76",
-          "text": "When facing a deadline, I",
-          "type": "likert",
-          "options": [],
+          "text": "When facing a deadline, I:",
+          "type": "single",
+          "options": [
+            "Start early and work steadily",
+            "Work in bursts of activity",
+            "Work best under pressure at the last minute"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -861,8 +877,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "77",
           "text": "I learn best through:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Reading and studying independently",
+            "Discussion and group work",
+            "Hands-on experience and practice"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -872,8 +892,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "78",
           "text": "My ideal work schedule would be:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Fixed hours, same time every day",
+            "Flexible hours within set boundaries",
+            "Complete flexibility to set my own schedule"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -883,8 +907,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "79",
           "text": "When solving problems, I prefer to:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Follow established procedures",
+            "Use a mix of proven methods and creativity",
+            "Find completely new and innovative solutions"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -894,8 +922,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "80",
           "text": "I am most productive when:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Working on one task at a time",
+            "Juggling a few different projects",
+            "Managing multiple tasks simultaneously"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -905,8 +937,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "81",
           "text": "I prefer feedback that is:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Detailed and specific",
+            "Balanced with praise and suggestions",
+            "Brief and to the point"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -916,8 +952,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "82",
           "text": "My ideal workspace would be:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "A private office with minimal distractions",
+            "An open area where I can interact with colleagues",
+            "A flexible space I can arrange as needed"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -927,8 +967,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "83",
           "text": "I prefer to receive instructions that are:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Very detailed and step-by-step",
+            "Clear with some room for interpretation",
+            "General guidelines that I can adapt"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -937,9 +981,13 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "84",
-          "text": "When working on long-term projects, I",
-          "type": "likert",
-          "options": [],
+          "text": "When working on long-term projects, I:",
+          "type": "single",
+          "options": [
+            "Create detailed timelines and stick to them",
+            "Set major milestones and adjust as needed",
+            "Work intuitively and adapt as I go"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -949,8 +997,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "85",
           "text": "I am most motivated by:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Personal achievement and recognition",
+            "Team success and collaboration",
+            "Making a positive impact on others"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -960,8 +1012,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "86",
           "text": "I handle stress best when I can:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Plan ahead and prepare thoroughly",
+            "Talk through problems with others",
+            "Take breaks and manage my energy"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -971,8 +1027,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "87",
           "text": "I prefer meetings that are:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Well-structured with clear agendas",
+            "Interactive with group participation",
+            "Brief and focused on decisions"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -982,8 +1042,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "88",
           "text": "When learning new skills, I prefer:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Formal training and structured courses",
+            "Mentoring and on-the-job guidance",
+            "Self-directed exploration and practice"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -993,8 +1057,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "89",
           "text": "I work best with supervisors who:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Provide clear expectations and regular check-ins",
+            "Offer support while allowing independence",
+            "Give me complete autonomy"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -1004,8 +1072,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "90",
           "text": "My ideal work pace is:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Steady and consistent",
+            "Varied depending on the project",
+            "Intense with periods of rest"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -1015,8 +1087,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "91",
           "text": "I prefer to communicate through:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Written reports and documentation",
+            "Face-to-face conversations",
+            "Quick messages and brief updates"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -1025,9 +1101,13 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "92",
-          "text": "When making decisions at work, I",
-          "type": "likert",
-          "options": [],
+          "text": "When making decisions at work, I:",
+          "type": "single",
+          "options": [
+            "Gather extensive information first",
+            "Consult with others before deciding",
+            "Trust my instincts and decide quickly"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -1037,8 +1117,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "93",
           "text": "I am most satisfied when my work:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Follows clear standards and procedures",
+            "Allows for creativity within guidelines",
+            "Breaks new ground and challenges norms"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -1048,8 +1132,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "94",
           "text": "I prefer recognition that is:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Private and personal",
+            "Shared with my immediate team",
+            "Public and visible to everyone"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -1058,9 +1146,13 @@ const COMPREHENSIVE_500_PACKAGE = {
         },
         {
           "questionId": "95",
-          "text": "When conflicts arise at work, I",
-          "type": "likert",
-          "options": [],
+          "text": "When conflicts arise at work, I:",
+          "type": "single",
+          "options": [
+            "Prefer to address them through proper channels",
+            "Try to mediate and find compromise",
+            "Deal with them directly and immediately"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,
@@ -1070,8 +1162,12 @@ const COMPREHENSIVE_500_PACKAGE = {
         {
           "questionId": "96",
           "text": "My ideal career path would involve:",
-          "type": "likert",
-          "options": [],
+          "type": "single",
+          "options": [
+            "Steady progression within one organization",
+            "Growth through diverse experiences",
+            "Creating my own opportunities and ventures"
+          ],
           "correctOption": "",
           "reverseScored": false,
           "weight": 1,

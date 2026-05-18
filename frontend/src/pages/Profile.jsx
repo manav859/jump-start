@@ -3,7 +3,10 @@ import { Link } from "react-router-dom";
 import {
   AlertTriangle,
   BadgeCheck,
+  Check,
+  Copy,
   GraduationCap,
+  Hash,
   Mail,
   MapPin,
   Phone,
@@ -57,6 +60,10 @@ const extraProfileFields = (profile) => [
 export default function Profile() {
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
+  // Prompt-9 Fix 1: copy-to-clipboard for the Jumpstart ID. `copied`
+  // returns to false after a short delay so the button reads as a
+  // transient acknowledgement rather than a sticky state.
+  const [copiedJumpstartId, setCopiedJumpstartId] = useState(false);
   const [error, setError] = useState("");
   const [profile, setProfile] = useState(null);
 
@@ -117,6 +124,71 @@ export default function Profile() {
 
         {error ? (
           <p className="mt-4 text-sm text-red-600">{error}</p>
+        ) : null}
+
+        {/* Prompt-9 Fix 1: Jumpstart ID card. Shown above the warning
+            banner so students can quote their ID to support / counsellors
+            even before they finish the profile form. Copy button uses the
+            modern clipboard API with a fallback notice for browsers that
+            block it (mostly older Safari over http://). */}
+        {profile?.jumpstartId || user?.jumpstartId ? (
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-[22px] border border-[#D4EEED] bg-[linear-gradient(180deg,#F6FDFC_0%,#FFFFFF_100%)] p-5">
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EAFBFB] text-[#188B8B]">
+                <Hash className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#188B8B]">
+                  Your Jumpstart ID
+                </p>
+                <p className="mt-1 font-mono text-xl font-bold text-[#0F1729]">
+                  {profile?.jumpstartId || user?.jumpstartId}
+                </p>
+                <p className="mt-1 text-xs text-[#65758B]">
+                  Quote this ID when contacting Jumpstart support or your
+                  counsellor — it identifies your account uniquely.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={async () => {
+                const id = profile?.jumpstartId || user?.jumpstartId || "";
+                if (!id) return;
+                try {
+                  if (navigator?.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(id);
+                  } else {
+                    const temp = document.createElement("textarea");
+                    temp.value = id;
+                    document.body.appendChild(temp);
+                    temp.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(temp);
+                  }
+                  setCopiedJumpstartId(true);
+                  setTimeout(() => setCopiedJumpstartId(false), 2000);
+                } catch {
+                  // Best-effort — clipboard blocked. No-op; the ID is
+                  // still readable on screen.
+                }
+              }}
+              className="inline-flex items-center gap-2 rounded-[12px] border border-[#188B8B] bg-white px-4 py-2 text-sm font-semibold text-[#188B8B] transition hover:bg-[#F6FDFC]"
+              aria-label="Copy your Jumpstart ID to the clipboard"
+            >
+              {copiedJumpstartId ? (
+                <>
+                  <Check className="h-4 w-4" />
+                  Copied
+                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4" />
+                  Copy ID
+                </>
+              )}
+            </button>
+          </div>
         ) : null}
 
         {profile?.studentProfile && !profile.studentProfile.isComplete ? (

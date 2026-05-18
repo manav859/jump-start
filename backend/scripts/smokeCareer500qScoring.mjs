@@ -293,13 +293,17 @@ const checkPersonalityProfile = (label, run) => {
 
   const ws = p.workStyle || {};
   assert(Boolean(ws.dominantStyle), `${label}: workStyle.dominantStyle must be non-empty`);
-  // Consistency must not be 0 for a fully-answered submission. The
-  // previous bug pinned it to 0 because the categorical scorer
-  // silently failed when the package stored Q73-Q96 as Likert.
-  assert(
-    Number(ws.consistency) > 0,
-    `${label}: workStyle.consistency must be > 0 for a fully-answered submission (got ${ws.consistency})`
-  );
+  // Prompt-9 Fix 4: the post-fix demo no longer probes Work Style
+  // (Q73/Q85 were swapped out for full OCEAN coverage). When the
+  // package doesn't include work-style questions, the snapshot
+  // reports "Not Measured" + consistency=0 honestly. Only assert
+  // consistency > 0 when work-style was actually probed.
+  if (ws.dominantStyle !== "Not Measured") {
+    assert(
+      Number(ws.consistency) > 0,
+      `${label}: workStyle.consistency must be > 0 for a measured submission (got ${ws.consistency})`
+    );
+  }
 };
 
 [

@@ -1605,8 +1605,21 @@ const buildHspqSignature = (hspqSubsection) => {
 const buildWorkStyleSnapshot = (workStyleSubsection) => {
   if (!workStyleSubsection) {
     return {
-      dominantStyle: "",
-      description: "",
+      dominantStyle: "Not Measured",
+      description: "Work-style preferences were not assessed by this test package.",
+      consistency: 0,
+    };
+  }
+  // Prompt-9 Fix 4: when the active package doesn't include any work-style
+  // questions (e.g., the post-fix demo no longer probes Q73-Q96), surface
+  // a clear "Not Measured" state instead of an ambiguous 0% / Balanced
+  // result. Mirrors the OCEAN "Not Measured" pattern.
+  const totalAssigned = Number(workStyleSubsection.totalQuestions ?? 0);
+  const answeredCount = Number(workStyleSubsection.answeredCount ?? 0);
+  if (totalAssigned === 0 || answeredCount === 0) {
+    return {
+      dominantStyle: "Not Measured",
+      description: "Work-style preferences were not assessed by this test package.",
       consistency: 0,
     };
   }
@@ -1683,6 +1696,24 @@ const buildManualReviewItems = ({ sections = [], questionMap }) => {
       const correctAnswer = String(question?.correctOption || "").trim().toUpperCase();
       const mediaUrl = getQuestionMediaUrl(questionId);
 
+      // Prompt-9 Fix 2: normalise the question's options into a stable
+      // [{label, text}] shape so the admin review card can render every
+      // choice with the correct one highlighted. Package data stores
+      // options as a string[]; convert to A/B/C/D-labelled entries.
+      const rawOptions = Array.isArray(question?.options) ? question.options : [];
+      const options = rawOptions.map((opt, idx) => {
+        if (opt && typeof opt === "object") {
+          return {
+            label: String(opt.label || String.fromCharCode(65 + idx)).trim(),
+            text: String(opt.text || opt.label || "").trim(),
+          };
+        }
+        return {
+          label: String.fromCharCode(65 + idx),
+          text: String(opt || "").trim(),
+        };
+      });
+
       items.push({
         questionId: String(questionId),
         questionText: String(question?.text || "").trim(),
@@ -1691,6 +1722,7 @@ const buildManualReviewItems = ({ sections = [], questionMap }) => {
         // correctAnswer is null when the answer key is missing — that's
         // the whole reason this item is in the review list.
         correctAnswer: correctAnswer || null,
+        options,
         // Cannot auto-grade. That's why this item is here.
         autoMarkedCorrect: false,
         requiresManualReview: true,

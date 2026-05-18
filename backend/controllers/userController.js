@@ -746,7 +746,7 @@ export const getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
       .select(
-        "_id name email mobile city dateOfBirth schoolName schoolLocation residentialAddress subscription role isSuspended selectedPackageId studentProfile createdAt"
+        "_id jumpstartId name email mobile city dateOfBirth schoolName schoolLocation residentialAddress subscription role isSuspended selectedPackageId studentProfile createdAt"
       )
       .lean();
     if (!user) return res.status(404).json({ success: false, msg: "User not found" });
@@ -1067,6 +1067,58 @@ export const init = async (req, res) => {
                 RESULT_PUBLICATION_STATUS.NOT_SUBMITTED,
             }
           : null,
+        // Prompt-9 Fix 3: in-progress test descriptor for the
+        // Dashboard's "Continue Test" card. Null when the student
+        // hasn't started a test yet OR has finished every section of
+        // the currently selected package. The dashboard reads this
+        // directly without re-deriving from testProgress + package
+        // metadata client-side.
+        test_in_progress: (() => {
+          const progress = user.testProgress || {};
+          const activePackageId = String(user.selectedPackageId || "");
+          if (!activePackageId || !pkg) return null;
+          const sections = getEnabledSections(pkg);
+          if (!sections.length) return null;
+          const completedSet = new Set(
+            Array.isArray(progress.completedSectionIds)
+              ? progress.completedSectionIds.map((id) => Number(id))
+              : []
+          );
+          const hasAnyAnswer =
+            progress.answers && Object.keys(progress.answers).length > 0;
+          const hasMidSection = Number(progress.questionIndex || 0) > 0;
+          const hasCompleted = completedSet.size > 0;
+          // Only show a "Continue" card when there's real progress
+          // (some answer, any completed section, or a non-zero
+          // questionIndex). A freshly purchased package with zero
+          // progress shouldn't surface as in-progress.
+          if (!hasAnyAnswer && !hasCompleted && !hasMidSection) return null;
+          // If every enabled section is already completed, the test
+          // is awaiting submit — don't show as in-progress.
+          const allDone = sections.every((s) =>
+            completedSet.has(Number(s.sectionId))
+          );
+          if (allDone) return null;
+          const currentSectionId = Number(
+            progress.sectionId || sections[0]?.sectionId || 1
+          );
+          const currentSection =
+            sections.find((s) => Number(s.sectionId) === currentSectionId) ||
+            sections[0];
+          return {
+            packageId: pkg.id,
+            packageTitle: pkg.title || "",
+            sectionId: currentSectionId,
+            sectionTitle: currentSection?.title || `Section ${currentSectionId}`,
+            completedSectionsCount: sections.filter((s) =>
+              completedSet.has(Number(s.sectionId))
+            ).length,
+            totalSections: sections.length,
+            questionIndex: Number(progress.questionIndex || 0),
+            timeRemainingSeconds: Number(progress.timeRemainingSeconds || 0),
+            updatedAt: progress.updatedAt || null,
+          };
+        })(),
       },
     });
   } catch (err) {

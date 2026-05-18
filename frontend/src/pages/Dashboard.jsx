@@ -30,6 +30,10 @@ const defaultState = {
   result_status: "not_submitted",
   demo_test: null,
   student_profile_complete: false,
+  // Prompt-9 Fix 3: descriptor for the "Continue Test" card. null when
+  // the student has no in-progress test on the currently selected
+  // package. Populated by /init.
+  test_in_progress: null,
 };
 
 const getPackageStatusMeta = (status) => {
@@ -156,6 +160,7 @@ export default function Dashboard() {
             data.student_profile_complete ??
               data.user?.studentProfile?.isComplete
           ),
+          test_in_progress: data.test_in_progress || null,
         });
       })
       .catch((err) => {
@@ -417,6 +422,52 @@ export default function Dashboard() {
             );
           })}
         </div>
+
+        {/* Prompt-9 Fix 3: Continue Test card. Shown when the student
+            has unfinished progress on their currently selected package.
+            Visually prioritised above the demo CTA so "resume" is the
+            obvious action for a returning student mid-test. */}
+        {stats.test_in_progress ? (
+          <section className="mt-8 overflow-hidden rounded-[26px] border border-[#9BD9D6] bg-[linear-gradient(135deg,#EAFBFB_0%,#FFFFFF_55%,#F6FDFC_100%)] p-6 shadow-[0_18px_36px_rgba(24,139,139,0.12)] sm:p-7">
+            <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+              <div className="max-w-2xl">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-white text-[#188B8B] shadow-sm">
+                    <PlayCircle className="h-4 w-4" />
+                  </span>
+                  <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#188B8B]">
+                    Test In Progress
+                  </span>
+                </div>
+                <h2 className="mt-4 text-2xl font-bold text-[#0F1729] sm:text-3xl">
+                  Continue your {stats.test_in_progress.packageTitle ||
+                    "assessment"}
+                </h2>
+                <p className="mt-2 text-sm leading-7 text-[#65758B] sm:text-base sm:leading-8">
+                  You're on {stats.test_in_progress.sectionTitle || "a section"}.{" "}
+                  <span className="font-semibold text-[#0F1729]">
+                    {stats.test_in_progress.completedSectionsCount ?? 0} of{" "}
+                    {stats.test_in_progress.totalSections ?? 0} sections
+                  </span>{" "}
+                  completed so far. Your answers are saved — resume anytime.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  openAssessmentPath(
+                    `/livetest/${stats.test_in_progress.sectionId}`
+                  )
+                }
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#188B8B] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(24,139,139,0.22)] hover:bg-[#147070]"
+              >
+                Resume Test
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </section>
+        ) : null}
 
         {stats.demo_test ? (
           <section className="mt-8 overflow-hidden rounded-[26px] border border-[#F5D9A6] bg-[linear-gradient(135deg,#FFF6E0_0%,#FFFFFF_55%,#F6FDFC_100%)] p-6 shadow-[0_18px_36px_rgba(245,159,10,0.12)] sm:p-7">

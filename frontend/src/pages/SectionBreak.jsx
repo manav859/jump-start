@@ -1,11 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { CheckCircle2, Coffee, TimerReset } from "lucide-react";
+import { CheckCircle2, Coffee, Save, TimerReset } from "lucide-react";
+import api from "../api/api";
 
 export default function SectionBreak() {
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state || {};
+  // Prompt-9 Fix 3: "Save & Return to Dashboard" path. Auto-save runs
+  // every few seconds while the student is in Livetest, but we trigger
+  // one final PATCH here as confirmation so the dashboard's "Continue"
+  // card reflects the most recent progress immediately.
+  const [savingReturn, setSavingReturn] = useState(false);
 
   const completedSection = Number(state.completedSection || 0);
   const completedSectionTitle = state.completedSectionTitle || `Section ${completedSection}`;
@@ -116,7 +122,7 @@ export default function SectionBreak() {
           <button
             type="button"
             onClick={() => navigate(`/livetest/${nextSectionId}`, { replace: true })}
-            className="mt-6 inline-flex w-full items-center justify-center rounded-[14px] bg-[#F59F0A] px-6 py-3.5 text-sm font-semibold text-[#0F1729] shadow-[0_14px_28px_rgba(245,159,10,0.18)] hover:bg-[#E89206]"
+            className="mt-6 inline-flex w-full cursor-pointer items-center justify-center rounded-[14px] bg-[#F59F0A] px-6 py-3.5 text-sm font-semibold text-[#0F1729] shadow-[0_14px_28px_rgba(245,159,10,0.18)] transition hover:bg-[#E89206]"
           >
             Continue to Next Section
           </button>
@@ -128,6 +134,45 @@ export default function SectionBreak() {
 
           <p className="mt-4 text-sm text-[#98A2B3]">
             Next up: {remainingTitles[0] || completedSectionTitle}
+          </p>
+
+          {/* Prompt-9 Fix 3: secondary "Save & Return to Dashboard"
+              path. Rendered as a teal-outlined button (not a text link)
+              so it matches the visual weight of the primary CTA above
+              while staying visually subordinate to it. Triggers one
+              final PATCH to /test-progress as a write-fence, then
+              navigates to /dashboard. Disabled during the save so a
+              double-click can't fire two writes. */}
+          <button
+            type="button"
+            onClick={async () => {
+              if (savingReturn) return;
+              setSavingReturn(true);
+              try {
+                // The auto-save loop in Livetest.jsx already pushed
+                // progress for the section the student just finished;
+                // this PATCH is a confirmation write to ensure the
+                // dashboard reflects the latest sectionId/answers.
+                await api.patch("/v1/user/test-progress", {
+                  sectionId: nextSectionId,
+                  questionIndex: 0,
+                });
+              } catch {
+                // Best-effort — never block the student from leaving.
+                // If the save fails, prior auto-save still applies.
+              } finally {
+                navigate("/dashboard", { replace: true });
+              }
+            }}
+            disabled={savingReturn}
+            className="mt-6 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] border-2 border-[#188B8B] bg-white px-6 py-3.5 text-sm font-semibold text-[#188B8B] transition hover:bg-[#F6FDFC] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <Save className="h-4 w-4" />
+            {savingReturn ? "Saving…" : "Save & Return to Dashboard"}
+          </button>
+          <p className="mt-3 text-xs leading-5 text-[#98A2B3]">
+            Your progress is saved. You can continue this test anytime from your
+            dashboard.
           </p>
         </div>
       </div>

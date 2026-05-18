@@ -9,8 +9,12 @@ const googleClientIds = (process.env.GOOGLE_CLIENT_ID || "")
 
 const googleClient = googleClientIds.length > 0 ? new OAuth2Client() : null;
 
-const signToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+// Prompt-9 Fix 1: include the user's Jumpstart ID in the JWT payload
+// alongside the Mongo id. Lets request handlers and middleware read
+// the human-readable id without a DB hit. The id (Mongo _id) remains
+// the canonical authentication subject — jumpstartId is informational.
+const signToken = (id, jumpstartId = "") =>
+  jwt.sign({ id, jumpstartId }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
 // POST /api/v1/user/auth/register
 export const register = async (req, res) => {
@@ -53,9 +57,15 @@ export const register = async (req, res) => {
       mobile: (mobile || "").toString().trim(),
     });
 
+    // Prompt-9 Fix 1: surface the freshly-assigned Jumpstart ID in the
+    // signup response so the frontend can show it on a welcome screen
+    // without waiting for the first login round-trip.
     return res.status(201).json({
       success: true,
       message: "Signup successful!",
+      data: {
+        jumpstartId: user.jumpstartId || "",
+      },
     });
   } catch (err) {
     console.error("Register error:", err);
@@ -111,7 +121,7 @@ export const login = async (req, res) => {
     user.lastLoginAt = new Date();
     await user.save();
 
-    const token = signToken(user._id);
+    const token = signToken(user._id, user.jumpstartId || "");
     const userObj = user.toAuthJSON();
 
     return res.status(200).json({
@@ -196,7 +206,7 @@ export const socialLogin = async (req, res) => {
     user.lastLoginAt = new Date();
     await user.save();
 
-    const authToken = signToken(user._id);
+    const authToken = signToken(user._id, user.jumpstartId || "");
     const userObj = user.toAuthJSON();
 
     return res.status(200).json({

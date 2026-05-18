@@ -365,6 +365,20 @@ const isFieldFilled = (profile, key) => {
 const computeStudentProfileComplete = (profile = {}) =>
   STUDENT_PROFILE_REQUIRED_FIELDS.every((key) => isFieldFilled(profile, key));
 
+// Prompt-9 Fix 2: per-option detail for the manual review card. The
+// scorer emits a structured options array (label + text) for every
+// review item so admin can see all choices side-by-side with the
+// correct one highlighted, rather than guessing from a bare answer
+// letter. Stored as a sub-schema (not Mixed) so the data shape is
+// validated even on legacy reports that get backfilled later.
+const manualReviewOptionSchema = new mongoose.Schema(
+  {
+    label: { type: String, default: "" },
+    text: { type: String, default: "" },
+  },
+  { _id: false }
+);
+
 const manualReviewItemSchema = new mongoose.Schema(
   {
     questionId: { type: String, default: "" },
@@ -372,6 +386,7 @@ const manualReviewItemSchema = new mongoose.Schema(
     mediaUrl: { type: String, default: null },
     studentAnswer: { type: String, default: "" },
     correctAnswer: { type: String, default: "" },
+    options: { type: [manualReviewOptionSchema], default: [] },
     autoMarkedCorrect: { type: Boolean, default: false },
     requiresManualReview: { type: Boolean, default: false },
     adminDecision: {
@@ -414,6 +429,18 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+    },
+    // Prompt-9 Fix 1: human-readable unique ID — JS-{YYYY}-{NNNNN}.
+    // Sparse so legacy users without one don't block the index, unique
+    // so duplicates are impossible at the DB level. The pre-save hook
+    // assigns it on first save; the migration script backfills any
+    // user that pre-dates this field.
+    jumpstartId: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+      default: null,
     },
     password: { type: String, minlength: 6, default: null },
     mobile: { type: String, trim: true, default: "" },
@@ -531,6 +558,36 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+// Prompt-9 Fix 1: assign a human-readable Jumpstart ID on first save.
+// Skip if already set (idempotent — running the migration after this
+// hook does nothing). The unique index on jumpstartId is the final
+// safety net against the count-then-save race window; if a concurrent
+// signup grabs the same counter, we retry once with a freshly-counted
+// suffix. Beyond two retries we give up and let the unique-index
+// violation surface as a save error rather than spinning forever.
+userSchema.pre("save", async function (next) {
+  if (this.jumpstartId) return next();
+  const Model = this.constructor;
+  const year = new Date().getFullYear();
+  try {
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const count = await Model.countDocuments();
+      const candidate = `JS-${year}-${String(count + 1 + attempt).padStart(5, "0")}`;
+      const clash = await Model.exists({ jumpstartId: candidate });
+      if (!clash) {
+        this.jumpstartId = candidate;
+        return next();
+      }
+    }
+    // Final fallback — base on createdAt timestamp so it's still
+    // year-prefixed but globally unique.
+    this.jumpstartId = `JS-${year}-${Date.now().toString().slice(-5)}`;
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
 userSchema.methods.isStudentProfileComplete = function () {
   return computeStudentProfileComplete(this.studentProfile);
 };
@@ -543,6 +600,7 @@ userSchema.methods.comparePassword = function (candidate) {
 userSchema.methods.toAuthJSON = function () {
   return {
     id: this._id,
+    jumpstartId: this.jumpstartId || "",
     name: this.name,
     email: this.email,
     mobile: this.mobile || "",

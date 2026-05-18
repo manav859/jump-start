@@ -713,17 +713,47 @@ export const getAdminNotifications = async (req, res) => {
   }
 };
 
+// Prompt-9 Fix 1: build the Mongo filter for admin user/submission
+// search. Matches name, email, OR jumpstartId (case-insensitive). Empty
+// query returns the unfiltered base filter so existing callers keep
+// working with no query at all.
+const escapeRegex = (value = "") =>
+  String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const buildAdminUserSearchFilter = (rawQuery = "", baseFilter = {}) => {
+  const query = String(rawQuery || "").trim();
+  if (!query) return baseFilter;
+  const safe = escapeRegex(query);
+  return {
+    ...baseFilter,
+    $or: [
+      { name: { $regex: safe, $options: "i" } },
+      { email: { $regex: safe, $options: "i" } },
+      { jumpstartId: { $regex: safe, $options: "i" } },
+    ],
+  };
+};
+
 // GET /api/v1/admin/users
 export const getAdminUsers = async (req, res) => {
   try {
-    const users = await User.find({ role: { $ne: "admin" } })
-      .select("name email mobile testsCompleted subscription lastLoginAt isSuspended createdAt selectedPackageId")
+    // Prompt-9 Fix 1: optional ?search= query matches name / email /
+    // jumpstartId. Falls back to "list everything" when no query is
+    // provided so the existing frontend list view is unaffected.
+    const filter = buildAdminUserSearchFilter(req.query?.search, {
+      role: { $ne: "admin" },
+    });
+    const users = await User.find(filter)
+      .select(
+        "name email mobile testsCompleted subscription lastLoginAt isSuspended createdAt selectedPackageId jumpstartId"
+      )
       .sort({ createdAt: -1 })
       .lean();
     return res.status(200).json({
       success: true,
       data: users.map((u) => ({
         id: String(u._id),
+        jumpstartId: u.jumpstartId || "",
         name: u.name || "Unknown",
         email: u.email || "",
         phone: u.mobile || "",
@@ -751,13 +781,16 @@ export const patchAdminUser = async (req, res) => {
     if (subscription !== undefined) update.subscription = subscription;
     if (status !== undefined) update.isSuspended = String(status) === "Suspended";
     const user = await User.findOneAndUpdate({ _id: userId, role: { $ne: "admin" } }, { $set: update }, { new: true })
-      .select("name email mobile testsCompleted subscription lastLoginAt isSuspended selectedPackageId")
+      .select(
+        "name email mobile testsCompleted subscription lastLoginAt isSuspended selectedPackageId jumpstartId"
+      )
       .lean();
     if (!user) return res.status(404).json({ success: false, msg: "User not found" });
     return res.status(200).json({
       success: true,
       data: {
         id: String(user._id),
+        jumpstartId: user.jumpstartId || "",
         name: user.name || "Unknown",
         email: user.email || "",
         phone: user.mobile || "",
@@ -832,10 +865,16 @@ export const getAdminPayments = async (req, res) => {
 // GET /api/v1/admin/submissions
 export const getAdminSubmissions = async (req, res) => {
   try {
+    // Prompt-9 Fix 1: optional ?search= filter applied at the user
+    // level (admin sees rows only from matching users). Same matchers
+    // as the users list — name, email, jumpstartId.
+    const userFilter = buildAdminUserSearchFilter(req.query?.search, {
+      role: { $ne: "admin" },
+    });
     const [users, cfg] = await Promise.all([
-      User.find({ role: { $ne: "admin" } })
+      User.find(userFilter)
         .select(
-          "name email subscription selectedPackageId resultProfile resultPublication assessmentReports testsCompleted updatedAt createdAt"
+          "name email subscription selectedPackageId resultProfile resultPublication assessmentReports testsCompleted updatedAt createdAt jumpstartId"
         )
         .lean(),
       AssessmentConfig.getOrCreateDefault(),
@@ -862,6 +901,7 @@ export const getAdminSubmissions = async (req, res) => {
           return {
             id: String(report._id),
             userId: String(user._id),
+            jumpstartId: user.jumpstartId || "",
             name: user.name || "Unknown",
             email: user.email || "",
             initials: toInitials(user.name),

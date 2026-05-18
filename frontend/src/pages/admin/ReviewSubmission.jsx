@@ -719,6 +719,100 @@ const decisionBadgeClass = (decision) => {
   return "border-[#F4DCA8] bg-[#FFF1D3] text-[#B86D00]";
 };
 
+// Prompt-9 Fix 2: render every answer option side-by-side with the
+// correct one highlighted green and the student's answer highlighted
+// blue (or red if it differs from correct). Letter labels (A/B/C/D)
+// come from the scorer; text is the option's full content.
+const normaliseLetter = (value = "") => String(value || "").trim().toUpperCase();
+
+function ManualReviewOptionList({ options = [], studentAnswer, correctAnswer }) {
+  const student = normaliseLetter(studentAnswer);
+  const correct = normaliseLetter(correctAnswer);
+  const studentMissed = Boolean(student && correct && student !== correct);
+  const list = Array.isArray(options) ? options : [];
+
+  if (!list.length) {
+    return (
+      <div className="rounded-[12px] border border-dashed border-[#D9E5EC] bg-[#FBFCFD] px-3 py-3 text-xs text-[#7D8CA2]">
+        Option text isn't stored for this question. Student answered{" "}
+        <span className="font-semibold text-[#0F1729]">
+          {studentAnswer || "—"}
+        </span>{" "}
+        · Correct answer{" "}
+        <span className="font-semibold text-[#1D7D46]">
+          {correctAnswer || "—"}
+        </span>
+        .
+      </div>
+    );
+  }
+
+  return (
+    <ul className="space-y-1.5">
+      {list.map((option, index) => {
+        const label = normaliseLetter(
+          option?.label || String.fromCharCode(65 + index)
+        );
+        const isCorrect = label === correct;
+        const isStudent = label === student;
+        // Style precedence: correct (green) > student's wrong (red) >
+        // student's confirmed-correct (already green) > student-only
+        // (blue when no answer key) > neutral.
+        let containerClass =
+          "border-[#E1E7EF] bg-white text-[#4E5D72]";
+        if (isCorrect) {
+          containerClass = "border-[#BEE7D1] bg-[#F1FCF5] text-[#0F1729]";
+        } else if (isStudent && studentMissed) {
+          containerClass = "border-[#F5D0D0] bg-[#FFF5F5] text-[#0F1729]";
+        } else if (isStudent) {
+          containerClass = "border-[#BFDBFE] bg-[#EFF6FF] text-[#0F1729]";
+        }
+        return (
+          <li
+            key={`${label}-${index}`}
+            className={`flex items-start gap-3 rounded-[12px] border px-3 py-2 ${containerClass}`}
+          >
+            <span
+              className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold ${
+                isCorrect
+                  ? "border-[#1D7D46] bg-[#1D7D46] text-white"
+                  : isStudent
+                    ? studentMissed
+                      ? "border-[#B42318] bg-[#B42318] text-white"
+                      : "border-[#2563EB] bg-[#2563EB] text-white"
+                    : "border-[#D9E5EC] bg-white text-[#4E5D72]"
+              }`}
+            >
+              {label}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[13px] leading-5">
+                {option?.text || "(no option text)"}
+              </p>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {isCorrect ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[#1D7D46] px-2 py-0.5 text-[10px] font-semibold text-white">
+                    Correct answer
+                  </span>
+                ) : null}
+                {isStudent ? (
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold text-white ${
+                      studentMissed ? "bg-[#B42318]" : "bg-[#2563EB]"
+                    }`}
+                  >
+                    Student answered
+                  </span>
+                ) : null}
+              </div>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 function ManualReviewItemCard({
   item,
   note,
@@ -791,33 +885,41 @@ function ManualReviewItemCard({
         </div>
 
         <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-[12px] bg-[#F8FAFC] px-3 py-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#7D8CA2]">
-                Student's answer
-              </p>
-              <p className="mt-1 text-base font-bold text-[#0F1729]">
-                {item.studentAnswer || "—"}
-              </p>
-            </div>
-            <div className="rounded-[12px] bg-[#F8FAFC] px-3 py-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#7D8CA2]">
-                Stored answer key
-              </p>
-              <p className="mt-1 text-base font-bold text-[#0F1729]">
-                {item.correctAnswer || "—"}
-              </p>
-            </div>
-          </div>
+          {/* Prompt-9 Fix 2: render the full options list with the correct
+              answer highlighted green and the student's answer highlighted
+              blue (or red if it differs from correct). Replaces the
+              previous two-column "student / stored key" tile pair, which
+              forced the admin to mentally map A/B/C back to text. */}
+          <ManualReviewOptionList
+            options={item.options}
+            studentAnswer={item.studentAnswer}
+            correctAnswer={item.correctAnswer}
+          />
 
           <p className="text-xs text-[#7D8CA2]">
-            Algorithm marked this{" "}
-            <span
-              className={`font-semibold ${item.autoMarkedCorrect ? "text-[#1D7D46]" : "text-[#B42318]"}`}
-            >
-              {item.autoMarkedCorrect ? "correct" : "incorrect"}
-            </span>
-            .
+            {item.correctAnswer ? (
+              <>
+                Stored answer key:{" "}
+                <span className="font-semibold text-[#1D7D46]">
+                  {item.correctAnswer}
+                </span>
+                . Algorithm marked this{" "}
+                <span
+                  className={`font-semibold ${item.autoMarkedCorrect ? "text-[#1D7D46]" : "text-[#B42318]"}`}
+                >
+                  {item.autoMarkedCorrect ? "correct" : "incorrect"}
+                </span>
+                .
+              </>
+            ) : (
+              <>
+                <span className="font-semibold text-[#B42318]">
+                  Answer key missing
+                </span>{" "}
+                — algorithm cannot grade. Admin decision is the source of
+                truth for this question.
+              </>
+            )}
           </p>
 
           <div className="space-y-2">

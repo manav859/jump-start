@@ -40,12 +40,19 @@ const UserManagement = () => {
     loadUsers();
   }, []);
 
+  // Prompt-9 Fix 1: search now also matches jumpstartId so admins can
+  // paste a code like "JS-2026-00142" and find the right student
+  // instantly. Local filter is duplicated server-side via the
+  // ?search= query parameter for future pagination/lazy-load.
   const filteredUsers = useMemo(
     () =>
       users.filter((user) => {
+        const q = searchQuery.trim().toLowerCase();
         const matchesSearch =
-          user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.email.toLowerCase().includes(searchQuery.toLowerCase());
+          !q ||
+          user.name?.toLowerCase().includes(q) ||
+          user.email?.toLowerCase().includes(q) ||
+          user.jumpstartId?.toLowerCase().includes(q);
         const matchesStatus = statusFilter === "All" || user.status === statusFilter;
         const matchesSubscription = subscriptionFilter === "All" || user.subscription === subscriptionFilter;
         return matchesSearch && matchesStatus && matchesSubscription;
@@ -86,7 +93,7 @@ const UserManagement = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by name or email..."
+            placeholder="Search by name, email or Jumpstart ID..."
             className="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-100 rounded-xl text-sm"
           />
         </div>
@@ -135,7 +142,14 @@ const UserManagement = () => {
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-teal-50 text-[#14b8a6] flex items-center justify-center font-bold text-[11px] border border-teal-100">{user.initials}</div>
-                        <span className="text-sm font-bold text-gray-900 whitespace-nowrap">{user.name}</span>
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-sm font-bold text-gray-900 whitespace-nowrap">{user.name}</span>
+                          {user.jumpstartId ? (
+                            <span className="inline-flex w-fit items-center rounded-full border border-[#D4EEED] bg-[#EAFBFB] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#188B8B]">
+                              {user.jumpstartId}
+                            </span>
+                          ) : null}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-5 text-sm text-gray-500 font-medium whitespace-nowrap">{user.email}</td>

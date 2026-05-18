@@ -19,11 +19,37 @@ export const DEMO_SECTION_BLUEPRINT = [
     sectionId: 1,
     title: "Personality Assessment",
     durationMinutes: 4,
-    scoringType: "mixed",
-    // 3 OCEAN (extraversion/openness/conscientiousness) +
-    // 3 HSPQ (warmth/reasoning/dominance) +
-    // 2 Work Style + 2 Leadership
-    questionIds: [1, 4, 7, 31, 32, 34, 73, 85, 97, 98],
+    scoringType: "likert",
+    // Section 1 curation rationale:
+    //   - Full OCEAN coverage with each trait represented by at least
+    //     one direct item; neuroticism gets two signals (Q3 direct +
+    //     Q8 reverse) for a more stable band.
+    //   - One HSPQ representative (Q31 warmth) so the HSPQ snapshot in
+    //     the personality profile has at least one data point.
+    //   - Two leadership items (Q97, Q98) for the leadership scoring
+    //     surface.
+    //
+    // Factor map for this curation (cross-checked against
+    // career500q.config.js):
+    //   Q1  → extraversion           (direct)
+    //   Q2  → openness               (direct)
+    //   Q3  → neuroticism            (direct)
+    //   Q4  → openness               (direct)
+    //   Q5  → agreeableness          (direct)
+    //   Q7  → conscientiousness      (direct)
+    //   Q8  → neuroticism            (reverse-scored)
+    //   Q31 → HSPQ warmth            (direct)
+    //   Q97 → leadership             (direct)
+    //   Q98 → leadership             (direct)
+    //
+    // Earlier iterations included Q32 / Q34 (HSPQ reasoning / dominance)
+    // and before that Q73 / Q85 (Work Style). The Work Style entries
+    // were dropped because the source package stored them as `likert`
+    // with empty options (later patched via patchWorkStyleQuestions.mjs).
+    // The HSPQ swap is a curation preference — Q31–Q72 all carry clean
+    // Likert text, but Q2 and Q3 give stronger OCEAN signal than two
+    // extra HSPQ items.
+    questionIds: [1, 2, 3, 4, 5, 7, 8, 31, 97, 98],
   },
   {
     sectionId: 2,

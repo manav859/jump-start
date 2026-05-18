@@ -35,6 +35,9 @@ export default function TestSubmissions() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Prompt-9 Fix 1: extend client-side filter to match jumpstartId in
+  // addition to name and email. Server returns full list; this local
+  // filter narrows it instantly as the admin types.
   const filteredRows = useMemo(
     () =>
       rows.filter((row) => {
@@ -42,7 +45,8 @@ export default function TestSubmissions() {
         const matchesSearch =
           !query ||
           row.name.toLowerCase().includes(query) ||
-          row.email.toLowerCase().includes(query);
+          row.email.toLowerCase().includes(query) ||
+          (row.jumpstartId || "").toLowerCase().includes(query);
         const matchesStatus = statusFilter ? row.status === statusFilter : true;
         const matchesType = typeFilter ? row.type === typeFilter : true;
         return matchesSearch && matchesStatus && matchesType;
@@ -107,7 +111,7 @@ export default function TestSubmissions() {
             <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8A94A6]" />
             <input
               type="text"
-              placeholder="Search by student name or email..."
+              placeholder="Search by name, email or Jumpstart ID..."
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               className="w-full rounded-[16px] border border-[#E1EAF0] bg-[#FBFCFD] py-3 pl-11 pr-4 text-sm text-[#0F1729] outline-none focus:border-[#9BD9D6]"
@@ -199,7 +203,14 @@ export default function TestSubmissions() {
                             {row.initials}
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-[#0F1729]">{row.name}</p>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="text-sm font-bold text-[#0F1729]">{row.name}</p>
+                              {row.jumpstartId ? (
+                                <span className="inline-flex items-center rounded-full border border-[#D4EEED] bg-[#EAFBFB] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#188B8B]">
+                                  {row.jumpstartId}
+                                </span>
+                              ) : null}
+                            </div>
                             <p className="text-xs text-[#8A94A6]">{row.email}</p>
                           </div>
                         </div>
