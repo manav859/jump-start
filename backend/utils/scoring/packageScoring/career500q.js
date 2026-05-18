@@ -572,6 +572,85 @@ const scoreCategoricalProfile = (subsectionConfig, questionMap, rules = []) => {
   // full-bank count. status falls through to "completed" when nothing
   // was assigned (subsection not in active package).
   const totalQuestions = assignedQuestionNumbers.length;
+
+  // Prompt-8 fix: when the answered values look like Likert (numeric 1-5)
+  // rather than option letters (A/B/C), the categorical path produces
+  // nothing (profileCounts never increments because "4" isn't a known
+  // profile key). This is the current Work Style state: questions are
+  // stored as `type: "likert"` with empty options even though the spec
+  // declares them as A/B/C single-choice — a known gap recorded in the
+  // package ambiguityNotes. Fall back to a Likert-derived consistency
+  // signal so the result is non-empty and meaningful instead of "0%".
+  const hasLikertAnswers = assignedQuestionNumbers.some((qn) => {
+    const entry = questionMap.get(Number(qn));
+    return getLikertValue(entry?.rawAnswer) != null;
+  });
+  if (dominantCount === 0 && answeredCount > 0 && hasLikertAnswers) {
+    const likertMetrics = computeLikertMetrics(
+      assignedQuestionNumbers,
+      questionMap
+    );
+    const likertAvg = likertMetrics.average;
+    const extremeCount = assignedQuestionNumbers.reduce((count, qn) => {
+      const value = getLikertValue(questionMap.get(Number(qn))?.rawAnswer);
+      if (value == null) return count;
+      // "Decisive" = answer leans clearly in one direction (>=4 or <=2),
+      // not parked at neutral 3.
+      return count + (value >= 4 || value <= 2 ? 1 : 0);
+    }, 0);
+    const consistencyFromLikert =
+      likertMetrics.answeredCount > 0
+        ? roundPercent((extremeCount / likertMetrics.answeredCount) * 100)
+        : 0;
+
+    // Map the Likert average to one of the three configured profile
+    // options when possible. Mapping is positional (low avg → first
+    // option, mid → second, high → third) — it can't be more precise
+    // than that without the A/B/C metadata the source PDF supplies.
+    const profileKeys = Object.keys(profileDictionary);
+    let positionalProfile = null;
+    if (profileKeys.length === 3 && likertAvg != null) {
+      const idx = likertAvg <= 2.5 ? 0 : likertAvg >= 3.5 ? 2 : 1;
+      positionalProfile = profileDictionary[profileKeys[idx]];
+    }
+
+    const fallbackBand = (() => {
+      if (likertAvg == null) return "Balanced";
+      if (likertAvg >= 4) return "Decisive";
+      if (likertAvg <= 2) return "Cautious";
+      return "Balanced";
+    })();
+
+    const interpretation = positionalProfile?.interpretation
+      ? `${positionalProfile.interpretation} (Derived from Likert preference signal; A/B/C option metadata pending in package seed.)`
+      : "Work-style preferences show a balanced pattern across the answered Likert questions.";
+
+    return {
+      key: subsectionConfig.key,
+      label: subsectionConfig.label,
+      answerType: subsectionConfig.answerType,
+      scoreType: subsectionConfig.scoreType,
+      score: likertAvg,
+      rawScore: likertMetrics.rawScore,
+      maxScore: 5,
+      average: likertAvg,
+      percentage: consistencyFromLikert,
+      band: positionalProfile?.label || fallbackBand,
+      interpretation,
+      careerImplication: positionalProfile?.careerImplication || "",
+      questionNumbers: assignedQuestionNumbers,
+      questionRangeLabel: buildQuestionRangeLabel(assignedQuestionNumbers),
+      status: summarizeStatus(likertMetrics.answeredCount, totalQuestions),
+      answeredCount: likertMetrics.answeredCount,
+      totalQuestions,
+      description: interpretation,
+      dominantProfileKey: positionalProfile
+        ? profileKeys[likertAvg <= 2.5 ? 0 : likertAvg >= 3.5 ? 2 : 1]
+        : "",
+      profileBreakdown,
+    };
+  }
+
   return {
     key: subsectionConfig.key,
     label: subsectionConfig.label,
@@ -1399,6 +1478,184 @@ const buildSpecialObservations = ({ sectionBreakdown = [], personalityType, flat
   return observations.filter(Boolean);
 };
 
+// Prompt-8: career-facing per-trait OCEAN interpretation strings. The
+// generic "High Openness" label isn't useful in a result report. These
+// strings explain what the trait score means in terms of work and
+// career fit, keyed by trait + band.
+const OCEAN_INTERPRETATIONS = {
+  openness: {
+    High: "Strong curiosity and appetite for new ideas. Suits research, design, innovation, and roles that reward exploration.",
+    Moderate: "Open to new ideas while staying grounded in proven approaches. Fits most professional roles.",
+    Low: "Prefers familiar methods and concrete tasks. Suits structured, well-defined work where reliability matters more than reinvention.",
+  },
+  conscientiousness: {
+    High: "Reliable, organised, and detail-oriented. Strong fit for medicine, accounting, engineering, law, and any role with high accountability.",
+    Moderate: "Balanced between structure and flexibility. Adapts well to most professional contexts.",
+    Low: "More flexible and spontaneous than methodical. Better suited to creative, adaptive, or fast-changing roles than to precision-heavy work.",
+  },
+  extraversion: {
+    High: "Energised by people and outward engagement. Suits sales, teaching, management, public-facing roles, and group leadership.",
+    Moderate: "Comfortable in both group and solo contexts. Adapts to varied work environments.",
+    Low: "Recharges through quieter, focused work. Suits research, writing, programming, and independent technical roles.",
+  },
+  agreeableness: {
+    High: "Cooperative, empathetic, and oriented toward harmony. Suits counselling, healthcare, social work, teaching, and people-development roles.",
+    Moderate: "Balances cooperation with independent judgement. Fits most professional roles.",
+    Low: "More direct and task-focused than relationship-focused. Suits competitive, analytical, or decisive roles like law, finance, and operations.",
+  },
+  neuroticism: {
+    // For neuroticism, the bands carry opposite career meaning — Low is
+    // the desirable signal (emotional stability) and High flags stress
+    // sensitivity. The interpretation text reflects this asymmetry.
+    Low: "Calm and emotionally stable under pressure. Suits high-stress careers like surgery, emergency response, leadership, and crisis management.",
+    Moderate: "Generally stable with normal emotional response to pressure. Suits most professional roles.",
+    High: "Emotionally reactive and stress-sensitive. Benefits from supportive environments and stress-management strategies before pursuing high-pressure paths.",
+  },
+};
+
+const HSPQ_HIGH_DESCRIPTORS = {
+  warmth: "Warm",
+  reasoning: "Reasoning-Strong",
+  emotional_stability: "Emotionally Stable",
+  dominance: "Dominant",
+  liveliness: "Lively",
+  rule_consciousness: "Rule-Conscious",
+  social_boldness: "Socially Bold",
+  sensitivity: "Sensitive",
+};
+
+const buildOceanProfileSnapshot = (bigFiveSection) => {
+  const factorResults = bigFiveSection?.factorResults || [];
+  // Prompt-8: when a trait has no answered questions in the active
+  // package (e.g., the 50-question demo only probes 3 OCEAN traits),
+  // emit a clear "Not Measured" band + explanatory interpretation
+  // instead of leaving the band empty. Lets the frontend render an
+  // honest "not assessed in this test" state.
+  const toEntry = (factor, key) => {
+    if (!factor) {
+      return {
+        score: null,
+        band: "Not Measured",
+        interpretation: `${key.charAt(0).toUpperCase() + key.slice(1)} was not assessed by this test package.`,
+        average: null,
+      };
+    }
+    const factorKey = factor.key;
+    const band = factor.band || "";
+    const score = factor.percentage ?? null;
+    if (!band || score == null) {
+      return {
+        score: null,
+        band: "Not Measured",
+        interpretation: `${(factor.label || factorKey).trim()} was not assessed by this test package.`,
+        average: factor.average ?? null,
+      };
+    }
+    const interpretation =
+      OCEAN_INTERPRETATIONS?.[factorKey]?.[band] ||
+      factor.description ||
+      `${band} ${factor.label || ""}`.trim();
+    return { score, band, interpretation, average: factor.average ?? null };
+  };
+
+  const factorByKey = Object.fromEntries(
+    factorResults.map((f) => [f.key, f])
+  );
+
+  const oceanProfile = {
+    openness: toEntry(factorByKey.openness, "openness"),
+    conscientiousness: toEntry(factorByKey.conscientiousness, "conscientiousness"),
+    extraversion: toEntry(factorByKey.extraversion, "extraversion"),
+    agreeableness: toEntry(factorByKey.agreeableness, "agreeableness"),
+    neuroticism: toEntry(factorByKey.neuroticism, "neuroticism"),
+  };
+
+  // Dominant traits = top 2 non-neuroticism scorers among the traits
+  // that were actually measured. Neuroticism is in the profile but
+  // excluded from "strengths" because high N isn't a strength. Traits
+  // that weren't measured (score === null) are skipped from the
+  // ranking — only what we measured counts.
+  const ranked = ["openness", "conscientiousness", "extraversion", "agreeableness"]
+    .filter((key) => Number.isFinite(Number(oceanProfile[key].score)))
+    .map((key) => ({
+      key,
+      label: key.charAt(0).toUpperCase() + key.slice(1),
+      score: Number(oceanProfile[key].score),
+    }))
+    .sort((a, b) => b.score - a.score);
+  const dominantTraits = ranked.slice(0, 2).map((t) => t.label);
+
+  return { ...oceanProfile, dominantTraits };
+};
+
+const buildHspqSignature = (hspqSubsection) => {
+  const factorResults = hspqSubsection?.factorResults || [];
+  const ranked = factorResults
+    .filter((f) => Number.isFinite(Number(f.percentage)))
+    .sort((a, b) => Number(b.percentage) - Number(a.percentage));
+  const topThree = ranked.slice(0, 3);
+  return topThree.map((f) => {
+    const band = String(f.band || "").trim();
+    const descriptor =
+      HSPQ_HIGH_DESCRIPTORS[f.key] || (f.label || f.key || "").trim();
+    return band ? `${band} ${descriptor}` : descriptor;
+  });
+};
+
+const buildWorkStyleSnapshot = (workStyleSubsection) => {
+  if (!workStyleSubsection) {
+    return {
+      dominantStyle: "",
+      description: "",
+      consistency: 0,
+    };
+  }
+  return {
+    dominantStyle: workStyleSubsection.band || "Balanced",
+    description:
+      workStyleSubsection.interpretation ||
+      workStyleSubsection.description ||
+      "Balanced work-style preferences across answered questions.",
+    consistency: Number(workStyleSubsection.percentage ?? 0),
+  };
+};
+
+const buildRichPersonalityProfile = (sectionBreakdown, personalityType) => {
+  const personality = sectionBreakdown.find((s) => s.key === "personality");
+  if (!personality) return null;
+  const bigFive = (personality.subsections || []).find(
+    (s) => s.key === "big_five_ocean"
+  );
+  const hspq = (personality.subsections || []).find(
+    (s) => s.key === "hspq_factors"
+  );
+  const workStyle = (personality.subsections || []).find(
+    (s) => s.key === "work_style_preferences"
+  );
+
+  const code = String(personalityType?.code || "");
+  const suffixMatch = code.match(/^([EI][NS][FT][JP])-([AT])$/);
+  const mbtiType = suffixMatch ? suffixMatch[1] : code.replace(/-[AT]$/, "");
+  const assertivenessLetter = suffixMatch ? suffixMatch[2] : "";
+  const assertiveness =
+    assertivenessLetter === "A"
+      ? "Assertive"
+      : assertivenessLetter === "T"
+        ? "Turbulent"
+        : "";
+
+  return {
+    mbtiType,
+    assertiveness,
+    personalityType: code,
+    archetypeName: personalityType?.title || "",
+    archetypeDescription: personalityType?.description || "",
+    oceanProfile: buildOceanProfileSnapshot(bigFive),
+    hspqSignature: buildHspqSignature(hspq),
+    workStyle: buildWorkStyleSnapshot(workStyle),
+  };
+};
+
 // Prompt-7 rewrite: build manualReviewItems ONLY for Section 4 objective
 // questions that the algorithm cannot grade — i.e., the answer key is
 // missing/ambiguous or the evaluation type isn't supported.
@@ -1623,6 +1880,14 @@ export const scoreCareer500QPackage = (answers = {}, sections = []) => {
       description: personalityType.description,
       traits: personalityType.traits,
     },
+    // Prompt-8: rich personality aggregator that surfaces the full
+    // personality picture (MBTI + OCEAN + HSPQ + Work Style) in one
+    // structured field. Lets the frontend render a complete personality
+    // panel without having to dig into sectionBreakdown.subsections.
+    personalityProfile: buildRichPersonalityProfile(
+      sectionBreakdown,
+      personalityType
+    ),
     reviewSummary: {
       ...reviewSummary,
       observations: [...(reviewSummary.observations || []), ...observations].filter(Boolean),

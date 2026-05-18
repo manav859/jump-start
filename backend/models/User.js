@@ -275,6 +275,11 @@ const resultProfileSchema = new mongoose.Schema(
     sectionBreakdown: { type: [sectionBreakdownSchema], default: [] },
     strengths: { type: [strengthSchema], default: [] },
     careerRecommendations: { type: [careerRecommendationSchema], default: [] },
+    // Prompt-8: rich personality aggregator (MBTI + OCEAN + HSPQ + Work
+    // Style). Stored as Mixed so the nested structure persists without
+    // per-field schema declarations. The scorer is the source of truth
+    // for the shape.
+    personalityProfile: { type: mongoose.Schema.Types.Mixed, default: () => ({}) },
     // Named profile buckets consumed by the careerMatcher. Stored as
     // open key/number maps so display-name keys ("Logical-Math") survive
     // the round-trip without per-key schema declarations.

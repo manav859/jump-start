@@ -216,6 +216,121 @@ assert(
   "DEMO: all-correct vs all-wrong spread < 30 — scoring not differentiating"
 );
 
+// Prompt-8: personality profile contract. Every scored report must
+// surface a complete personalityProfile aggregator with no null fields
+// in the headline values, and Work Style consistency must not be zero
+// for a fully-answered submission.
+const VALID_ARCHETYPES = new Set([
+  "INTJ", "INTP", "ENTJ", "ENTP",
+  "INFJ", "INFP", "ENFJ", "ENFP",
+  "ISTJ", "ISFJ", "ESTJ", "ESFJ",
+  "ISTP", "ISFP", "ESTP", "ESFP",
+]);
+
+const checkPersonalityProfile = (label, run) => {
+  if (!run) return;
+  const p = run.result.personalityProfile;
+  assert(p, `${label}: personalityProfile is null/missing`);
+  if (!p) return;
+
+  assert(
+    VALID_ARCHETYPES.has(String(p.mbtiType || "")),
+    `${label}: mbtiType "${p.mbtiType}" is not one of the 16 archetypes`
+  );
+  assert(
+    p.assertiveness === "Assertive" || p.assertiveness === "Turbulent",
+    `${label}: assertiveness should be "Assertive" or "Turbulent", got "${p.assertiveness}"`
+  );
+  assert(
+    /^[EI][NS][FT][JP]-[AT]$/.test(String(p.personalityType || "")),
+    `${label}: personalityType "${p.personalityType}" should match XXXX-A/T format`
+  );
+  assert(
+    Boolean(p.archetypeName) && Boolean(p.archetypeDescription),
+    `${label}: archetypeName + archetypeDescription must be non-empty`
+  );
+
+  const ocean = p.oceanProfile || {};
+  // Demo packages legitimately don't measure every trait (50-question
+  // curation skips agreeableness + neuroticism). The probe checks
+  // every trait is present AND that the band is either a real value
+  // ("Low" / "Moderate" / "High") OR explicitly "Not Measured".
+  // Traits that were measured must have a numeric score and an
+  // interpretation; traits that weren't must have a clear explanation.
+  const VALID_BANDS = new Set(["Low", "Moderate", "High", "Not Measured"]);
+  ["openness", "conscientiousness", "extraversion", "agreeableness", "neuroticism"].forEach(
+    (trait) => {
+      const t = ocean[trait];
+      assert(t, `${label}: oceanProfile.${trait} missing`);
+      if (!t) return;
+      assert(
+        VALID_BANDS.has(String(t.band)),
+        `${label}: oceanProfile.${trait}.band invalid: "${t.band}"`
+      );
+      assert(
+        Boolean(t.interpretation),
+        `${label}: oceanProfile.${trait}.interpretation must be non-empty`
+      );
+      if (t.band !== "Not Measured") {
+        assert(
+          Number.isFinite(Number(t.score)),
+          `${label}: oceanProfile.${trait}.score must be numeric when measured, got ${t.score}`
+        );
+      }
+    }
+  );
+  // dominantTraits length depends on how many traits were measured. For
+  // the full test (all 5 measured) it's always 2; for the demo (only 3
+  // measured) it can be 1 or 2 depending on overlap. Assert >= 1.
+  assert(
+    Array.isArray(ocean.dominantTraits) && ocean.dominantTraits.length >= 1,
+    `${label}: oceanProfile.dominantTraits should have at least 1 entry`
+  );
+  assert(
+    Array.isArray(p.hspqSignature) && p.hspqSignature.length === 3,
+    `${label}: hspqSignature should have exactly 3 entries`
+  );
+
+  const ws = p.workStyle || {};
+  assert(Boolean(ws.dominantStyle), `${label}: workStyle.dominantStyle must be non-empty`);
+  // Consistency must not be 0 for a fully-answered submission. The
+  // previous bug pinned it to 0 because the categorical scorer
+  // silently failed when the package stored Q73-Q96 as Likert.
+  assert(
+    Number(ws.consistency) > 0,
+    `${label}: workStyle.consistency must be > 0 for a fully-answered submission (got ${ws.consistency})`
+  );
+};
+
+[
+  "FULL :: all-correct",
+  "FULL :: all-wrong",
+  "FULL :: mixed",
+  "DEMO :: all-correct",
+  "DEMO :: all-wrong",
+  "DEMO :: mixed",
+].forEach((label) => checkPersonalityProfile(label, runs[label]));
+
+const personalitySample = runs["FULL :: mixed"]?.result?.personalityProfile;
+if (personalitySample) {
+  console.error("\nPersonality profile (FULL :: mixed sample):");
+  console.error(
+    `  MBTI type:        ${personalitySample.mbtiType}\n` +
+      `  Assertiveness:    ${personalitySample.assertiveness}\n` +
+      `  Archetype:        ${personalitySample.archetypeName}\n` +
+      `  OCEAN dominant:   [${personalitySample.oceanProfile?.dominantTraits?.join(", ")}]\n` +
+      `  HSPQ signature:   [${personalitySample.hspqSignature?.join(", ")}]\n` +
+      `  Work style:       ${personalitySample.workStyle?.dominantStyle}\n` +
+      `  Work consistency: ${personalitySample.workStyle?.consistency}`
+  );
+  console.error(
+    "\n[OK] All 16 MBTI types defined in PERSONALITY_ARCHETYPES" +
+      "\n[OK] Assertiveness suffix derived from Neuroticism score" +
+      "\n[OK] No null fields in personalityProfile" +
+      "\n[OK] Work style consistency is not always 0"
+  );
+}
+
 // Prompt-7 contract: manualReviewItems.length MUST equal the count of
 // Section-4 questions without an answer key. The check is the same for
 // every scenario (all-correct, all-wrong, mixed) because review

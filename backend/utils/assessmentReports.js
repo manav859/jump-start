@@ -219,6 +219,13 @@ export const cloneResultProfile = (profile = {}) => ({
       eqMatch: toNullableNumber(career?.breakdown?.eqMatch),
     },
   })),
+  // Prompt-8: deep-clone the nested personalityProfile aggregator. Open
+  // structure (Mixed schema field), so JSON-clone is safe and keeps
+  // every nested field including oceanProfile.dominantTraits and
+  // hspqSignature[].
+  personalityProfile: profile?.personalityProfile
+    ? JSON.parse(JSON.stringify(profile.personalityProfile))
+    : null,
   hollandProfile: cloneScoreMap(profile?.hollandProfile),
   multipleIntelligences: cloneScoreMap(profile?.multipleIntelligences),
   aptitudeScores: cloneScoreMap(profile?.aptitudeScores),
