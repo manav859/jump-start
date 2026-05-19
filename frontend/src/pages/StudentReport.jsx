@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
+  ArrowRight,
   BadgeCheck,
   CalendarDays,
   Download,
@@ -385,6 +386,16 @@ export default function StudentReport() {
                         ) : null}
                       </ul>
                     ) : null}
+                    <div className="report-print-hidden mt-3 flex justify-end">
+                      <Link
+                        to={`/careerdetail?career=${encodeURIComponent(career.title || "")}`}
+                        state={{ career }}
+                        className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#188B8B] hover:underline"
+                      >
+                        View Details
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    </div>
                   </div>
                 );
               })
