@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { apiUnavailableMessage, getApiV1Url } from "../config/env";
 
 export const AuthContext = createContext();
@@ -42,10 +42,13 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // ------------------------------------
-  // 1️⃣ LOGIN WITH EMAIL + PASSWORD
-  // ------------------------------------
-  const login = async ({ email, password }) => {
+  // login / loginWithGoogle / logout / updateUser are wrapped in
+  // useCallback so the function references stay stable across renders.
+  // The provider value object is also memoised below — together they
+  // mean a context consumer only re-renders when `user`, `token`, or
+  // `loading` actually changes (not on every parent render).
+
+  const login = useCallback(async ({ email, password }) => {
     let res;
     try {
       res = await fetch(getApiV1Url("/user/auth/login"), {
@@ -58,7 +61,6 @@ export const AuthProvider = ({ children }) => {
     }
 
     const data = await res.json();
-    console.log("LOGIN RESPONSE:", data);
 
     if (!data.success) {
       throw new Error(data.msg || "Login failed");
@@ -76,12 +78,9 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("token", tokenStr);
 
     return data;
-  };
+  }, []);
 
-  // ------------------------------------
-  // 2️⃣ LOGIN WITH GOOGLE (SOCIAL LOGIN)
-  // ------------------------------------
-  const loginWithGoogle = async (google_id_token) => {
+  const loginWithGoogle = useCallback(async (google_id_token) => {
     let res;
     try {
       res = await fetch(getApiV1Url("/user/auth/social-login"), {
@@ -97,7 +96,6 @@ export const AuthProvider = ({ children }) => {
     }
 
     const data = await res.json();
-    console.log("GOOGLE LOGIN RESPONSE:", data);
 
     if (!data.success) {
       throw new Error(data.msg || "Google login failed");
@@ -115,38 +113,36 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("token", tokenStr);
 
     return data;
-  };
+  }, []);
 
-  // ------------------------------------
-  // 3️⃣ LOGOUT
-  // ------------------------------------
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
     setToken("");
 
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-  };
+  }, []);
 
-  const updateUser = (nextUser) => {
+  const updateUser = useCallback((nextUser) => {
     if (!nextUser) return;
     setUser(nextUser);
     localStorage.setItem("user", JSON.stringify(nextUser));
-  };
+  }, []);
+
+  const contextValue = useMemo(
+    () => ({
+      user,
+      token,
+      login,
+      loginWithGoogle,
+      updateUser,
+      logout,
+      loading,
+    }),
+    [user, token, login, loginWithGoogle, updateUser, logout, loading]
+  );
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        login,
-        loginWithGoogle, // <-- Added Google Login
-        updateUser,
-        logout,
-        loading,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };

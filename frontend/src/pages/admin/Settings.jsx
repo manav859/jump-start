@@ -1,6 +1,8 @@
 import React, { useMemo, useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import api from "../../api/api";
 import { SettingsSkeleton } from "../../components/admin/Skeletons";
+import TranslationsPanel from "../../components/admin/TranslationsPanel";
 
 const blankPackage = {
   id: "",
@@ -114,6 +116,12 @@ const blankSupportPages = {
 };
 
 export default function Settings() {
+  const { t } = useTranslation();
+  // Tab toggle — the existing assessment management UI sits on the
+  // "assessment" tab; the new TranslationsPanel sits on "translations".
+  // Defaulting to "assessment" so existing admin muscle memory is
+  // unchanged.
+  const [activeTab, setActiveTab] = useState("assessment");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -382,17 +390,55 @@ export default function Settings() {
       .finally(() => setSyncing(""));
   };
 
-  if (loading) return <SettingsSkeleton />;
+  // The Translations tab does its own loading/error state, so we
+  // only block on the assessment-manager skeleton when that tab is
+  // active. This means switching to Translations works even if the
+  // initial /admin/config payload is still in flight.
+  if (loading && activeTab === "assessment") return <SettingsSkeleton />;
+
+  const tabs = [
+    { value: "assessment", label: t("adminPages.tabAssessment") },
+    { value: "translations", label: t("adminPages.tabTranslations") },
+  ];
 
   return (
     <div className="p-6 md:p-8 max-w-[1280px] mx-auto w-full flex flex-col gap-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Assessment Manager</h1>
-          <p className="text-gray-500 mt-1">Manage the dummy test and the comprehensive 500-question assessment package.</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {activeTab === "translations"
+              ? t("adminPages.tabTranslations")
+              : t("adminPages.tabAssessment")}
+          </h1>
+          <p className="text-gray-500 mt-1">
+            {activeTab === "translations"
+              ? t("adminPages.translationsSubtitle")
+              : t("adminPages.assessmentSubtitle")}
+          </p>
         </div>
       </div>
 
+      <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-2">
+        {tabs.map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            onClick={() => setActiveTab(tab.value)}
+            className={`rounded-t-lg px-4 py-2 text-sm font-semibold transition ${
+              activeTab === tab.value
+                ? "bg-[#188B8B] text-white"
+                : "bg-white text-gray-600 hover:text-[#188B8B]"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === "translations" ? (
+        <TranslationsPanel />
+      ) : (
+        <>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {success ? <p className="text-sm text-emerald-700">{success}</p> : null}
 
@@ -725,6 +771,8 @@ export default function Settings() {
           </section>
         </>
       ) : null}
+        </>
+      )}
     </div>
   );
 }

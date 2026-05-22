@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   AlertTriangle,
   Brain,
@@ -28,7 +29,16 @@ import { ReviewSkeleton } from "../../components/admin/Skeletons";
 const chipClass =
   "rounded-full border border-[#D7E7EC] bg-white px-3 py-1 text-xs font-semibold text-[#4E5D72]";
 
+// Subsection key → translation key. Profile data in the DB stays English;
+// the UI looks up the localised label at render time.
+const SUBSECTION_LABEL_KEYS = {
+  abstract_reasoning: "reviewSubmission.subsectionAbstract",
+  spatial_relations: "reviewSubmission.subsectionSpatial",
+  mechanical_reasoning: "reviewSubmission.subsectionMechanical",
+};
+
 export default function ReviewSubmission() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { userId } = useParams();
   const [loading, setLoading] = useState(true);
@@ -82,9 +92,10 @@ export default function ReviewSubmission() {
         }
       })
       .catch((err) => {
-        setError(err?.response?.data?.msg || "Failed to load submission review.");
+        setError(err?.response?.data?.msg || t("reviewSubmission.loadFailed"));
       })
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   const recordDecision = async (questionId, decision) => {
@@ -140,7 +151,7 @@ export default function ReviewSubmission() {
         decisionFor: "",
         error:
           err?.response?.data?.msg ||
-          "Failed to save this decision. Please retry.",
+          t("reviewSubmission.saveDecisionFailed"),
       }));
     }
   };
@@ -211,7 +222,7 @@ export default function ReviewSubmission() {
         finalizing: false,
         error:
           err?.response?.data?.msg ||
-          "Failed to finalize manual review. Please retry.",
+          t("reviewSubmission.finalizeFailed"),
       }));
     }
   };
@@ -252,10 +263,10 @@ export default function ReviewSubmission() {
       if (data?.error === "MANUAL_REVIEW_PENDING") {
         setError(
           data.message ||
-            "Complete manual review of flagged questions before approving this report."
+            t("reviewSubmission.approvePending")
         );
       } else {
-        setError(data?.msg || "Failed to publish this result.");
+        setError(data?.msg || t("reviewSubmission.publishFailed"));
       }
     } finally {
       setApproving(false);
@@ -265,7 +276,7 @@ export default function ReviewSubmission() {
   const handleDelete = async () => {
     if (!detail?.actions?.canDelete || !userId) return;
     const confirmed = window.confirm(
-      "Delete this reviewed submission and remove its result from the workflow?"
+      t("reviewSubmission.deleteConfirm")
     );
     if (!confirmed) return;
 
@@ -276,7 +287,7 @@ export default function ReviewSubmission() {
       emitAdminNotificationsRefresh();
       navigate("/admin/testsubmissions");
     } catch (err) {
-      setError(err?.response?.data?.msg || "Failed to delete this result.");
+      setError(err?.response?.data?.msg || t("reviewSubmission.deleteFailed"));
       setDeleting(false);
     }
   };
@@ -289,14 +300,14 @@ export default function ReviewSubmission() {
     return (
       <main className="mx-auto max-w-[1440px] px-6 py-8">
         <div className="surface-card rounded-[28px] p-8 text-center">
-          <h1 className="text-3xl font-bold text-[#0F1729]">Review Unavailable</h1>
+          <h1 className="text-3xl font-bold text-[#0F1729]">{t("reviewSubmission.unavailableHeading")}</h1>
           <p className="mt-3 text-[#65758B]">{error}</p>
           <button
             type="button"
             onClick={() => navigate("/admin/testsubmissions")}
             className="primary-btn mt-6"
           >
-            Back to Test Submission
+            {t("reviewSubmission.back")}
           </button>
         </div>
       </main>
@@ -306,10 +317,10 @@ export default function ReviewSubmission() {
   return (
     <main className="mx-auto max-w-[1440px] px-6 py-8">
       <AdminPageHeader
-        title="Review Submitted Test"
-        subtitle="Inspect the student's details, section performance, subsection scores, and result analysis before publishing the report."
+        title={t("reviewSubmission.title")}
+        subtitle={t("reviewSubmission.subtitle")}
         backTo="/admin/testsubmissions"
-        backLabel="Back to Test Submission"
+        backLabel={t("reviewSubmission.back")}
         actions={
           detail ? <ResultStatusBadge status={detail.statusLabel} /> : null
         }
@@ -322,11 +333,10 @@ export default function ReviewSubmission() {
           <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-[#F59F0A]" />
           <div>
             <p className="text-sm font-semibold text-[#0F1729]">
-              Demo Test — 50 questions.
+              {t("reviewSubmission.demoBannerTitle")}
             </p>
             <p className="mt-1 text-sm leading-6">
-              Scores are proportional to the assigned question set, not the
-              full 500-question bank.
+              {t("reviewSubmission.demoBannerBody")}
             </p>
           </div>
         </div>
@@ -345,24 +355,23 @@ export default function ReviewSubmission() {
         />
       </div>
 
-      <StudentProfileReviewBlock profile={detail?.student?.profile} />
+      <StudentProfileReviewBlock profile={detail?.student?.profile} t={t} />
 
       <section className="surface-card mt-8 rounded-[28px] p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#188B8B]">
-              Section-Wise Breakdown
+              {t("reviewSubmission.sectionBreakdownEyebrow")}
             </p>
             <h2 className="mt-3 text-2xl font-bold text-[#0F1729]">
-              Review all completed sections
+              {t("reviewSubmission.sectionBreakdownHeading")}
             </h2>
             <p className="mt-2 text-sm leading-7 text-[#65758B]">
-              Each section includes a score summary and nested subsection performance
-              where data is available.
+              {t("reviewSubmission.sectionBreakdownBody")}
             </p>
           </div>
           <div className="rounded-full bg-[#F6FDFC] px-4 py-2 text-sm font-semibold text-[#188B8B]">
-            {sectionCards.length} sections
+            {t("reviewSubmission.sectionsCount", { count: sectionCards.length })}
           </div>
         </div>
 
@@ -377,7 +386,7 @@ export default function ReviewSubmission() {
             ))
           ) : (
             <div className="rounded-[22px] border border-dashed border-[#D8E6EC] bg-[#FBFCFD] px-5 py-8 text-center text-sm text-[#65758B]">
-              No section breakdown is available for this submission yet.
+              {t("reviewSubmission.noSectionBreakdown")}
             </div>
           )}
         </div>
@@ -389,6 +398,7 @@ export default function ReviewSubmission() {
         onDecision={recordDecision}
         onUndo={undoDecision}
         onFinalize={handleFinalize}
+        t={t}
       />
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
@@ -399,10 +409,10 @@ export default function ReviewSubmission() {
             </div>
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#188B8B]">
-                Review Notes
+                {t("reviewSubmission.reviewNotesEyebrow")}
               </p>
               <h2 className="mt-2 text-2xl font-bold text-[#0F1729]">
-                Result / Analysis / Review Area
+                {t("reviewSubmission.reviewNotesHeading")}
               </h2>
             </div>
           </div>
@@ -413,7 +423,7 @@ export default function ReviewSubmission() {
                 <div className="rounded-2xl bg-[#FFF6DF] p-2.5 text-[#F59F0A]">
                   <Lightbulb className="h-4 w-4" />
                 </div>
-                <h3 className="text-lg font-bold text-[#0F1729]">Observations</h3>
+                <h3 className="text-lg font-bold text-[#0F1729]">{t("reviewSubmission.observationsHeading")}</h3>
               </div>
               <div className="mt-4 space-y-3">
                 {(detail?.analysis?.reviewSummary?.observations || []).length ? (
@@ -424,7 +434,7 @@ export default function ReviewSubmission() {
                   ))
                 ) : (
                   <p className="text-sm text-[#65758B]">
-                    No written observations are available for this submission.
+                    {t("reviewSubmission.noObservations")}
                   </p>
                 )}
               </div>
@@ -435,20 +445,20 @@ export default function ReviewSubmission() {
                 <div className="rounded-2xl bg-[#EAFBFB] p-2.5 text-[#188B8B]">
                   <Target className="h-4 w-4" />
                 </div>
-                <h3 className="text-lg font-bold text-[#0F1729]">Readiness State</h3>
+                <h3 className="text-lg font-bold text-[#0F1729]">{t("reviewSubmission.readinessHeading")}</h3>
               </div>
               <div className="mt-4 space-y-4">
                 <div className="rounded-[18px] bg-white px-4 py-3 shadow-sm">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8A94A6]">
-                    Review Status
+                    {t("reviewSubmission.reviewStatus")}
                   </p>
                   <p className="mt-2 text-lg font-bold text-[#0F1729]">
-                    {detail?.analysis?.reviewSummary?.statusLabel || "Ready for Review"}
+                    {detail?.analysis?.reviewSummary?.statusLabel || t("reviewSubmission.readyForReviewFallback")}
                   </p>
                 </div>
                 <div className="rounded-[18px] bg-white px-4 py-3 shadow-sm">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8A94A6]">
-                    Strongest Signals
+                    {t("reviewSubmission.strongestSignals")}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {(detail?.analysis?.reviewSummary?.strongestSignals || []).length ? (
@@ -459,14 +469,14 @@ export default function ReviewSubmission() {
                       ))
                     ) : (
                       <span className="text-sm text-[#65758B]">
-                        No signal highlights available.
+                        {t("reviewSubmission.noSignalHighlights")}
                       </span>
                     )}
                   </div>
                 </div>
                 <div className="rounded-[18px] bg-white px-4 py-3 shadow-sm">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8A94A6]">
-                    Recommended Careers
+                    {t("reviewSubmission.recommendedCareers")}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {(detail?.analysis?.reviewSummary?.topCareerTitles || []).length ? (
@@ -477,7 +487,7 @@ export default function ReviewSubmission() {
                       ))
                     ) : (
                       <span className="text-sm text-[#65758B]">
-                        No recommendation highlights available.
+                        {t("reviewSubmission.noRecommendationHighlights")}
                       </span>
                     )}
                   </div>
@@ -495,19 +505,19 @@ export default function ReviewSubmission() {
               </div>
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#188B8B]">
-                  Personality Type
+                  {t("reviewSubmission.personalityTypeEyebrow")}
                 </p>
                 <h2 className="mt-2 text-2xl font-bold text-[#0F1729]">
-                  {detail?.analysis?.personalityType?.code || "Not available"}
+                  {detail?.analysis?.personalityType?.code || t("reviewSubmission.personalityTypeNotAvailable")}
                 </h2>
               </div>
             </div>
             <p className="mt-4 text-lg font-semibold text-[#0F1729]">
-              {detail?.analysis?.personalityType?.title || "Assessment profile pending"}
+              {detail?.analysis?.personalityType?.title || t("reviewSubmission.personalityProfilePending")}
             </p>
             <p className="mt-2 text-sm leading-7 text-[#65758B]">
               {detail?.analysis?.personalityType?.description ||
-                "This submission does not yet include a published personality analysis."}
+                t("reviewSubmission.personalityProfilePendingBody")}
             </p>
           </section>
 
@@ -518,10 +528,10 @@ export default function ReviewSubmission() {
               </div>
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#188B8B]">
-                  Strengths & Matches
+                  {t("reviewSubmission.strengthsMatchesEyebrow")}
                 </p>
                 <h2 className="mt-2 text-2xl font-bold text-[#0F1729]">
-                  Evaluation Highlights
+                  {t("reviewSubmission.evaluationHighlights")}
                 </h2>
               </div>
             </div>
@@ -529,7 +539,7 @@ export default function ReviewSubmission() {
             <div className="mt-5 space-y-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8A94A6]">
-                  Strengths
+                  {t("reviewSubmission.strengthsLabel")}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {(detail?.analysis?.strengths || []).length ? (
@@ -540,7 +550,7 @@ export default function ReviewSubmission() {
                     ))
                   ) : (
                     <span className="text-sm text-[#65758B]">
-                      No strength breakdown available.
+                      {t("reviewSubmission.noStrengthsBreakdown")}
                     </span>
                   )}
                 </div>
@@ -548,7 +558,7 @@ export default function ReviewSubmission() {
 
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8A94A6]">
-                  Top Career Recommendations
+                  {t("reviewSubmission.topCareerRecommendationsLabel")}
                 </p>
                 <div className="mt-3 space-y-3">
                   {(detail?.analysis?.careers || []).length ? (
@@ -562,7 +572,7 @@ export default function ReviewSubmission() {
                             {career.title}
                           </p>
                           <span className="rounded-full bg-[#EAFBFB] px-3 py-1 text-xs font-semibold text-[#188B8B]">
-                            {career.matchPercent ?? 0}% Match
+                            {t("reviewSubmission.matchPercent", { value: career.matchPercent ?? 0 })}
                           </span>
                         </div>
                         <p className="mt-2 text-sm leading-6 text-[#65758B]">
@@ -572,7 +582,7 @@ export default function ReviewSubmission() {
                     ))
                   ) : (
                     <span className="text-sm text-[#65758B]">
-                      No career recommendations available.
+                      {t("reviewSubmission.noCareerRecommendationsLabel")}
                     </span>
                   )}
                 </div>
@@ -586,7 +596,7 @@ export default function ReviewSubmission() {
         {manualReview.hasUnreviewedItems ? (
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#F4DCA8] bg-[#FFF1D3] px-3 py-1.5 text-xs font-semibold text-[#B86D00]">
             <AlertTriangle className="h-3.5 w-3.5" />
-            Complete manual review first to enable Approve
+            {t("reviewSubmission.manualReviewBannerNeeded")}
           </div>
         ) : null}
         <ReviewActionBar
@@ -618,21 +628,24 @@ const formatProfileDate = (value) => {
   });
 };
 
-const PROFILE_FIELD_DEFINITIONS = [
-  { key: "dateOfBirth", label: "Date of Birth", format: formatProfileDate },
-  { key: "gender", label: "Gender" },
-  { key: "phone", label: "Phone" },
-  { key: "schoolOrCollege", label: "School / College" },
-  { key: "classOrGrade", label: "Class / Grade" },
-  { key: "stream", label: "Stream" },
-  { key: "board", label: "Board / University" },
-  { key: "city", label: "City" },
-  { key: "state", label: "State / UT" },
+// Field definitions take `t` so labels translate live with the
+// language toggle. Keys stay in English (they index the API response).
+const buildProfileFieldDefinitions = (t) => [
+  { key: "dateOfBirth", label: t("reviewSubmission.fieldDateOfBirth"), format: formatProfileDate },
+  { key: "gender", label: t("reviewSubmission.fieldGender") },
+  { key: "phone", label: t("reviewSubmission.fieldPhone") },
+  { key: "schoolOrCollege", label: t("reviewSubmission.fieldSchoolCollege") },
+  { key: "classOrGrade", label: t("reviewSubmission.fieldClassGrade") },
+  { key: "stream", label: t("reviewSubmission.fieldStream") },
+  { key: "board", label: t("reviewSubmission.fieldBoard") },
+  { key: "city", label: t("reviewSubmission.fieldCity") },
+  { key: "state", label: t("reviewSubmission.fieldState") },
 ];
 
-function StudentProfileReviewBlock({ profile }) {
+function StudentProfileReviewBlock({ profile, t }) {
   const safeProfile = profile || {};
-  const hasAnyData = PROFILE_FIELD_DEFINITIONS.some((field) =>
+  const fields = buildProfileFieldDefinitions(t);
+  const hasAnyData = fields.some((field) =>
     String(safeProfile[field.key] || "").trim()
   );
 
@@ -645,31 +658,30 @@ function StudentProfileReviewBlock({ profile }) {
           </span>
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#188B8B]">
-              Student Profile
+              {t("reviewSubmission.studentProfileEyebrow")}
             </p>
             <h2 className="mt-1 text-2xl font-bold text-[#0F1729]">
-              Background submitted by the student
+              {t("reviewSubmission.studentProfileHeading")}
             </h2>
             <p className="mt-1 text-sm leading-7 text-[#65758B]">
-              Captured before the assessment began. Use this context when
-              interpreting their results.
+              {t("reviewSubmission.studentProfileBody")}
             </p>
           </div>
         </div>
         {safeProfile.isComplete ? (
           <span className="inline-flex shrink-0 items-center rounded-full bg-[#E2F8F7] px-3 py-1 text-xs font-semibold text-[#188B8B]">
-            Complete
+            {t("reviewSubmission.profileComplete")}
           </span>
         ) : (
           <span className="inline-flex shrink-0 items-center rounded-full bg-[#FFF1D3] px-3 py-1 text-xs font-semibold text-[#B86D00]">
-            Incomplete
+            {t("reviewSubmission.profileIncomplete")}
           </span>
         )}
       </div>
 
       {hasAnyData ? (
         <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {PROFILE_FIELD_DEFINITIONS.map((field) => {
+          {fields.map((field) => {
             const raw = safeProfile[field.key];
             const value = field.format
               ? field.format(raw)
@@ -690,8 +702,7 @@ function StudentProfileReviewBlock({ profile }) {
         </dl>
       ) : (
         <p className="mt-6 rounded-2xl bg-[#F8FAFC] px-4 py-4 text-sm text-[#65758B]">
-          The student submitted this test before the profile form was rolled
-          out, so no structured profile data is attached.
+          {t("reviewSubmission.noProfileDataNotice")}
         </p>
       )}
     </section>
@@ -702,12 +713,6 @@ function StudentProfileReviewBlock({ profile }) {
 // Manual Review section — Section 4 image/diagram items with per-item
 // correct/incorrect override + a finalize button that recalculates scoring.
 // ---------------------------------------------------------------------------
-
-const SUBSECTION_LABELS = {
-  abstract_reasoning: "Abstract Reasoning",
-  spatial_relations: "Spatial Relations",
-  mechanical_reasoning: "Mechanical Reasoning",
-};
 
 const decisionBadgeClass = (decision) => {
   if (decision === "correct") {
@@ -725,7 +730,7 @@ const decisionBadgeClass = (decision) => {
 // come from the scorer; text is the option's full content.
 const normaliseLetter = (value = "") => String(value || "").trim().toUpperCase();
 
-function ManualReviewOptionList({ options = [], studentAnswer, correctAnswer }) {
+function ManualReviewOptionList({ options = [], studentAnswer, correctAnswer, t }) {
   const student = normaliseLetter(studentAnswer);
   const correct = normaliseLetter(correctAnswer);
   const studentMissed = Boolean(student && correct && student !== correct);
@@ -734,11 +739,11 @@ function ManualReviewOptionList({ options = [], studentAnswer, correctAnswer }) 
   if (!list.length) {
     return (
       <div className="rounded-[12px] border border-dashed border-[#D9E5EC] bg-[#FBFCFD] px-3 py-3 text-xs text-[#7D8CA2]">
-        Option text isn't stored for this question. Student answered{" "}
+        {t("reviewSubmission.optionsNotStored")}{" "}
         <span className="font-semibold text-[#0F1729]">
           {studentAnswer || "—"}
         </span>{" "}
-        · Correct answer{" "}
+        · {t("reviewSubmission.correctAnswerInline")}{" "}
         <span className="font-semibold text-[#1D7D46]">
           {correctAnswer || "—"}
         </span>
@@ -787,12 +792,12 @@ function ManualReviewOptionList({ options = [], studentAnswer, correctAnswer }) 
             </span>
             <div className="min-w-0 flex-1">
               <p className="text-[13px] leading-5">
-                {option?.text || "(no option text)"}
+                {option?.text || t("reviewSubmission.noOptionText")}
               </p>
               <div className="mt-1 flex flex-wrap gap-2">
                 {isCorrect ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-[#1D7D46] px-2 py-0.5 text-[10px] font-semibold text-white">
-                    Correct answer
+                    {t("reviewSubmission.correctAnswerBadge")}
                   </span>
                 ) : null}
                 {isStudent ? (
@@ -801,7 +806,7 @@ function ManualReviewOptionList({ options = [], studentAnswer, correctAnswer }) 
                       studentMissed ? "bg-[#B42318]" : "bg-[#2563EB]"
                     }`}
                   >
-                    Student answered
+                    {t("reviewSubmission.studentAnsweredBadge")}
                   </span>
                 ) : null}
               </div>
@@ -820,16 +825,20 @@ function ManualReviewItemCard({
   onDecision,
   onUndo,
   isSaving,
+  t,
 }) {
   const decision = item.adminDecision;
   const decisionLabel =
     decision === "correct"
-      ? "Marked Correct"
+      ? t("reviewSubmission.decisionMarkedCorrect")
       : decision === "incorrect"
-        ? "Marked Incorrect"
+        ? t("reviewSubmission.decisionMarkedIncorrect")
         : item.requiresManualReview
-          ? "Pending"
-          : "Auto-Graded";
+          ? t("reviewSubmission.decisionPending")
+          : t("reviewSubmission.decisionAutoGraded");
+  const subsectionLabel = SUBSECTION_LABEL_KEYS[item.subsectionKey]
+    ? t(SUBSECTION_LABEL_KEYS[item.subsectionKey])
+    : item.subsectionKey;
 
   return (
     <div className="rounded-[20px] border border-[#E1E7EF] bg-white p-5">
@@ -840,12 +849,12 @@ function ManualReviewItemCard({
               Q{item.questionId}
             </span>
             <span className="rounded-full border border-[#D7E7EC] bg-white px-2.5 py-0.5 text-[11px] font-semibold text-[#4E5D72]">
-              {SUBSECTION_LABELS[item.subsectionKey] || item.subsectionKey}
+              {subsectionLabel}
             </span>
             {item.requiresManualReview ? (
               <span className="inline-flex items-center gap-1 rounded-full border border-[#F4DCA8] bg-[#FFF1D3] px-2.5 py-0.5 text-[11px] font-semibold text-[#B86D00]">
                 <AlertTriangle className="h-3 w-3" />
-                Review required
+                {t("reviewSubmission.reviewRequiredChip")}
               </span>
             ) : null}
             <span
@@ -855,7 +864,7 @@ function ManualReviewItemCard({
             </span>
           </div>
           <p className="mt-3 text-sm leading-6 text-[#0F1729]">
-            {item.questionText || "(Question text not available)"}
+            {item.questionText || t("reviewSubmission.questionTextUnavailable")}
           </p>
         </div>
       </div>
@@ -865,7 +874,7 @@ function ManualReviewItemCard({
           {item.mediaUrl ? (
             <img
               src={item.mediaUrl}
-              alt={`Question ${item.questionId} reference`}
+              alt={t("reviewSubmission.questionMediaAlt", { id: item.questionId })}
               className="block h-auto w-full"
               onError={(e) => {
                 e.currentTarget.style.display = "none";
@@ -875,10 +884,10 @@ function ManualReviewItemCard({
             <div className="flex flex-col items-center justify-center gap-1.5 px-4 py-8 text-[#7D8CA2]">
               <ImageOff className="h-5 w-5" />
               <p className="text-[11px] font-medium uppercase tracking-[0.1em]">
-                No image
+                {t("reviewSubmission.noImage")}
               </p>
               <p className="text-[11px] leading-4 text-center">
-                Text-only or media unavailable
+                {t("reviewSubmission.textOnlyMedia")}
               </p>
             </div>
           )}
@@ -894,30 +903,32 @@ function ManualReviewItemCard({
             options={item.options}
             studentAnswer={item.studentAnswer}
             correctAnswer={item.correctAnswer}
+            t={t}
           />
 
           <p className="text-xs text-[#7D8CA2]">
             {item.correctAnswer ? (
               <>
-                Stored answer key:{" "}
+                {t("reviewSubmission.storedAnswerKey")}{" "}
                 <span className="font-semibold text-[#1D7D46]">
                   {item.correctAnswer}
                 </span>
-                . Algorithm marked this{" "}
+                . {t("reviewSubmission.algorithmMarkedThis")}{" "}
                 <span
                   className={`font-semibold ${item.autoMarkedCorrect ? "text-[#1D7D46]" : "text-[#B42318]"}`}
                 >
-                  {item.autoMarkedCorrect ? "correct" : "incorrect"}
+                  {item.autoMarkedCorrect
+                    ? t("reviewSubmission.markedCorrectLower")
+                    : t("reviewSubmission.markedIncorrectLower")}
                 </span>
                 .
               </>
             ) : (
               <>
                 <span className="font-semibold text-[#B42318]">
-                  Answer key missing
+                  {t("reviewSubmission.answerKeyMissing")}
                 </span>{" "}
-                — algorithm cannot grade. Admin decision is the source of
-                truth for this question.
+                {t("reviewSubmission.answerKeyMissingNote")}
               </>
             )}
           </p>
@@ -927,14 +938,14 @@ function ManualReviewItemCard({
               htmlFor={`note-${item.questionId}`}
               className="block text-[10px] font-semibold uppercase tracking-[0.1em] text-[#7D8CA2]"
             >
-              Admin note (optional)
+              {t("reviewSubmission.adminNoteLabel")}
             </label>
             <input
               id={`note-${item.questionId}`}
               type="text"
               value={note}
               onChange={(e) => onNoteChange(item.questionId, e.target.value)}
-              placeholder="e.g. Image rotated 90° — answer key matches anyway"
+              placeholder={t("reviewSubmission.adminNotePlaceholder")}
               className="w-full rounded-[10px] border border-[#D9E5EC] bg-white px-3 py-1.5 text-xs text-[#0F1729] focus:border-[#188B8B] focus:outline-none focus:ring-2 focus:ring-[#188B8B]/15"
               maxLength={500}
             />
@@ -952,7 +963,7 @@ function ManualReviewItemCard({
               }`}
             >
               <Check className="h-3.5 w-3.5" />
-              Mark Correct
+              {t("reviewSubmission.markCorrect")}
             </button>
             <button
               type="button"
@@ -965,7 +976,7 @@ function ManualReviewItemCard({
               }`}
             >
               <X className="h-3.5 w-3.5" />
-              Mark Incorrect
+              {t("reviewSubmission.markIncorrect")}
             </button>
             {decision ? (
               <button
@@ -973,7 +984,7 @@ function ManualReviewItemCard({
                 onClick={() => onUndo(item.questionId)}
                 className="inline-flex items-center gap-1.5 rounded-[10px] border border-[#D9E5EC] bg-white px-3 py-1.5 text-xs font-semibold text-[#4E5D72] hover:bg-[#F8FAFC]"
               >
-                Undo
+                {t("reviewSubmission.undo")}
               </button>
             ) : null}
           </div>
@@ -989,6 +1000,7 @@ function ManualReviewSection({
   onDecision,
   onUndo,
   onFinalize,
+  t,
 }) {
   const items = manualReview.items || [];
   const pending = items.filter(
@@ -1010,15 +1022,13 @@ function ManualReviewSection({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#188B8B]">
-            Manual Review
+            {t("reviewSubmission.manualReviewEyebrow")}
           </p>
           <h2 className="mt-2 text-2xl font-bold text-[#0F1729]">
-            Verify flagged Section 4 questions
+            {t("reviewSubmission.manualReviewHeading")}
           </h2>
           <p className="mt-2 max-w-3xl text-sm leading-7 text-[#65758B]">
-            Image- and diagram-based aptitude items appear here. Override the
-            algorithm's marking when the rendered image diverges from the
-            stored answer key.
+            {t("reviewSubmission.manualReviewBody")}
           </p>
         </div>
         <div className="text-right text-xs text-[#65758B]">
@@ -1028,17 +1038,17 @@ function ManualReviewSection({
                 <span className="font-semibold text-[#0F1729]">
                   {items.length}
                 </span>{" "}
-                flagged items
+                {t("reviewSubmission.flaggedItems")}
               </p>
               <p>
                 <span className="font-semibold text-[#B86D00]">
                   {pending.length}
                 </span>{" "}
-                pending ·{" "}
+                {t("reviewSubmission.pending")} ·{" "}
                 <span className="font-semibold text-[#1D7D46]">
                   {completed.length}
                 </span>{" "}
-                resolved
+                {t("reviewSubmission.resolved")}
               </p>
             </>
           ) : null}
@@ -1054,7 +1064,7 @@ function ManualReviewSection({
       {manualReview.loading ? (
         <div className="mt-6 flex items-center gap-2 text-sm text-[#65758B]">
           <Loader2 className="h-4 w-4 animate-spin" />
-          Loading manual-review queue...
+          {t("reviewSubmission.loadingQueue")}
         </div>
       ) : items.length === 0 ||
         items.every((item) => !item.requiresManualReview) ? (
@@ -1062,14 +1072,10 @@ function ManualReviewSection({
           <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" />
           <div>
             <p className="font-semibold">
-              All aptitude questions were graded automatically — no manual
-              review required.
+              {t("reviewSubmission.allAutoGradedHeading")}
             </p>
             <p className="mt-1 text-[#4E5D72]">
-              Manual review is only needed when a question's answer key is
-              missing or ambiguous. Every Section&nbsp;4 question on this
-              submission had a definitive answer key, so the algorithm
-              scored them without admin input.
+              {t("reviewSubmission.allAutoGradedBody")}
             </p>
           </div>
         </div>
@@ -1079,13 +1085,10 @@ function ManualReviewSection({
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[#F59F0A]" />
             <div>
               <p className="font-semibold text-[#0F1729]">
-                {items.length} question{items.length === 1 ? "" : "s"} could not
-                be auto-graded (answer key missing).
+                {t("reviewSubmission.questionsCouldNotGrade", { count: items.length })}
               </p>
               <p className="mt-1 text-[#65758B]">
-                Please review each one below and mark it correct or incorrect.
-                The aptitude subsection score will recalculate after you
-                finalise the review.
+                {t("reviewSubmission.reviewEachOne")}
               </p>
             </div>
           </div>
@@ -1099,6 +1102,7 @@ function ManualReviewSection({
                 onDecision={onDecision}
                 onUndo={onUndo}
                 isSaving={manualReview.decisionFor === item.questionId}
+                t={t}
               />
             ))}
           </div>
@@ -1107,12 +1111,11 @@ function ManualReviewSection({
             <div>
               <p className="text-sm font-semibold text-[#0F1729]">
                 {pending.length === 0
-                  ? "All flagged items decided — ready to recompute scores."
-                  : `${pending.length} flagged item${pending.length === 1 ? "" : "s"} still need a decision.`}
+                  ? t("reviewSubmission.allDecided")
+                  : t("reviewSubmission.stillNeedDecision", { count: pending.length })}
               </p>
               <p className="mt-1 text-xs text-[#65758B]">
-                Finalizing re-runs Section 4 scoring with your decisions and
-                refreshes the career recommendations on this report.
+                {t("reviewSubmission.finalizingBody")}
               </p>
             </div>
             <button
@@ -1124,12 +1127,12 @@ function ManualReviewSection({
               {manualReview.finalizing ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Recalculating...
+                  {t("reviewSubmission.recalculating")}
                 </>
               ) : (
                 <>
                   <ClipboardCheck className="h-4 w-4" />
-                  Finalize Review & Recalculate Scores
+                  {t("reviewSubmission.finalizeAction")}
                 </>
               )}
             </button>
@@ -1140,15 +1143,15 @@ function ManualReviewSection({
       {manualReview.refreshedScores ? (
         <div className="mt-5 rounded-[20px] border border-[#D4EBEE] bg-[linear-gradient(180deg,#F7FDFD_0%,#FFFFFF_100%)] p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#188B8B]">
-            Recomputed
+            {t("reviewSubmission.recomputed")}
           </p>
           <h3 className="mt-1 text-lg font-bold text-[#0F1729]">
-            Updated scores after manual review
+            {t("reviewSubmission.updatedScoresHeading")}
           </h3>
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
             <div className="rounded-[14px] bg-white px-3 py-2 shadow-[0_2px_8px_rgba(15,23,41,0.04)]">
               <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#7D8CA2]">
-                Overall score
+                {t("reviewSubmission.overallScoreLabel")}
               </p>
               <p className="mt-1 text-2xl font-bold text-[#188B8B]">
                 {manualReview.refreshedScores.overallScore ?? "—"}
@@ -1175,7 +1178,7 @@ function ManualReviewSection({
           {(manualReview.refreshedScores.careerRecommendations || []).length ? (
             <div className="mt-4">
               <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#7D8CA2]">
-                Refreshed top careers
+                {t("reviewSubmission.refreshedTopCareers")}
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {manualReview.refreshedScores.careerRecommendations
@@ -1199,8 +1202,9 @@ function ManualReviewSection({
 
       {manualReview.completedAt && !manualReview.refreshedScores ? (
         <p className="mt-4 text-xs text-[#7D8CA2]">
-          Manual review completed{" "}
-          {new Date(manualReview.completedAt).toLocaleString("en-IN")}.
+          {t("reviewSubmission.manualReviewCompletedAt", {
+            date: new Date(manualReview.completedAt).toLocaleString("en-IN"),
+          })}
         </p>
       ) : null}
     </section>

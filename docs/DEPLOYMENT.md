@@ -173,6 +173,7 @@ Recommended post-deploy seed commands:
 ```bash
 npm run seed:assessment
 npm run seed:admin
+npm run seed:demo-package
 ```
 
 Run those from the deployed backend environment or your connected production shell.
@@ -181,6 +182,39 @@ If skipped:
 
 - packages may not exist in production
 - admin login may not exist in production
+- the live demo package will be missing or stale, and Section 4 may render as "No Questions Available Yet" until reseeded
+
+### Re-seed after every question/config change
+
+Any deployment that touches question text, options, package curation, or scoring configs MUST be followed by a fresh seed on the production backend:
+
+```bash
+npm run seed:assessment
+npm run seed:demo-package
+```
+
+Without this, the live database keeps serving stale or empty question sets and students see broken sections, missing options, or "No Questions Available Yet" on sections that look fine in local dev.
+
+Common triggers that require a reseed:
+
+- editing `backend/config/comprehensive500Package.generated.js`
+- running any `npm run patch:*` script (e.g. `patch:work-style-questions`, `patch:math-operators`)
+- changing `backend/utils/scoring/configs/career500qDemo.config.js` (demo curation)
+- editing answer keys in `backend/utils/scoring/specs/career500qEvaluationSpec.js`
+
+If only one of the two seeds is run, the mismatch shows up as: demo students see old questions while full-test students see the new ones (or vice versa). Always run both.
+
+### Frontend redeploy after UI changes
+
+Frontend changes do NOT take effect on production until Vercel rebuilds. A code-only push to the default branch will trigger an automatic redeploy in most Vercel setups, but if auto-deploy is disabled or the change is on a non-default branch, trigger one manually:
+
+```bash
+vercel --prod
+```
+
+Or from the Vercel dashboard → Deployments → Redeploy.
+
+If you've shipped a frontend fix locally and the live site still shows the old behaviour, the most common cause is a missed redeploy. Verify by checking the Vercel "Latest Deployment" timestamp against the commit time.
 
 ## Step 3: Deploy the frontend on Vercel
 

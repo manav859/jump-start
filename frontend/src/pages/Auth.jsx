@@ -1,5 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ArrowRight,
   BadgeCheck,
@@ -18,18 +19,18 @@ import {
   isGoogleAuthConfigured,
 } from "../config/env";
 
-/* ── static copy ─────────────────────────────────────── */
-
-const loginHighlights = [
-  "Resume assessments from where you paused them.",
-  "Track purchased packages and results in one dashboard.",
-  "Unlock career recommendations and counselling access.",
+/* Highlight + benefit copy lives in the locale files now so the
+   language toggle takes effect on the marketing side of the panel
+   without re-rendering the form state. */
+const LOGIN_HIGHLIGHT_KEYS = [
+  "auth.highlightResume",
+  "auth.highlightTrack",
+  "auth.highlightUnlock",
 ];
-
-const signupBenefits = [
-  "Unlock purchased tests and progress tracking.",
-  "Save answers automatically during assessments.",
-  "Access results, career matches, and counselling support.",
+const SIGNUP_BENEFIT_KEYS = [
+  "auth.signupBenefitPurchased",
+  "auth.signupBenefitAnswers",
+  "auth.signupBenefitResults",
 ];
 
 const getPostLoginDestination = (authResponse) =>
@@ -38,6 +39,7 @@ const getPostLoginDestination = (authResponse) =>
 /* ── component ───────────────────────────────────────── */
 
 export default function Auth() {
+  const { t } = useTranslation();
   const { login, loginWithGoogle } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
@@ -89,7 +91,7 @@ export default function Auth() {
       }
     } catch (err) {
       console.error("Google Auth Error:", err);
-      setError(err.message || "Google Authentication Failed");
+      setError(err.message || t("auth.googleLoginError"));
     }
   };
 
@@ -117,7 +119,7 @@ export default function Auth() {
     loadScript()
       .then(() => {
         if (!window.google?.accounts) {
-          setError("Google Sign-In could not be loaded.");
+          setError(t("auth.googleFailed"));
           return;
         }
 
@@ -151,7 +153,7 @@ export default function Auth() {
       const authResponse = await login({ email, password });
       navigate(getPostLoginDestination(authResponse), { replace: true });
     } catch (err) {
-      setError(err.message || "Invalid credentials");
+      setError(err.message || t("auth.invalidCredentials"));
     } finally {
       setLoading(false);
     }
@@ -169,12 +171,12 @@ export default function Auth() {
       });
       const data = await res.json();
       if (res.ok) {
-        setMsg("Signup successful!");
+        setMsg(t("auth.signupSuccessful"));
         window.setTimeout(() => {
           setIsLogin(true);
         }, 600);
       } else {
-        setMsg(data.msg || data.message || "Signup failed");
+        setMsg(data.msg || data.message || t("auth.signupFailed"));
       }
     } catch {
       setMsg(apiUnavailableMessage);
@@ -213,12 +215,12 @@ export default function Auth() {
             {isLogin ? (
               <>
                 <ShieldCheck className="h-4 w-4" />
-                {adminLoginRequired ? "Admin access" : "Welcome back"}
+                {adminLoginRequired ? t("auth.adminAccess") : t("auth.loginTitle")}
               </>
             ) : (
               <>
                 <Sparkles className="h-4 w-4" />
-                Get started
+                {t("auth.getStartedBadge")}
               </>
             )}
           </div>
@@ -227,24 +229,23 @@ export default function Auth() {
           <h1 className="mt-4 text-3xl font-bold text-[#0F1729] sm:mt-6 sm:text-4xl">
             {isLogin
               ? adminLoginRequired
-                ? "Admin sign in"
-                : "Log in"
-              : "Sign up"}
+                ? t("auth.adminSignIn")
+                : t("nav.signIn")
+              : t("auth.signupHeading")}
           </h1>
 
           {/* Subtitle */}
           <p className="mt-2 text-sm text-[#65758B] sm:mt-3 sm:text-base">
             {isLogin
               ? adminLoginRequired
-                ? "Enter an admin account email and password to continue to the admin panel."
-                : "Continue your assessment journey and pick up right where you left off."
-              : "Set up your account to unlock tests, dashboard access, and results."}
+                ? t("auth.adminSubtitle")
+                : t("auth.loginSubtitle")
+              : t("auth.signupShortBody")}
           </p>
 
           {switchAccountRequired && isLogin ? (
             <div className="mt-5 rounded-2xl border border-[#F4DCA8] bg-[#FFF9EE] px-4 py-3 text-sm text-[#8C5A00]">
-              The current account does not have admin access. Sign in with an
-              admin account.
+              {t("auth.switchAccountWarning")}
             </div>
           ) : null}
 
@@ -259,7 +260,7 @@ export default function Auth() {
                 <form className="space-y-4 sm:space-y-5" onSubmit={handleLoginSubmit}>
                   <div>
                     <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                      Email
+                      {t("auth.emailLabel")}
                     </label>
                     <input
                       type="email"
@@ -271,7 +272,7 @@ export default function Auth() {
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                      Password
+                      {t("auth.passwordLabel")}
                     </label>
                     <div className="relative">
                       <input
@@ -284,7 +285,7 @@ export default function Auth() {
                       <button
                         type="button"
                         onClick={() => setShowPassword((c) => !c)}
-                        aria-label={showPassword ? "Hide password" : "Show password"}
+                        aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}
                         className="absolute inset-y-0 right-0 flex items-center px-4 text-[#65758B] transition hover:text-[#0F1729]"
                       >
                         {showPassword ? (
@@ -305,7 +306,7 @@ export default function Auth() {
                     disabled={loading}
                     className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0F1729] px-5 py-3.5 text-sm font-semibold text-white hover:bg-[#1E293B] disabled:cursor-not-allowed disabled:opacity-70 transition-colors"
                   >
-                    {loading && isLogin ? "Signing in..." : "Sign in"}
+                    {loading && isLogin ? t("auth.loggingIn") : t("auth.loginButton")}
                     <ArrowRight className="h-4 w-4" />
                   </button>
                 </form>
@@ -313,13 +314,13 @@ export default function Auth() {
                 <div className="mt-4" id="google-auth-btn" />
 
                 <p className="mt-6 text-sm text-[#65758B]">
-                  Do not have an account?{" "}
+                  {t("auth.noAccount")}{" "}
                   <button
                     type="button"
                     onClick={switchMode}
                     className="font-semibold text-[#188B8B] hover:underline"
                   >
-                    Create one now
+                    {t("auth.createOneNow")}
                   </button>
                 </p>
               </div>
@@ -329,7 +330,7 @@ export default function Auth() {
                 <form className="space-y-3 sm:space-y-5" onSubmit={handleSignupSubmit}>
                   <div>
                     <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                      Name
+                      {t("auth.nameLabelShort")}
                     </label>
                     <input
                       type="text"
@@ -341,7 +342,7 @@ export default function Auth() {
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                      Mobile
+                      {t("auth.mobileLabel")}
                     </label>
                     <input
                       type="tel"
@@ -353,7 +354,7 @@ export default function Auth() {
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                      Email
+                      {t("auth.emailLabel")}
                     </label>
                     <input
                       type="email"
@@ -365,7 +366,7 @@ export default function Auth() {
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                      Password
+                      {t("auth.passwordLabel")}
                     </label>
                     <div className="relative">
                       <input
@@ -380,7 +381,7 @@ export default function Auth() {
                       <button
                         type="button"
                         onClick={() => setShowPassword((c) => !c)}
-                        aria-label={showPassword ? "Hide password" : "Show password"}
+                        aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}
                         className="absolute inset-y-0 right-0 flex items-center px-4 text-[#65758B] transition hover:text-[#0F1729]"
                       >
                         {showPassword ? (
@@ -393,7 +394,7 @@ export default function Auth() {
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                      Confirm Password
+                      {t("auth.confirmPasswordLabel")}
                     </label>
                     <div className="relative">
                       <input
@@ -413,8 +414,8 @@ export default function Auth() {
                         onClick={() => setShowConfirmPassword((c) => !c)}
                         aria-label={
                           showConfirmPassword
-                            ? "Hide confirm password"
-                            : "Show confirm password"
+                            ? t("auth.hideConfirmPassword")
+                            : t("auth.showConfirmPassword")
                         }
                         className="absolute inset-y-0 right-0 flex items-center px-4 text-[#65758B] transition hover:text-[#0F1729]"
                       >
@@ -430,7 +431,8 @@ export default function Auth() {
                   {msg ? (
                     <p
                       className={`text-sm ${
-                        msg.toLowerCase().includes("successful")
+                        msg.toLowerCase().includes("successful") ||
+                        msg === t("auth.signupSuccessful")
                           ? "text-emerald-700"
                           : "text-red-600"
                       }`}
@@ -448,19 +450,19 @@ export default function Auth() {
                     disabled={loading}
                     className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0F1729] px-5 py-3.5 text-sm font-semibold text-white hover:bg-[#1E293B] disabled:cursor-not-allowed disabled:opacity-70 transition-colors"
                   >
-                    {loading && !isLogin ? "Creating account..." : "Create account"}
+                    {loading && !isLogin ? t("auth.signingUp") : t("auth.createAccount")}
                     <ArrowRight className="h-4 w-4" />
                   </button>
                 </form>
 
                 <p className="mt-6 text-sm text-[#65758B]">
-                  Already have an account?{" "}
+                  {t("auth.alreadyHaveAccount")}{" "}
                   <button
                     type="button"
                     onClick={switchMode}
                     className="font-semibold text-[#188B8B] hover:underline"
                   >
-                    Log in
+                    {t("auth.loginShort")}
                   </button>
                 </p>
               </div>
@@ -484,28 +486,27 @@ export default function Auth() {
           >
             <div className="max-w-xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#188B8B]">
-                Jumpstart account
+                {t("auth.accountSidePillow")}
               </p>
               <h2 className="mt-5 text-3xl font-bold text-[#0F1729] sm:text-4xl">
-                Your dashboard, results, and package progress stay connected.
+                {t("auth.accountSideHeading")}
               </h2>
               <p className="mt-5 text-base leading-8 text-[#65758B]">
-                Log in to resume paused tests, review completed reports, and
-                manage your profile without losing your saved progress.
+                {t("auth.accountSideBody")}
               </p>
             </div>
 
             <div className="mt-10 space-y-4">
-              {loginHighlights.map((item) => (
+              {LOGIN_HIGHLIGHT_KEYS.map((key) => (
                 <div
-                  key={item}
+                  key={key}
                   className="surface-card rounded-[24px] bg-white/90 px-5 py-4"
                 >
                   <div className="flex items-start gap-3">
                     <div className="rounded-full bg-[#E8F9F8] p-2 text-[#188B8B]">
                       <CheckCircle2 className="h-4 w-4" />
                     </div>
-                    <p className="text-sm leading-7 text-[#0F1729]">{item}</p>
+                    <p className="text-sm leading-7 text-[#0F1729]">{t(key)}</p>
                   </div>
                 </div>
               ))}
@@ -522,29 +523,27 @@ export default function Auth() {
           >
             <div className="max-w-xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#188B8B]">
-                Create your account
+                {t("auth.signupTitle")}
               </p>
               <h2 className="mt-5 text-3xl font-bold text-[#0F1729] sm:text-4xl">
-                Start your career discovery journey with a saved Jumpstart
-                profile.
+                {t("auth.signupHeroBigHeading")}
               </h2>
               <p className="mt-5 text-base leading-8 text-[#65758B]">
-                Create your account once and keep your test purchases, saved
-                answers, results, and counselling access tied together.
+                {t("auth.signupHeroBigBody")}
               </p>
             </div>
 
             <div className="mt-10 space-y-4">
-              {signupBenefits.map((item) => (
+              {SIGNUP_BENEFIT_KEYS.map((key) => (
                 <div
-                  key={item}
+                  key={key}
                   className="surface-card rounded-[24px] bg-white/90 px-5 py-4"
                 >
                   <div className="flex items-start gap-3">
                     <div className="rounded-full bg-[#E8F9F8] p-2 text-[#188B8B]">
                       <BadgeCheck className="h-4 w-4" />
                     </div>
-                    <p className="text-sm leading-7 text-[#0F1729]">{item}</p>
+                    <p className="text-sm leading-7 text-[#0F1729]">{t(key)}</p>
                   </div>
                 </div>
               ))}

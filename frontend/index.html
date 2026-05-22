@@ -4,6 +4,19 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- index.css imports Inter + Poppins from Google Fonts. Preconnect
+         lets the browser open the TLS connection in parallel with HTML
+         parse, shaving ~200ms off the first font byte on cold loads. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Gujarati script support — loaded once for both languages so
+         switching to Gujarati never shows a font-fallback flash. The
+         :lang(gu) selector in index.css scopes Noto Sans Gujarati to
+         the gu locale only; English continues to use Inter/Poppins. -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <title>Jumpstart</title>
   </head>
   <body>

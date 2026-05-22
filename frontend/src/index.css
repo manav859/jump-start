@@ -32,6 +32,31 @@ h6 {
   font-family: "Poppins", sans-serif;
 }
 
+/* Gujarati script: Noto Sans Gujarati renders the script reliably and
+   matches the visual weight of Inter/Poppins. The :lang(gu) selector
+   targets the descendant tree when <html lang="gu"> is set by
+   i18n.js — so toggling the language swaps the font globally without
+   per-component overrides. */
+:lang(gu),
+[lang="gu"] {
+  font-family: "Noto Sans Gujarati", "Inter", sans-serif;
+}
+
+:lang(gu) h1,
+:lang(gu) h2,
+:lang(gu) h3,
+:lang(gu) h4,
+:lang(gu) h5,
+:lang(gu) h6,
+[lang="gu"] h1,
+[lang="gu"] h2,
+[lang="gu"] h3,
+[lang="gu"] h4,
+[lang="gu"] h5,
+[lang="gu"] h6 {
+  font-family: "Noto Sans Gujarati", "Poppins", sans-serif;
+}
+
 a,
 button,
 input,
@@ -126,9 +151,33 @@ textarea {
   text-decoration: none !important;
 }
 
+/* Reveal print-only content when our Download flow toggles print mode
+   on the body. Without this, the .report-print-only blocks (added for
+   the per-career profile pages in StudentReport.jsx) stay hidden even
+   though we want them in the PDF. */
+.jumpstart-report-print-mode .report-print-only {
+  display: block !important;
+}
+
+/* In print mode, force every collapsible/accordion content block to
+   render. Two complementary rules:
+   1. Our admin SectionBreakdownCard uses `data-state="closed"` +
+      Tailwind `hidden` to collapse the content. Override both.
+   2. A future Radix/HeadlessUI accordion using `.accordion-content`
+      would also be revealed by the same rule. */
+.jumpstart-report-print-mode .accordion-content,
+.jumpstart-report-print-mode [data-state="closed"] {
+  display: block !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
 @media print {
+  /* Tighter margin so we fit the long report in fewer pages. The old
+     14mm value pushed the section-breakdown content onto an extra
+     page-pair. 10mm matches the typical "narrow" print preset. */
   @page {
-    margin: 14mm;
+    margin: 10mm;
   }
 
   html,
@@ -148,6 +197,11 @@ textarea {
     display: none !important;
   }
 
+  /* Reveal print-only blocks that are hidden on screen. */
+  .report-print-only {
+    display: block !important;
+  }
+
   #root,
   .report-print-page {
     background: white !important;
@@ -164,6 +218,38 @@ textarea {
     box-shadow: none !important;
     break-inside: avoid-page;
     page-break-inside: avoid;
+  }
+
+  /* Native Ctrl+P fallback for collapsed accordion content. Mirrors
+     the body-class rules above so users who skip our Download button
+     and rely on the browser's own print/Save-as-PDF still get the
+     full report. */
+  .accordion-content,
+  [data-state="closed"] {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Page breaks for the major report sections. Each top-level block
+     starts on a fresh page so the table of contents reads cleanly in
+     the PDF. */
+  .report-print-page-break-before {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  /* Individual career profile blocks each get their own page. */
+  .report-print-career-page {
+    break-after: page;
+    page-break-after: always;
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+
+  .report-print-career-page:last-child {
+    break-after: auto;
+    page-break-after: auto;
   }
 
   .report-print-link {

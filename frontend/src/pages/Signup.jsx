@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ArrowRight, BadgeCheck, Eye, EyeOff, Sparkles } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 import {
@@ -10,13 +11,14 @@ import {
   isGoogleAuthConfigured,
 } from "../config/env";
 
-const benefits = [
-  "Unlock purchased tests and progress tracking.",
-  "Save answers automatically during assessments.",
-  "Access results, career matches, and counselling support.",
+const BENEFIT_KEYS = [
+  "auth.signupBenefitPurchased",
+  "auth.signupBenefitAnswers",
+  "auth.signupBenefitResults",
 ];
 
 export default function Signup() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { loginWithGoogle } = useContext(AuthContext);
 
@@ -43,7 +45,7 @@ export default function Signup() {
       navigate("/dashboard");
     } catch (err) {
       console.error("Google Signup Error:", err);
-      setMsg(err.message || "Google Signup Failed");
+      setMsg(err.message || t("auth.googleSignupError"));
     }
   };
 
@@ -70,7 +72,7 @@ export default function Signup() {
 
     loadScript().then(() => {
       if (!window.google?.accounts) {
-        setMsg("Google Sign-In could not be loaded.");
+        setMsg(t("auth.googleFailed"));
         return;
       }
 
@@ -105,10 +107,10 @@ export default function Signup() {
 
       const data = await res.json();
       if (res.ok) {
-        setMsg("Signup successful!");
+        setMsg(t("auth.signupSuccessful"));
         window.setTimeout(() => navigate("/login"), 500);
       } else {
-        setMsg(data.msg || data.message || "Signup failed");
+        setMsg(data.msg || data.message || t("auth.signupFailed"));
       }
     } catch (error) {
       console.error("Signup error:", error);
@@ -124,28 +126,27 @@ export default function Signup() {
         <div className="relative overflow-hidden rounded-[36px] bg-[radial-gradient(circle_at_top_left,_rgba(52,211,203,0.28),_transparent_35%),linear-gradient(180deg,#F4FEFE_0%,#EAFBFB_100%)] p-8 sm:p-10">
           <div className="max-w-xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#188B8B]">
-              Create your account
+              {t("auth.signupTitle")}
             </p>
             <h2 className="mt-5 text-4xl font-bold text-[#0F1729]">
-              Start your career discovery journey with a saved Jumpstart profile.
+              {t("auth.signupHeroBigHeading")}
             </h2>
             <p className="mt-5 text-base leading-8 text-[#65758B]">
-              Create your account once and keep your test purchases, saved
-              answers, results, and counselling access tied together.
+              {t("auth.signupHeroBigBody")}
             </p>
           </div>
 
           <div className="mt-10 space-y-4">
-            {benefits.map((item) => (
+            {BENEFIT_KEYS.map((key) => (
               <div
-                key={item}
+                key={key}
                 className="surface-card rounded-[24px] bg-white/90 px-5 py-4"
               >
                 <div className="flex items-start gap-3">
                   <div className="rounded-full bg-[#E8F9F8] p-2 text-[#188B8B]">
                     <BadgeCheck className="h-4 w-4" />
                   </div>
-                  <p className="text-sm leading-7 text-[#0F1729]">{item}</p>
+                  <p className="text-sm leading-7 text-[#0F1729]">{t(key)}</p>
                 </div>
               </div>
             ))}
@@ -155,17 +156,17 @@ export default function Signup() {
         <div className="surface-card rounded-[32px] p-8 sm:p-10">
           <div className="inline-flex items-center gap-2 rounded-full bg-[#E8F9F8] px-4 py-2 text-sm font-semibold text-[#188B8B]">
             <Sparkles className="h-4 w-4" />
-            Get started
+            {t("auth.getStartedBadge")}
           </div>
-          <h1 className="mt-6 text-4xl font-bold text-[#0F1729]">Sign up</h1>
+          <h1 className="mt-6 text-4xl font-bold text-[#0F1729]">{t("auth.signupHeading")}</h1>
           <p className="mt-3 text-base text-[#65758B]">
-            Set up your account to unlock tests, dashboard access, and results.
+            {t("auth.signupShortBody")}
           </p>
 
           <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                Name
+                {t("auth.nameLabelShort")}
               </label>
               <input
                 type="text"
@@ -177,7 +178,7 @@ export default function Signup() {
             </div>
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                Mobile
+                {t("auth.mobileLabel")}
               </label>
               <input
                 type="tel"
@@ -189,7 +190,7 @@ export default function Signup() {
             </div>
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                Email
+                {t("auth.emailLabel")}
               </label>
               <input
                 type="email"
@@ -201,7 +202,7 @@ export default function Signup() {
             </div>
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                Password
+                {t("auth.passwordLabel")}
               </label>
               <div className="relative">
                 <input
@@ -214,7 +215,11 @@ export default function Signup() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((current) => !current)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={
+                    showPassword
+                      ? t("auth.hidePassword")
+                      : t("auth.showPassword")
+                  }
                   className="absolute inset-y-0 right-0 flex items-center px-4 text-[#65758B] transition hover:text-[#0F1729]"
                 >
                   {showPassword ? (
@@ -227,7 +232,7 @@ export default function Signup() {
             </div>
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                Confirm Password
+                {t("auth.confirmPasswordLabel")}
               </label>
               <div className="relative">
                 <input
@@ -246,8 +251,8 @@ export default function Signup() {
                   }
                   aria-label={
                     showConfirmPassword
-                      ? "Hide confirm password"
-                      : "Show confirm password"
+                      ? t("auth.hideConfirmPassword")
+                      : t("auth.showConfirmPassword")
                   }
                   className="absolute inset-y-0 right-0 flex items-center px-4 text-[#65758B] transition hover:text-[#0F1729]"
                 >
@@ -263,7 +268,8 @@ export default function Signup() {
             {msg ? (
               <p
                 className={`text-sm ${
-                  msg.toLowerCase().includes("successful")
+                  msg.toLowerCase().includes("successful") ||
+                  msg === t("auth.signupSuccessful")
                     ? "text-emerald-700"
                     : "text-red-600"
                 }`}
@@ -277,7 +283,7 @@ export default function Signup() {
               disabled={loading}
               className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0F1729] px-5 py-3.5 text-sm font-semibold text-white hover:bg-[#1E293B] disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {loading ? "Creating account..." : "Create account"}
+              {loading ? t("auth.signingUp") : t("auth.createAccount")}
               <ArrowRight className="h-4 w-4" />
             </button>
           </form>
@@ -285,9 +291,9 @@ export default function Signup() {
           <div className="mt-4" id="google-signup" />
 
           <p className="mt-6 text-sm text-[#65758B]">
-            Already have an account?{" "}
+            {t("auth.alreadyHaveAccount")}{" "}
             <Link to="/login" className="font-semibold text-[#188B8B] hover:underline">
-              Log in
+              {t("auth.loginShort")}
             </Link>
           </p>
         </div>

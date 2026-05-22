@@ -1,5 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { UserRound } from "lucide-react";
 import api from "../api/api";
 import { AuthContext } from "../context/AuthContext";
@@ -19,6 +20,7 @@ const initialForm = {
 };
 
 export default function EditProfile() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, updateUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
@@ -46,9 +48,10 @@ export default function EditProfile() {
         });
       })
       .catch((err) => {
-        setError(err?.response?.data?.msg || "Failed to load profile.");
+        setError(err?.response?.data?.msg || t("editProfile.loadFailed"));
       })
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const initial = useMemo(
@@ -76,10 +79,10 @@ export default function EditProfile() {
         updateUser(updatedUser);
       }
 
-      setMessage("Profile updated successfully.");
+      setMessage(t("editProfile.updatedSuccess"));
       window.setTimeout(() => navigate("/profile"), 450);
     } catch (err) {
-      setError(err?.response?.data?.msg || "Failed to update profile.");
+      setError(err?.response?.data?.msg || t("editProfile.saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -88,7 +91,7 @@ export default function EditProfile() {
   if (loading) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center bg-white px-4">
-        <p className="text-[#65758B]">Loading edit profile...</p>
+        <p className="text-[#65758B]">{t("editProfile.loading")}</p>
       </div>
     );
   }
@@ -98,14 +101,14 @@ export default function EditProfile() {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-[#0F1729]">Edit Profile</h1>
+            <h1 className="text-4xl font-bold text-[#0F1729]">{t("editProfile.title")}</h1>
             <p className="mt-2 text-base text-[#65758B]">
-              Update your details to keep your account and reports accurate.
+              {t("editProfile.subtitleLong")}
             </p>
           </div>
           <div className="flex gap-3">
             <Link to="/profile" className="secondary-btn">
-              Cancel
+              {t("editProfile.cancel")}
             </Link>
             <button
               type="submit"
@@ -113,7 +116,7 @@ export default function EditProfile() {
               disabled={saving}
               className="primary-btn disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {saving ? "Saving..." : "Save Changes"}
+              {saving ? t("editProfile.saving") : t("editProfile.saveChanges")}
             </button>
           </div>
         </div>
@@ -138,7 +141,7 @@ export default function EditProfile() {
           <div className="grid gap-5 md:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                User ID
+                {t("editProfile.userIdLabel")}
               </label>
               <input
                 value={formatUserId(profile?._id || user?.id)}
@@ -148,10 +151,14 @@ export default function EditProfile() {
             </div>
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                Account
+                {t("editProfile.accountLabel")}
               </label>
               <input
-                value={profile?.isSuspended ? "Suspended" : "Active"}
+                value={
+                  profile?.isSuspended
+                    ? t("editProfile.statusSuspended")
+                    : t("editProfile.statusActive")
+                }
                 disabled
                 className="h-[58px] w-full rounded-2xl border border-[#E1E7EF] bg-[#F8FAFC] px-4 text-sm text-[#0F1729]"
               />
@@ -159,7 +166,7 @@ export default function EditProfile() {
 
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                Full Name
+                {t("editProfile.fullNameLabel")}
               </label>
               <input
                 value={form.name}
@@ -169,7 +176,7 @@ export default function EditProfile() {
             </div>
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                Email Id
+                {t("editProfile.emailLabel")}
               </label>
               <input
                 type="email"
@@ -181,7 +188,7 @@ export default function EditProfile() {
 
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                Phone Number
+                {t("editProfile.phoneLabel")}
               </label>
               <input
                 value={form.mobile}
@@ -191,7 +198,7 @@ export default function EditProfile() {
             </div>
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                Date of Birth
+                {t("editProfile.dateOfBirthLabel")}
               </label>
               <input
                 value={form.dateOfBirth}
@@ -203,7 +210,7 @@ export default function EditProfile() {
 
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                School Name
+                {t("editProfile.schoolNameLabel")}
               </label>
               <input
                 value={form.schoolName}
@@ -213,7 +220,7 @@ export default function EditProfile() {
             </div>
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                School Location
+                {t("editProfile.schoolLocationLabel")}
               </label>
               <input
                 value={form.schoolLocation}
@@ -224,7 +231,7 @@ export default function EditProfile() {
 
             <div className="md:col-span-2">
               <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                Residential Address
+                {t("editProfile.addressLabel")}
               </label>
               <textarea
                 rows={4}
@@ -238,7 +245,7 @@ export default function EditProfile() {
 
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#344054]">
-                City
+                {t("editProfile.cityLabel")}
               </label>
               <input
                 value={form.city}

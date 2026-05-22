@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import vdIcon from "../assets/vd.svg";
 import cllIcon from "../assets/cll.svg";
 import prsonIcon from "../assets/prson.svg";
@@ -26,6 +27,7 @@ function getMonthMatrix(year, month) {
   return matrix;
 }
 const BookCounselling = () => {
+  const { t } = useTranslation();
   const today = new Date();
 
   const [sessionType, setSessionType] = useState("video");
@@ -37,20 +39,20 @@ const BookCounselling = () => {
   const sessionTypes = [
     {
       id: "video",
-      title: "Video Call",
-      desc: "One-on-one video consultation",
+      title: t("bookCounselling.videoCall"),
+      desc: t("bookCounselling.videoCallDesc"),
       icon: vdIcon,
     },
     {
       id: "phone",
-      title: "Phone Call",
-      desc: "Telephonic consultation",
+      title: t("bookCounselling.phoneCall"),
+      desc: t("bookCounselling.phoneCallDesc"),
       icon: cllIcon,
     },
     {
       id: "inperson",
-      title: "In-Person",
-      desc: "Face-to-face meeting at our office",
+      title: t("bookCounselling.inPerson"),
+      desc: t("bookCounselling.inPersonDesc"),
       icon: prsonIcon,
     },
   ];
@@ -106,10 +108,10 @@ const BookCounselling = () => {
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-[#0F1729]">
-            Book Career Counseling
+            {t("bookCounselling.pageTitle")}
           </h1>
           <p className="!text-base text-[#65758B] mt-1">
-            Get personalized guidance from our expert career counsellors
+            {t("bookCounselling.pageSubtitle")}
           </p>
         </div>
 
@@ -118,10 +120,10 @@ const BookCounselling = () => {
             {/* Session Type */}
             <div className="bg-white border border-slate-200 rounded-xl p-6">
               <h3 className="text-2xl text-[#0F1729] font-semibold">
-                Session Type
+                {t("bookCounselling.sessionType")}
               </h3>
               <p className="!text-sm text-[#65758B] mb-8 mt-1">
-                Choose your preferred counselling format
+                {t("bookCounselling.sessionTypeSubtitle")}
               </p>
 
               <div className="space-y-3">
@@ -159,10 +161,10 @@ const BookCounselling = () => {
             {/* Date */}
             <div className="bg-white border border-slate-200 rounded-xl p-6">
               <h3 className="text-2xl text-[#0F1729] font-semibold">
-                Select Date
+                {t("bookCounselling.selectDate")}
               </h3>
               <p className="!text-sm text-[#65758B] mb-8 mt-1">
-                Choose a date for your counselling session
+                {t("bookCounselling.selectDateSubtitle")}
               </p>
 
               <div className="max-w-sm mx-auto border rounded-xl p-4">
@@ -229,10 +231,10 @@ const BookCounselling = () => {
             {/* Time Slots */}
             <div className="bg-white border border-slate-200 rounded-xl p-6">
               <h3 className="text-2xl text-[#0F1729] font-semibold">
-                Select Time Slot
+                {t("bookCounselling.selectTimeSlot")}
               </h3>
               <p className="!text-sm text-[#65758B] mb-8 mt-1">
-                Available slots for {selectedDate.toLocaleDateString()}
+                {t("bookCounselling.availableSlotsFor", { date: selectedDate.toLocaleDateString() })}
               </p>
 
               <div className="flex flex-wrap gap-3">
@@ -263,56 +265,56 @@ const BookCounselling = () => {
           {/* Right Summary */}
           <div className="bg-white border border-slate-200 rounded-xl p-6 h-fit">
             <h3 className="text-2xl text-[#0F1729] font-semibold">
-              Session Details
+              {t("bookCounselling.sessionDetails")}
             </h3>
 
             <div className="text-sm space-y-2 mt-2 mb-4 font-inter text-[#0F1729]">
               <div className="flex justify-between">
-                <span>Type</span>
+                <span>{t("bookCounselling.type")}</span>
                 <span>{sessionType}</span>
               </div>
               <div className="flex justify-between">
-                <span>Date</span>
+                <span>{t("bookCounselling.date")}</span>
                 <span>{selectedDate.toDateString()}</span>
               </div>
               <div className="flex justify-between">
-                <span>Time</span>
-                <span>{selectedTime || "Not selected"}</span>
+                <span>{t("bookCounselling.time")}</span>
+                <span>{selectedTime || t("bookCounselling.notSelected")}</span>
               </div>
             </div>
 
             <ul className="space-y-3 text-sm font-inter text-[#0F1729]">
               <li className="flex items-center gap-2">
-                <img src={checkIcon} alt="check" className="w-4 h-4" />
-                <span>60-minute session</span>
+                <img src={checkIcon} alt="" className="w-4 h-4" />
+                <span>{t("bookCounselling.feature60Min")}</span>
               </li>
               <li className="flex items-center gap-2">
-                <img src={checkIcon} alt="check" className="w-4 h-4" />
-                <span>Expert career counsellor</span>
+                <img src={checkIcon} alt="" className="w-4 h-4" />
+                <span>{t("bookCounselling.featureExpert")}</span>
               </li>
               <li className="flex items-center gap-2">
-                <img src={checkIcon} alt="check" className="w-4 h-4" />
-                <span>Personalized action plan</span>
+                <img src={checkIcon} alt="" className="w-4 h-4" />
+                <span>{t("bookCounselling.featureActionPlan")}</span>
               </li>
               <li className="flex items-center gap-2">
-                <img src={checkIcon} alt="check" className="w-4 h-4" />
-                <span>Follow-up resources</span>
+                <img src={checkIcon} alt="" className="w-4 h-4" />
+                <span>{t("bookCounselling.featureFollowUp")}</span>
               </li>
             </ul>
 
             <div className="border-y border-[#E1E7EF] mt-4 py-4 text-sm space-y-2 font-inter">
               <div className="flex justify-between">
-                <span className="text-sm text-[#65758B]">Session Fee</span>
+                <span className="text-sm text-[#65758B]">{t("bookCounselling.sessionFee")}</span>
                 <span className="text-base text-[#0F1729] font-semibold">₹999</span>
               </div>
               <div className="flex justify-between text-slate-500">
-                <span className="text-sm text-[#65758B]">GST (18%)</span>
+                <span className="text-sm text-[#65758B]">{t("bookCounselling.gst")}</span>
                 <span className="text-[#0F1729]">₹180</span>
               </div>
             </div>
 
             <div className="flex justify-between mt-4 font-inter">
-              <span className="text-base text-[#0F1729] font-semibold">Total</span>
+              <span className="text-base text-[#0F1729] font-semibold">{t("bookCounselling.total")}</span>
               <span className="text-2xl text-[#188B8B] font-bold">₹1,179</span>
             </div>
 
@@ -324,11 +326,11 @@ const BookCounselling = () => {
                   : "bg-[#facf84] text-slate-400 cursor-not-allowed"
               }`}
             >
-              Confirm & Pay
+              {t("bookCounselling.confirmAndPay")}
             </button>
 
             <p className="!text-xs text-[#65758B] text-center mt-3">
-              You can reschedule or cancel up to 24 <br/>hours before the session
+              {t("bookCounselling.cancellationNotice")}
             </p>
           </div>
         </div>

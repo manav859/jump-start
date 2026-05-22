@@ -1,14 +1,19 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LogOut, Menu, UserRound, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { AuthContext } from "../context/AuthContext";
+import { setLanguage, SUPPORTED_LANGUAGES } from "../i18n/i18n";
 import ConfirmDialog from "./ConfirmDialog";
 
+// Nav items live by translation key now. The `to` path is preserved;
+// `labelKey` looks up the localized string under the `common.nav`
+// namespace at render time.
 const defaultNavItems = [
-  { label: "Home", to: "/" },
-  { label: "Tests", to: "/test" },
-  { label: "Dashboard", to: "/dashboard" },
-  { label: "Results", to: "/result" },
+  { labelKey: "nav.home", to: "/" },
+  { labelKey: "nav.tests", to: "/test" },
+  { labelKey: "nav.dashboard", to: "/dashboard" },
+  { labelKey: "nav.results", to: "/result" },
 ];
 
 const getLinkClassName = ({ isActive }) =>
@@ -27,9 +32,13 @@ export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useContext(AuthContext);
+  const { t, i18n } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const isAdmin = user?.role === "admin";
+  const currentLanguage = SUPPORTED_LANGUAGES.includes(i18n.language)
+    ? i18n.language
+    : "en";
 
   const firstName = useMemo(() => {
     const name = String(user?.name || "").trim();
@@ -89,7 +98,7 @@ export default function Header() {
           onClick={() => setMobileOpen(false)}
           className={getLinkClassName}
         >
-          {item.label}
+          {t(item.labelKey)}
         </NavLink>
       ))}
     </>
@@ -104,10 +113,40 @@ export default function Header() {
           onClick={() => setMobileOpen(false)}
           className={getMobileLinkClassName}
         >
-          {item.label}
+          {t(item.labelKey)}
         </NavLink>
       ))}
     </>
+  );
+
+  // Compact EN / ગુજ toggle. Phase 1: only the nav labels respond.
+  // Page-level content stays in English until per-page i18n lands.
+  const renderLanguageToggle = (extraClass = "") => (
+    <div
+      role="group"
+      aria-label={t("language.label", "Language")}
+      className={`inline-flex items-center gap-1 rounded-full border border-[#D9E5EC] bg-white p-0.5 ${extraClass}`}
+    >
+      {SUPPORTED_LANGUAGES.map((lang) => {
+        const isActive = currentLanguage === lang;
+        const label = lang === "gu" ? "ગુજ" : "EN";
+        return (
+          <button
+            key={lang}
+            type="button"
+            onClick={() => setLanguage(lang)}
+            aria-pressed={isActive}
+            className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${
+              isActive
+                ? "bg-[#188B8B] text-white"
+                : "text-[#0F1729] hover:bg-[#F0FBFB]"
+            }`}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
   );
 
   return (
@@ -126,6 +165,7 @@ export default function Header() {
           </div>
 
           <div className="hidden items-center gap-3 lg:flex">
+            {renderLanguageToggle()}
             {user ? (
               <>
                 <Link
@@ -143,7 +183,7 @@ export default function Header() {
                   className="inline-flex items-center gap-2 rounded-full bg-[#F59F0A] px-5 py-3 text-sm font-semibold text-[#0F1729] shadow-[0_12px_24px_rgba(245,159,10,0.22)] hover:-translate-y-0.5 hover:bg-[#E89206]"
                 >
                   <LogOut className="h-4 w-4" />
-                  Logout
+                  {t("nav.logout")}
                 </button>
               </>
             ) : (
@@ -153,10 +193,10 @@ export default function Header() {
                   className="inline-flex items-center gap-2 text-sm font-semibold text-[#0F1729] hover:text-[#188B8B]"
                 >
                   <UserRound className="h-4 w-4" />
-                  Sign In
+                  {t("nav.signIn")}
                 </Link>
                 <Link to="/signup" className="primary-btn">
-                  Get Started
+                  {t("nav.getStarted")}
                 </Link>
               </>
             )}
@@ -208,6 +248,8 @@ export default function Header() {
 
           <nav className="mt-8 flex flex-col gap-2">{mobileNavLinks}</nav>
 
+          <div className="mt-6 flex justify-center">{renderLanguageToggle()}</div>
+
           <div className="mt-auto flex flex-col gap-3 pt-8">
             {user ? (
               <>
@@ -217,7 +259,7 @@ export default function Header() {
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#D9E5EC] px-4 py-3 text-sm font-semibold text-[#0F1729]"
                 >
                   <UserRound className="h-4 w-4" />
-                  My Profile
+                  {t("nav.profile")}
                 </Link>
                 <button
                   type="button"
@@ -225,7 +267,7 @@ export default function Header() {
                   className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#F59F0A] px-4 py-3 text-sm font-semibold text-[#0F1729]"
                 >
                   <LogOut className="h-4 w-4" />
-                  Logout
+                  {t("nav.logout")}
                 </button>
               </>
             ) : (
@@ -236,14 +278,14 @@ export default function Header() {
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#D9E5EC] px-4 py-3 text-sm font-semibold text-[#0F1729]"
                 >
                   <UserRound className="h-4 w-4" />
-                  Sign In
+                  {t("nav.signIn")}
                 </Link>
                 <Link
                   to="/signup"
                   onClick={() => setMobileOpen(false)}
                   className="primary-btn"
                 >
-                  Get Started
+                  {t("nav.getStarted")}
                 </Link>
               </>
             )}

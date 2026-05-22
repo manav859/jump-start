@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { BadgeCheck, Check, LayoutDashboard, ShieldCheck, Sparkles } from "lucide-react";
 import api from "../api/api";
 import { AuthContext } from "../context/AuthContext";
@@ -22,74 +23,58 @@ const accentStyles = [
   },
 ];
 
-const includedBenefits = [
-  {
-    title: "Dashboard Access",
-    description: "Track section progress and revisit your purchased packages anytime.",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Scientifically Valid",
-    description: "Tests are designed with psychologist-led methodology and scoring.",
-    icon: Sparkles,
-  },
-  {
-    title: "Lifetime Access",
-    description: "Review your reports and recommendations whenever you need them.",
-    icon: ShieldCheck,
-  },
-];
-
 const formatPrice = (amount) => `₹ ${Number(amount || 0).toLocaleString("en-IN")}`;
 
-const getPlanActionMeta = (plan) => {
+// Plan-action meta factory takes `t` so labels translate live with the
+// language toggle. `mode` keys stay english so the dispatch logic in
+// handlePlanAction continues to work unchanged.
+const getPlanActionMeta = (plan, t) => {
   if (plan.ownershipStatus === "completed") {
     if (plan.publicationStatus === "pending_approval") {
       return {
-        badgeLabel: "Result Pending",
+        badgeLabel: t("testCatalog.badgeResultPending"),
         badgeClass: "bg-amber-50 text-amber-700",
-        helperText:
-          "Your latest submission is awaiting admin approval.",
-        actionLabel: "View Submission Status",
+        helperText: t("testCatalog.helperPendingApproval"),
+        actionLabel: t("testCatalog.actionPendingView"),
         mode: "pending",
       };
     }
 
     return {
-      badgeLabel: "Purchased",
+      badgeLabel: t("testCatalog.badgePurchased"),
       badgeClass: "bg-emerald-50 text-emerald-700",
-      helperText: "This assessment is already completed. Review it from your results hub.",
-      actionLabel: "Open Results Hub",
+      helperText: t("testCatalog.helperPurchasedDone"),
+      actionLabel: t("testCatalog.actionResultsHub"),
       mode: "results",
     };
   }
 
   if (plan.ownershipStatus === "in_progress") {
     return {
-      badgeLabel: "In Progress",
+      badgeLabel: t("testCatalog.badgeInProgress"),
       badgeClass: "bg-amber-50 text-amber-700",
-      helperText: "Your answers are saved. Resume from your sections page.",
-      actionLabel: "Resume Assessment",
+      helperText: t("testCatalog.helperInProgress"),
+      actionLabel: t("testCatalog.actionResume"),
       mode: "open",
     };
   }
 
   if (plan.owned) {
     return {
-      badgeLabel: "Purchased",
+      badgeLabel: t("testCatalog.badgePurchased"),
       badgeClass: "bg-[#E8F9F8] text-[#188B8B]",
-      helperText: "Already purchased and ready to start from your account.",
-      actionLabel: "Start Assessment",
+      helperText: t("testCatalog.helperPurchasedReady"),
+      actionLabel: t("testCatalog.actionStart"),
       mode: "open",
     };
   }
 
   if (Number(plan.amount || 0) <= 0) {
     return {
-      badgeLabel: "Free",
+      badgeLabel: t("testCatalog.badgeFree"),
       badgeClass: "bg-sky-50 text-sky-700",
-      helperText: "Free access. Unlock and start this assessment instantly.",
-      actionLabel: "Start Free Test",
+      helperText: t("testCatalog.helperFree"),
+      actionLabel: t("testCatalog.actionStartFree"),
       mode: "unlock",
     };
   }
@@ -97,15 +82,49 @@ const getPlanActionMeta = (plan) => {
   return {
     badgeLabel: null,
     badgeClass: "",
-    helperText: "One-time payment",
-    actionLabel: "Buy Assessment",
+    helperText: t("testCatalog.helperPurchase"),
+    actionLabel: t("testCatalog.actionBuy"),
     mode: "purchase",
   };
 };
 
+// Look up a localised package field (title/badge/description/durationText/features)
+// for one of the three seeded packages. Falls back to the API value when the
+// locale has no entry, which is what keeps unknown / future package ids working.
+const localisedPackageField = (t, packageId, field, fallback) => {
+  if (!packageId) return fallback;
+  const key = `testCatalog.packages.${packageId}.${field}`;
+  const value = t(key, { defaultValue: "", returnObjects: field === "features" });
+  if (field === "features") {
+    return Array.isArray(value) && value.length ? value : fallback;
+  }
+  return value || fallback;
+};
+
 export default function Test() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { token, user, updateUser } = useContext(AuthContext);
+
+  // Static benefit cards — title + description keys. Rebuilt at render
+  // time so the language toggle updates them without a hot reload.
+  const includedBenefits = [
+    {
+      titleKey: "testCatalog.benefitDashboard",
+      descKey: "testCatalog.benefitDashboardBody",
+      icon: LayoutDashboard,
+    },
+    {
+      titleKey: "testCatalog.benefitValid",
+      descKey: "testCatalog.benefitValidBody",
+      icon: Sparkles,
+    },
+    {
+      titleKey: "testCatalog.benefitLifetime",
+      descKey: "testCatalog.benefitLifetimeBody",
+      icon: ShieldCheck,
+    },
+  ];
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openingPlanId, setOpeningPlanId] = useState("");
@@ -125,7 +144,7 @@ export default function Test() {
           configRes.status === "rejected"
             ? configRes.reason?.response?.data?.msg ||
               configRes.reason?.message ||
-              "Failed to load available packages."
+              t("testCatalog.loadFailedDefault")
             : "";
         const publicPackages =
           configRes.status === "fulfilled"
@@ -156,14 +175,15 @@ export default function Test() {
       })
       .catch((err) => {
         console.error("Failed to load packages", err);
-        setLoadError(err?.response?.data?.msg || err?.message || "Failed to load available packages.");
+        setLoadError(err?.response?.data?.msg || err?.message || t("testCatalog.loadFailedDefault"));
         setPlans([]);
       })
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const handlePlanAction = async (plan) => {
-    const action = getPlanActionMeta(plan);
+    const action = getPlanActionMeta(plan, t);
 
     if (action.mode === "purchase") {
       navigate("/payment", { state: { plan } });
@@ -196,7 +216,7 @@ export default function Test() {
     } catch (err) {
       console.error("Failed to open package", err);
       window.alert(
-        err?.response?.data?.msg || "Unable to open this package right now."
+        err?.response?.data?.msg || t("testCatalog.openFailed")
       );
     } finally {
       setOpeningPlanId("");
@@ -206,7 +226,7 @@ export default function Test() {
   if (loading) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center bg-[#FAFAFA] px-4">
-        <p className="text-[#65758B]">Loading packages...</p>
+        <p className="text-[#65758B]">{t("testCatalog.loading")}</p>
       </div>
     );
   }
@@ -217,25 +237,24 @@ export default function Test() {
         <div className="text-center">
           <div className="inline-flex items-center gap-2 rounded-full bg-[#E8F9F8] px-4 py-2 text-sm font-semibold text-[#188B8B]">
             <BadgeCheck className="h-4 w-4" />
-            Assessment Packages
+            {t("testCatalog.badge")}
           </div>
           <h1 className="mt-6 text-4xl font-bold text-[#0F1729] sm:text-5xl">
-            Career Aptitude Tests
+            {t("testCatalog.heading")}
           </h1>
           <p className="mx-auto mt-4 max-w-3xl text-base leading-8 text-[#65758B]">
-            Start with the quick dummy test for a fast dry run, or take the
-            comprehensive 500-question assessment for full career-fit analysis.
+            {t("testCatalog.subheading")}
           </p>
         </div>
 
         {loadError ? (
           <div className="surface-card mx-auto mt-8 max-w-3xl rounded-[24px] border border-[#F3C7C7] bg-[#FFF5F5] p-5 text-center">
             <h2 className="text-xl font-bold text-[#0F1729]">
-              Unable to Load Packages
+              {t("testCatalog.loadFailedHeading")}
             </h2>
             <p className="mt-2 text-sm text-[#B42318]">{loadError}</p>
             <p className="mt-2 text-sm text-[#65758B]">
-              This is different from having no packages configured. Once the backend config loads correctly, your packages will appear here.
+              {t("testCatalog.loadFailedBody")}
             </p>
           </div>
         ) : null}
@@ -244,7 +263,7 @@ export default function Test() {
           <div className={planContainerClassName}>
             {plans.map((plan, index) => {
               const accent = accentStyles[index % accentStyles.length];
-              const action = getPlanActionMeta(plan);
+              const action = getPlanActionMeta(plan, t);
               const buttonClass =
                 action.mode === "purchase"
                   ? accentStyles[0].button
@@ -257,7 +276,8 @@ export default function Test() {
                   <div className="flex flex-wrap items-center gap-2">
                     <div className={`inline-flex w-fit items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${accent.badge}`}>
                       <BadgeCheck className="h-4 w-4" />
-                      {plan.badge || (index === 1 ? "Best Value" : "Popular Choice")}
+                      {localisedPackageField(t, plan.id, "badge", plan.badge) ||
+                        (index === 1 ? t("testCatalog.bestValue") : t("testCatalog.popularChoice"))}
                     </div>
                     {action.badgeLabel ? (
                       <div
@@ -270,10 +290,11 @@ export default function Test() {
                   </div>
 
                   <h2 className="mt-6 text-3xl font-bold text-[#0F1729]">
-                    {plan.title}
+                    {localisedPackageField(t, plan.id, "title", plan.title)}
                   </h2>
                   <p className="mt-2 text-sm text-[#65758B]">
-                    {plan.description || "Career assessment package."}
+                    {localisedPackageField(t, plan.id, "description", plan.description) ||
+                      t("testCatalog.fallbackDescription")}
                   </p>
 
                   <div className="mt-8">
@@ -284,14 +305,16 @@ export default function Test() {
                   </div>
 
                   <ul className="mt-8 space-y-3 text-sm text-[#475467] flex-grow">
-                    {(plan.features || []).map((feature) => (
-                      <li key={feature} className="flex items-start gap-3">
-                        <span className="mt-0.5 rounded-full bg-[#E8F9F8] p-1 text-[#188B8B]">
-                          <Check className="h-3 w-3" />
-                        </span>
-                        <span>{feature}</span>
-                      </li>
-                    ))}
+                    {localisedPackageField(t, plan.id, "features", plan.features || []).map(
+                      (feature, featureIndex) => (
+                        <li key={`${plan.id}-feat-${featureIndex}`} className="flex items-start gap-3">
+                          <span className="mt-0.5 rounded-full bg-[#E8F9F8] p-1 text-[#188B8B]">
+                            <Check className="h-3 w-3" />
+                          </span>
+                          <span>{feature}</span>
+                        </li>
+                      )
+                    )}
                   </ul>
 
                   <button
@@ -299,11 +322,12 @@ export default function Test() {
                     onClick={() => handlePlanAction(plan)}
                     className={`mt-8 w-full rounded-2xl px-5 py-3 text-sm font-semibold ${buttonClass}`}
                   >
-                    {openingPlanId === plan.id ? "Opening..." : action.actionLabel}
+                    {openingPlanId === plan.id ? t("testCatalog.actionOpening") : action.actionLabel}
                   </button>
 
                   <p className="mt-4 text-center text-xs text-[#98A2B3]">
-                    {plan.durationText || "Total duration depends on selected sections"}
+                    {localisedPackageField(t, plan.id, "durationText", plan.durationText) ||
+                      t("testCatalog.fallbackDuration")}
                   </p>
                 </article>
               );
@@ -312,33 +336,33 @@ export default function Test() {
         ) : (
           <div className="surface-card mx-auto mt-12 max-w-2xl rounded-[30px] p-10 text-center">
             <h2 className="text-2xl font-bold text-[#0F1729]">
-              {loadError ? "Package Loading Failed" : "No packages are available right now"}
+              {loadError ? t("testCatalog.loadingFailedHeading") : t("testCatalog.noPackagesHeading")}
             </h2>
             <p className="mt-3 text-[#65758B]">
               {loadError
-                ? "The package API did not return data successfully. Check the backend config or restart the backend so the seeded packages can load."
-                : "Please check back shortly. Your administrator may still be configuring the assessment packages."}
+                ? t("testCatalog.loadingFailedBody")
+                : t("testCatalog.noPackagesBody")}
             </p>
           </div>
         )}
 
         <div className="surface-card mx-auto mt-14 max-w-5xl rounded-[32px] bg-[linear-gradient(180deg,#F0FCFB_0%,#FFFFFF_100%)] px-6 py-10 sm:px-10">
           <h2 className="text-center text-3xl font-bold text-[#0F1729]">
-            All Packages Include
+            {t("testCatalog.allPackagesInclude")}
           </h2>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {includedBenefits.map((benefit) => {
               const Icon = benefit.icon;
               return (
-                <div key={benefit.title} className="text-center">
+                <div key={benefit.titleKey} className="text-center">
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-white text-[#188B8B] shadow-sm">
                     <Icon className="h-5 w-5" />
                   </div>
                   <h3 className="mt-4 text-lg font-semibold text-[#0F1729]">
-                    {benefit.title}
+                    {t(benefit.titleKey)}
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-[#65758B]">
-                    {benefit.description}
+                    {t(benefit.descKey)}
                   </p>
                 </div>
               );

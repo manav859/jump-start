@@ -1,5 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ArrowRight,
   BadgeCheck,
@@ -86,6 +87,7 @@ const getTestSummaryText = (test) => {
 
 export default function Result() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user, updateUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -109,25 +111,6 @@ export default function Result() {
   const summaryCards = useMemo(
     () => [
       {
-        key: "overall_score",
-        label: "Overall Score",
-        value: data.overallScore ?? "--",
-        helper:
-          [
-            data.overallPercentile || "",
-            data.scoredTestsCount
-              ? `from ${data.scoredTestsCount} given test${
-                  data.scoredTestsCount === 1 ? "" : "s"
-                }`
-              : "",
-          ]
-            .filter(Boolean)
-            .join(" • ") || "Latest published profile",
-        icon: BadgeCheck,
-        valueClass: "text-[#188B8B]",
-        iconClass: "bg-[#EAFBFB] text-[#188B8B]",
-      },
-      {
         key: "completed_tests",
         label: "Completed Tests",
         value: data.completedTestsCount ?? 0,
@@ -149,8 +132,6 @@ export default function Result() {
     [
       data.careerPathwaysCount,
       data.completedTestsCount,
-      data.overallPercentile,
-      data.overallScore,
       data.totalTestsCount,
     ]
   );
@@ -160,10 +141,14 @@ export default function Result() {
     [data.strengths]
   );
 
+  // Backend (matchCareers in careerMatcher.js) already applies the
+  // threshold rules: score >= 60, minimum 3 results, maximum 10 (demo)
+  // or 15 (full test). Render whatever the API returns — no further
+  // client-side cap.
   const visibleCareers = useMemo(
     () =>
       Array.isArray(data.careerRecommendations)
-        ? data.careerRecommendations.slice(0, 3)
+        ? data.careerRecommendations
         : [],
     [data.careerRecommendations]
   );
@@ -265,7 +250,7 @@ export default function Result() {
   if (loading) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center bg-[#FAFAFA] px-4">
-        <p className="text-[#6E7F97]">Loading your results...</p>
+        <p className="text-[#6E7F97]">{t("result.loadingResults")}</p>
       </div>
     );
   }
@@ -331,10 +316,10 @@ export default function Result() {
               <Sparkles className="mt-1 h-5 w-5 shrink-0 text-[#F59F0A]" />
               <div>
                 <p className="text-sm font-semibold text-[#0F1729]">
-                  Demo result — based on 50 questions.
+                  {t("result.demoBannerTitle")}
                 </p>
                 <p className="mt-1 text-sm leading-6">
-                  Purchase the full 500-question assessment for a complete profile.
+                  {t("result.demoBannerBody")}
                 </p>
               </div>
             </div>
@@ -343,7 +328,7 @@ export default function Result() {
           <section
             className={`${resultCardClass} report-print-card mt-8 min-h-[144px] overflow-hidden rounded-[16px] bg-[radial-gradient(circle_at_10%_0%,rgba(232,249,250,0.75),transparent_36%),linear-gradient(180deg,#FFFFFF_0%,#FCFEFF_100%)] px-6 py-[26px]`}
           >
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2">
               {summaryCards.map((card) => {
                 const Icon = card.icon;
                 return (
@@ -521,10 +506,10 @@ export default function Result() {
               <section className={`${resultCardClass} report-print-card min-h-[672px] rounded-[16px] p-[25px]`}>
                 <div>
                   <h2 className="text-[24px] font-semibold leading-6 text-[#0F1729]">
-                    Top Career Recommendations
+                    {t("result.topCareerMatches")}
                   </h2>
                   <p className="mt-[6px] text-[14px] leading-5 text-[#65758B]">
-                    Careers that match your profile (sorted by compatibility)
+                    {t("result.topCareerMatchesSubtitle")}
                   </p>
                 </div>
 
@@ -598,17 +583,17 @@ export default function Result() {
                             <details className="report-print-hidden mt-3 group">
                               <summary className="cursor-pointer list-none text-[12px] font-semibold text-[#188B8B] hover:underline">
                                 <span className="group-open:hidden">
-                                  Why this career matched you ▾
+                                  {t("result.whyMatched")} ▾
                                 </span>
                                 <span className="hidden group-open:inline">
-                                  Hide match details ▴
+                                  {t("result.hideMatchDetails")} ▴
                                 </span>
                               </summary>
                               <ul className="mt-2 space-y-1.5 rounded-[10px] bg-[#F6FDFC] px-3 py-2.5 text-[12px] leading-5 text-[#4E5D72]">
                                 {reasons.holland ? (
                                   <li>
                                     <span className="font-semibold text-[#0F1729]">
-                                      Interests:
+                                      {t("result.matchReasonInterests")}:
                                     </span>{" "}
                                     {reasons.holland}
                                   </li>
@@ -616,7 +601,7 @@ export default function Result() {
                                 {reasons.intelligence ? (
                                   <li>
                                     <span className="font-semibold text-[#0F1729]">
-                                      Intelligence:
+                                      {t("result.matchReasonIntelligence")}:
                                     </span>{" "}
                                     {reasons.intelligence}
                                   </li>
@@ -624,7 +609,7 @@ export default function Result() {
                                 {reasons.aptitude ? (
                                   <li>
                                     <span className="font-semibold text-[#0F1729]">
-                                      Aptitude:
+                                      {t("result.matchReasonAptitude")}:
                                     </span>{" "}
                                     {reasons.aptitude}
                                   </li>
@@ -632,7 +617,7 @@ export default function Result() {
                                 {reasons.eq ? (
                                   <li>
                                     <span className="font-semibold text-[#0F1729]">
-                                      EQ:
+                                      {t("result.matchReasonEq")}:
                                     </span>{" "}
                                     {reasons.eq}
                                   </li>
@@ -649,7 +634,7 @@ export default function Result() {
                               state={{ career }}
                               className="report-print-hidden inline-flex items-center gap-1.5 text-[13px] font-medium text-[#188B8B] hover:underline"
                             >
-                              View Details
+                              {t("result.viewDetails")}
                               <ArrowRight className="h-4 w-4" />
                             </Link>
                           </div>
@@ -658,7 +643,7 @@ export default function Result() {
                     })
                   ) : (
                     <div className="rounded-[16px] bg-[#F8FAFC] px-4 py-5 text-sm text-[#65758B]">
-                      Career recommendations will appear after a published result is available.
+                      {t("result.noCareerRecommendations")}
                     </div>
                   )}
                 </div>

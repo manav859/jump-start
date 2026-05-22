@@ -1,5 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   CheckCircle2,
   Clock3,
@@ -36,10 +37,14 @@ const defaultState = {
   test_in_progress: null,
 };
 
-const getPackageStatusMeta = (status) => {
+// Status / action / publication meta — labels resolved at render time
+// via t() so the language toggle updates them instantly. Cards stay
+// keyed by status id so React state and prop-equality checks stay
+// stable across renders.
+const getPackageStatusMeta = (status, t) => {
   if (status === "completed") {
     return {
-      label: "Completed",
+      label: t("dashboardExtra.statusCompleted"),
       badgeClass: "bg-emerald-50 text-emerald-700",
       cardClass: "border-[#D8F3E6] bg-emerald-50/30 hover:border-[#52B788]",
       clickable: true,
@@ -48,66 +53,66 @@ const getPackageStatusMeta = (status) => {
 
   if (status === "in_progress") {
     return {
-      label: "In Progress",
+      label: t("dashboardExtra.statusInProgress"),
       badgeClass: "bg-amber-50 text-amber-700",
       cardClass: "border-[#F8D38B] bg-[#FFF9EE] hover:border-[#F2B53D]",
-      actionLabel: "Resume Assessment",
+      actionLabel: t("dashboardExtra.actionResume"),
       clickable: true,
     };
   }
 
   return {
-    label: "Not Completed",
+    label: t("dashboardExtra.statusNotCompleted"),
     badgeClass: "bg-slate-100 text-slate-700",
     cardClass: "border-[#E1E7EF] bg-white hover:border-[#9BD9D6] hover:bg-[#F6FDFC]",
-    actionLabel: "Open Assessment",
+    actionLabel: t("dashboardExtra.actionOpen"),
     clickable: true,
   };
 };
 
-const getPackageActionMeta = (pkg) => {
+const getPackageActionMeta = (pkg, t) => {
   if (pkg.status === "completed") {
     if (pkg.publicationStatus === "pending_approval") {
       return {
-        label: "View Submission Status",
+        label: t("dashboardExtra.actionPendingView"),
         mode: "pending",
       };
     }
 
     return {
-      label: "Open Results Hub",
+      label: t("dashboardExtra.actionResultsHub"),
       mode: "results",
     };
   }
 
   if (pkg.status === "in_progress") {
     return {
-      label: "Resume Assessment",
+      label: t("dashboardExtra.actionResume"),
       mode: "open",
     };
   }
 
   return {
-    label: "Open Assessment",
+    label: t("dashboardExtra.actionOpen"),
     mode: "open",
   };
 };
 
-const getPackagePublicationMeta = (publicationStatus) => {
+const getPackagePublicationMeta = (publicationStatus, t) => {
   if (publicationStatus === "pending_approval") {
     return {
-      label: "Result Pending",
+      label: t("dashboardExtra.resultPendingLabel"),
       badgeClass: "bg-amber-50 text-amber-700",
-      note: "Latest attempt submitted. Result is awaiting admin approval.",
+      note: t("dashboardExtra.resultPendingNote"),
       noteClass: "text-amber-700",
     };
   }
 
   if (publicationStatus === "approved") {
     return {
-      label: "Report Ready",
+      label: t("dashboardExtra.reportReadyLabel"),
       badgeClass: "bg-blue-50 text-blue-700",
-      note: "Published report is available in your results.",
+      note: t("dashboardExtra.reportReadyNote"),
       noteClass: "text-blue-700",
     };
   }
@@ -116,6 +121,7 @@ const getPackagePublicationMeta = (publicationStatus) => {
 };
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { token, user, updateUser } = useContext(AuthContext);
@@ -176,28 +182,28 @@ export default function Dashboard() {
   const statCards = useMemo(
     () => [
       {
-        label: "Tests Completed",
+        label: t("dashboardExtra.statTestsCompleted"),
         value: stats.tests_completed,
         icon: CheckCircle2,
         accent: "text-emerald-500",
         bg: "bg-emerald-50",
       },
       {
-        label: "Tests in Progress",
+        label: t("dashboardExtra.statTestsInProgress"),
         value: stats.tests_in_progress,
         icon: PlayCircle,
         accent: "text-amber-500",
         bg: "bg-amber-50",
       },
       {
-        label: "Reports Ready",
+        label: t("dashboardExtra.statReportsReady"),
         value: stats.reports_ready,
         icon: FileText,
         accent: "text-blue-500",
         bg: "bg-blue-50",
       },
       {
-        label: "Counselling Sessions",
+        label: t("dashboardExtra.statCounsellingSessions"),
         value: stats.counselling_sessions,
         icon: Video,
         accent: "text-slate-500",
@@ -205,6 +211,7 @@ export default function Dashboard() {
       },
     ],
     [
+      t,
       stats.counselling_sessions,
       stats.reports_ready,
       stats.tests_completed,
@@ -279,7 +286,7 @@ export default function Dashboard() {
       setPackageError(
         err?.response?.data?.msg ||
           err?.message ||
-          "Failed to open the demo test."
+          t("dashboardExtra.openDemoFailed")
       );
     } finally {
       setOpeningPackageId("");
@@ -287,8 +294,8 @@ export default function Dashboard() {
   };
 
   const handleOpenPackage = async (pkg) => {
-    const statusMeta = getPackageStatusMeta(pkg.status);
-    const actionMeta = getPackageActionMeta(pkg);
+    const statusMeta = getPackageStatusMeta(pkg.status, t);
+    const actionMeta = getPackageActionMeta(pkg, t);
     if (!statusMeta.clickable) return;
 
     if (actionMeta.mode === "pending") {
@@ -337,7 +344,7 @@ export default function Dashboard() {
       setPackageError(
         err?.response?.data?.msg ||
           err?.message ||
-          "Failed to open this assessment."
+          t("dashboardExtra.openAssessmentFailed")
       );
     } finally {
       setOpeningPackageId("");
@@ -347,12 +354,12 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center bg-[#FAFAFA] px-4">
-        <p className="text-[#65758B]">Loading dashboard...</p>
+        <p className="text-[#65758B]">{t("dashboardExtra.loading")}</p>
       </div>
     );
   }
 
-  const displayName = stats.user?.name || user?.name || "User";
+  const displayName = stats.user?.name || user?.name || t("dashboardExtra.userFallback");
   const initial = displayName.charAt(0).toUpperCase();
 
   return (
@@ -362,11 +369,10 @@ export default function Dashboard() {
           <div className="mb-6 flex items-start justify-between gap-4 rounded-[24px] border border-[#F8D38B] bg-[#FFF9EE] px-5 py-4">
             <div>
               <h2 className="text-sm font-semibold text-[#0F1729]">
-                Admin panel access is limited to admin accounts
+                {t("dashboardExtra.adminNoticeTitle")}
               </h2>
               <p className="mt-1 text-sm leading-6 text-[#65758B]">
-                You were redirected back to your dashboard because this account
-                does not have admin access.
+                {t("dashboardExtra.adminNoticeBody")}
               </p>
             </div>
             <button
@@ -374,7 +380,7 @@ export default function Dashboard() {
               onClick={() => setShowAdminAccessNotice(false)}
               className="shrink-0 rounded-full border border-[#E8C16A] px-3 py-1 text-xs font-semibold text-[#8C5A00] hover:bg-white"
             >
-              Dismiss
+              {t("dashboardExtra.dismiss")}
             </button>
           </div>
         ) : null}
@@ -382,10 +388,10 @@ export default function Dashboard() {
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <h1 className="text-4xl font-bold text-[#0F1729]">
-              Welcome, {displayName}!
+              {t("dashboardExtra.welcomeName", { name: displayName })}
             </h1>
             <p className="mt-2 text-base text-[#65758B]">
-              Track your progress and continue your career discovery journey.
+              {t("dashboardExtra.subtitle")}
             </p>
           </div>
           <Link
@@ -395,7 +401,7 @@ export default function Dashboard() {
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E8F9F8] text-[#188B8B]">
               <UserRound className="h-4 w-4" />
             </span>
-            Manage Profile
+            {t("dashboardExtra.manageProfile")}
           </Link>
         </div>
 
@@ -436,20 +442,25 @@ export default function Dashboard() {
                     <PlayCircle className="h-4 w-4" />
                   </span>
                   <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#188B8B]">
-                    Test In Progress
+                    {t("dashboardExtra.testInProgressBadge")}
                   </span>
                 </div>
                 <h2 className="mt-4 text-2xl font-bold text-[#0F1729] sm:text-3xl">
-                  Continue your {stats.test_in_progress.packageTitle ||
-                    "assessment"}
+                  {t("dashboardExtra.continueYourAssessment", {
+                    title: stats.test_in_progress.packageTitle || t("dashboardExtra.assessmentFallback"),
+                  })}
                 </h2>
                 <p className="mt-2 text-sm leading-7 text-[#65758B] sm:text-base sm:leading-8">
-                  You're on {stats.test_in_progress.sectionTitle || "a section"}.{" "}
+                  {t("dashboardExtra.youreOnSection", {
+                    section: stats.test_in_progress.sectionTitle || t("dashboardExtra.sectionFallback"),
+                  })}{" "}
                   <span className="font-semibold text-[#0F1729]">
-                    {stats.test_in_progress.completedSectionsCount ?? 0} of{" "}
-                    {stats.test_in_progress.totalSections ?? 0} sections
+                    {t("dashboardExtra.sectionsCompletedSoFar", {
+                      completed: stats.test_in_progress.completedSectionsCount ?? 0,
+                      total: stats.test_in_progress.totalSections ?? 0,
+                    })}
                   </span>{" "}
-                  completed so far. Your answers are saved — resume anytime.
+                  {t("dashboardExtra.sectionsCompletedSuffix")}
                 </p>
               </div>
 
@@ -462,7 +473,7 @@ export default function Dashboard() {
                 }
                 className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#188B8B] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(24,139,139,0.22)] hover:bg-[#147070]"
               >
-                Resume Test
+                {t("dashboardExtra.resumeTest")}
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
@@ -478,27 +489,27 @@ export default function Dashboard() {
                     <Sparkles className="h-4 w-4" />
                   </span>
                   <span className="rounded-full bg-[#FFF1D3] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#B86D00]">
-                    Free Client Demo
+                    {t("dashboardExtra.freeClientDemo")}
                   </span>
                 </div>
                 <h2 className="mt-4 text-2xl font-bold text-[#0F1729] sm:text-3xl">
-                  Try the {stats.demo_test.totalQuestions || 50}-Question Demo Test
+                  {t("dashboardExtra.tryDemoTestHeading", {
+                    count: stats.demo_test.totalQuestions || 50,
+                  })}
                 </h2>
                 <p className="mt-2 text-sm leading-7 text-[#65758B] sm:text-base sm:leading-8">
-                  A short, curated subset of the full 500-question assessment.
-                  Same scoring engine — strengths, top careers, and personality
-                  profile — delivered in under{" "}
-                  {stats.demo_test.totalDurationMinutes || 25} minutes. No
-                  payment required.
+                  {t("dashboardExtra.tryDemoTestBody", {
+                    minutes: stats.demo_test.totalDurationMinutes || 25,
+                  })}
                 </p>
                 {stats.demo_test.attempted ? (
                   <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 text-xs font-semibold text-[#188B8B]">
                     <CheckCircle2 className="h-4 w-4" />
                     {stats.demo_test.publicationStatus === "approved"
-                      ? "Demo result published — open below."
+                      ? t("dashboardExtra.demoStatusApproved")
                       : stats.demo_test.publicationStatus === "pending_approval"
-                        ? "Demo submitted — awaiting admin approval."
-                        : "Demo attempt on file."}
+                        ? t("dashboardExtra.demoStatusPending")
+                        : t("dashboardExtra.demoStatusOnFile")}
                   </p>
                 ) : null}
               </div>
@@ -510,12 +521,12 @@ export default function Dashboard() {
                 className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#F59F0A] px-6 py-3 text-sm font-semibold text-[#0F1729] shadow-[0_14px_28px_rgba(245,159,10,0.25)] hover:bg-[#E89206] disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {openingPackageId === DEMO_PACKAGE_ID
-                  ? "Opening..."
+                  ? t("dashboardExtra.opening")
                   : stats.demo_test.publishedReportId
-                    ? "View Demo Result"
+                    ? t("dashboardExtra.viewDemoResult")
                     : stats.demo_test.publicationStatus === "pending_approval"
-                      ? "View Submission Status"
-                      : "Try Demo Test (50 Questions)"}
+                      ? t("dashboardExtra.viewSubmissionStatus")
+                      : t("dashboardExtra.tryDemoButton")}
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
@@ -527,24 +538,25 @@ export default function Dashboard() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-3xl font-bold text-[#0F1729]">
-                  Purchased Packages
+                  {t("dashboardExtra.purchasedPackagesHeading")}
                 </h2>
                 <p className="mt-2 text-base text-[#65758B]">
-                  Only packages you have unlocked will appear here.
+                  {t("dashboardExtra.purchasedPackagesBody")}
                 </p>
               </div>
               <div className="hidden rounded-full bg-[#F6FDFC] px-4 py-2 text-sm font-semibold text-[#188B8B] sm:block">
-                {stats.purchased_packages.length} unlocked
+                {stats.purchased_packages.length} {t("dashboardExtra.unlocked")}
               </div>
             </div>
 
             <div className="mt-7 space-y-4">
               {stats.purchased_packages.length ? (
                 stats.purchased_packages.map((pkg) => {
-                  const statusMeta = getPackageStatusMeta(pkg.status);
-                  const actionMeta = getPackageActionMeta(pkg);
+                  const statusMeta = getPackageStatusMeta(pkg.status, t);
+                  const actionMeta = getPackageActionMeta(pkg, t);
                   const publicationMeta = getPackagePublicationMeta(
-                    pkg.publicationStatus
+                    pkg.publicationStatus,
+                    t
                   );
                   return (
                     <button
@@ -560,10 +572,10 @@ export default function Dashboard() {
                             {pkg.title}
                           </h3>
                           <div className="mt-3 flex flex-wrap gap-5 text-sm text-[#65758B]">
-                            <span>Sections: {pkg.totalSections ?? 0}</span>
-                            <span>Total Questions: {pkg.totalQuestions ?? 0}</span>
+                            <span>{t("dashboardExtra.sectionsCount2", { count: pkg.totalSections ?? 0 })}</span>
+                            <span>{t("dashboardExtra.totalQuestionsCount", { count: pkg.totalQuestions ?? 0 })}</span>
                             <span>
-                              Total Duration: {pkg.totalDurationMinutes ?? 0} Minutes
+                              {t("dashboardExtra.totalDurationCount", { count: pkg.totalDurationMinutes ?? 0 })}
                             </span>
                           </div>
                           {publicationMeta ? (
@@ -593,7 +605,7 @@ export default function Dashboard() {
                       <div className="mt-6 flex items-center justify-between gap-4">
                         <p className="text-sm font-semibold text-[#188B8B]">
                           {openingPackageId === pkg.id
-                            ? "Opening..."
+                            ? t("dashboardExtra.opening")
                             : actionMeta.label}
                         </p>
                         {statusMeta.clickable ? (
@@ -606,10 +618,10 @@ export default function Dashboard() {
               ) : (
                 <div className="rounded-[26px] border border-dashed border-[#C8D7E1] bg-[#FBFCFD] p-8 text-center">
                   <h3 className="text-2xl font-semibold text-[#0F1729]">
-                    No purchased packages yet
+                    {t("dashboardExtra.noPackagesHeading")}
                   </h3>
                   <p className="mt-3 text-[#65758B]">
-                    Choose a test package to unlock your assessment workflow.
+                    {t("dashboardExtra.noPackagesBody")}
                   </p>
                 </div>
               )}
@@ -623,19 +635,19 @@ export default function Dashboard() {
               to="/test"
               className="mt-6 inline-flex w-full items-center justify-center rounded-2xl border-2 border-[#188B8B] px-5 py-3 text-sm font-semibold text-[#188B8B] hover:bg-[#F6FDFC]"
             >
-              Browse More Tests
+              {t("dashboardExtra.browseMoreTests")}
             </Link>
           </section>
 
           <div className="space-y-6">
             <section className="surface-card rounded-[30px] p-7">
               <h2 className="text-2xl font-bold text-[#0F1729]">
-                Top Career Matches
+                {t("dashboardExtra.topCareerMatchesHeading")}
               </h2>
               <p className="mt-2 text-sm text-[#65758B]">
                 {stats.result_status === "pending_approval"
-                  ? "Awaiting admin approval"
-                  : "Based on your results"}
+                  ? t("dashboardExtra.awaitingAdminApproval")
+                  : t("dashboardExtra.basedOnResults")}
               </p>
 
               <div className="mt-5 space-y-3">
@@ -647,11 +659,10 @@ export default function Dashboard() {
                       </div>
                       <div>
                         <h3 className="font-semibold text-[#0F1729]">
-                          Result pending approval
+                          {t("dashboardExtra.resultPendingHeading")}
                         </h3>
                         <p className="mt-1 text-sm leading-6 text-[#65758B]">
-                          Your assessment was submitted successfully. Your report
-                          will appear here after an admin reviews and approves it.
+                          {t("dashboardExtra.resultPendingBody")}
                         </p>
                       </div>
                     </div>
@@ -671,7 +682,7 @@ export default function Dashboard() {
                             {career.title}
                           </h3>
                           <p className="mt-1 text-sm text-[#65758B]">
-                            {career.matchPercent ?? 0}% match
+                            {t("dashboardExtra.matchPercent", { percent: career.matchPercent ?? 0 })}
                           </p>
                         </div>
                       </div>
@@ -679,8 +690,7 @@ export default function Dashboard() {
                   ))
                 ) : (
                   <div className="rounded-2xl bg-[#F8FAFC] p-4 text-sm text-[#65758B]">
-                    Complete your assessments to unlock personalized career
-                    matches here.
+                    {t("dashboardExtra.completeToUnlock")}
                   </div>
                 )}
               </div>
@@ -690,48 +700,47 @@ export default function Dashboard() {
                 className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#188B8B] hover:underline"
               >
                 {stats.result_status === "pending_approval"
-                  ? "View Submission Status"
-                  : "Open Results Hub"}
+                  ? t("dashboardExtra.viewSubmissionStatus")
+                  : t("dashboardExtra.openResultsHub")}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </section>
 
             <section className="surface-card rounded-[30px] bg-[linear-gradient(180deg,#F8FEFE_0%,#FFFFFF_100%)] p-7">
               <h2 className="text-2xl font-bold text-[#0F1729]">
-                Book Counselling
+                {t("dashboardExtra.bookCounselling")}
               </h2>
               <p className="mt-2 text-sm text-[#65758B]">
-                Get expert guidance after your assessment.
+                {t("dashboardExtra.bookCounsellingSubtitle")}
               </p>
               <p className="mt-4 text-sm leading-7 text-[#65758B]">
-                Schedule a one-on-one session with our psychologists to discuss
-                your report and next steps.
+                {t("dashboardExtra.bookCounsellingBody")}
               </p>
               <Link
                 to="/bookcounselling"
                 className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#F59F0A] px-5 py-3 text-sm font-semibold text-[#0F1729] shadow-[0_14px_28px_rgba(245,159,10,0.18)] hover:bg-[#E89206]"
               >
                 <CalendarDays className="h-4 w-4" />
-                Book Session
+                {t("dashboardExtra.bookSession")}
               </Link>
             </section>
 
             <section className="surface-card rounded-[30px] p-7">
-              <h2 className="text-2xl font-bold text-[#0F1729]">Need Help?</h2>
+              <h2 className="text-2xl font-bold text-[#0F1729]">{t("dashboardExtra.needHelpHeading")}</h2>
               <div className="mt-5 space-y-3">
                 <Link
                   to="/bookcounselling"
                   className="flex items-center gap-3 rounded-2xl border border-[#D9E5EC] px-4 py-3 text-sm font-semibold text-[#0F1729] hover:bg-[#F8FAFC]"
                 >
                   <HelpCircle className="h-4 w-4 text-[#188B8B]" />
-                  Help Center
+                  {t("dashboardExtra.helpCenter")}
                 </Link>
                 <Link
                   to="/profile"
                   className="flex items-center gap-3 rounded-2xl border border-[#D9E5EC] px-4 py-3 text-sm font-semibold text-[#0F1729] hover:bg-[#F8FAFC]"
                 >
                   <UserRound className="h-4 w-4 text-[#188B8B]" />
-                  My Profile
+                  {t("dashboardExtra.myProfile")}
                 </Link>
               </div>
             </section>
@@ -746,7 +755,7 @@ export default function Dashboard() {
                     {displayName}
                   </h2>
                   <p className="text-sm text-[#65758B]">
-                    {stats.user?.email || user?.email || "No email available"}
+                    {stats.user?.email || user?.email || t("dashboardExtra.noEmailAvailable")}
                   </p>
                 </div>
               </div>
@@ -754,7 +763,7 @@ export default function Dashboard() {
                 to="/profile"
                 className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#188B8B] hover:underline"
               >
-                View profile
+                {t("dashboardExtra.viewProfile")}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </section>

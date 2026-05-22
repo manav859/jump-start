@@ -524,6 +524,27 @@ const userSchema = new mongoose.Schema(
 const shouldSanitizePath = (doc, path) =>
   typeof doc.isSelected === "function" ? doc.isSelected(path) !== false : true;
 
+// Compound + secondary indexes for the hot read paths. Mongoose
+// auto-creates indexes for the `unique: true` fields above (`email`
+// and `jumpstartId`), so we only declare the ones that aren't covered
+// by the field definitions. In production, run `db.users.getIndexes()`
+// after deploy to confirm — and watch for "build indexes in foreground"
+// pauses on the first restart after this change lands.
+//
+// Why these specifically:
+//   - selectedPackageId  : queried by admin dashboards and the demo
+//                          surface to count active learners on each
+//                          package; previously a collection scan.
+//   - assessmentReports.status / publication.status : the admin
+//                          review queue filters reports by publication
+//                          status; without an index it scans every
+//                          user document and then every embedded
+//                          report.
+//   - purchaseHistory.status : surfaced in admin Payments page.
+userSchema.index({ selectedPackageId: 1 });
+userSchema.index({ "assessmentReports.publication.status": 1 });
+userSchema.index({ "purchaseHistory.status": 1 });
+
 userSchema.pre("validate", function (next) {
   if (shouldSanitizePath(this, "resultProfile")) {
     this.resultProfile = cloneResultProfile(this.resultProfile);

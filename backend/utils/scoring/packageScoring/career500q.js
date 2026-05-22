@@ -1842,7 +1842,10 @@ export const scoreCareer500QPackage = (answers = {}, sections = []) => {
   // Career recommendations now flow through the matchCareers engine
   // (backend/utils/scoring/careerMatcher.js) — weighted Holland +
   // intelligence + aptitude + EQ scoring against the 125-career source.
-  const careerRecommendations = matchCareers(namedProfile, 10);
+  // Full test: cap at 15 — threshold-based filter (score >= 60) inside
+  // matchCareers keeps the visible list tight; the cap is the absolute
+  // ceiling for the rare case where 20+ careers all clear the bar.
+  const careerRecommendations = matchCareers(namedProfile, 15);
   // Prompt-5 fix: overall is a WEIGHTED average per section weight, not
   // a plain mean. Sections with null percentages drop out and remaining
   // weights are renormalised so partial completions aren't penalised.

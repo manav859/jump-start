@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ArrowLeft, ChevronDown, ChevronRight, ShieldCheck } from "lucide-react";
 import api from "../api/api";
 import {
@@ -34,6 +35,7 @@ const splitLegacyFaqItem = (value = "") => {
 };
 
 export default function SupportContentPage({ pageKey }) {
+  const { t } = useTranslation();
   const definition = supportPageDefinitions[pageKey] || null;
   const fallbackPage = fallbackSupportPages[pageKey] || null;
   const [loading, setLoading] = useState(true);
@@ -111,9 +113,9 @@ export default function SupportContentPage({ pageKey }) {
     return (
       <main className="bg-[#F7F8FA]">
         <div className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-[#0F1729]">Page Unavailable</h1>
+          <h1 className="text-3xl font-bold text-[#0F1729]">{t("support.pageUnavailable")}</h1>
           <Link to="/" className="primary-btn mt-6">
-            Back to Home
+            {t("support.backHome")}
           </Link>
         </div>
       </main>
@@ -124,12 +126,12 @@ export default function SupportContentPage({ pageKey }) {
     return (
       <main className="bg-[#F7F8FA]">
         <div className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-[#0F1729]">Page Unavailable</h1>
+          <h1 className="text-3xl font-bold text-[#0F1729]">{t("support.pageUnavailable")}</h1>
           <p className="mt-3 text-[#65758B]">
-            This support page is currently hidden by the administrator.
+            {t("support.pageHidden")}
           </p>
           <Link to="/" className="primary-btn mt-6">
-            Back to Home
+            {t("support.backHome")}
           </Link>
         </div>
       </main>
@@ -144,28 +146,28 @@ export default function SupportContentPage({ pageKey }) {
           className="inline-flex items-center gap-2 text-sm font-semibold text-[#4E5D72] hover:text-[#188B8B]"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Home
+          {t("support.backHome")}
         </Link>
 
         <section className="surface-card mt-6 rounded-[30px] overflow-hidden">
           <div className="bg-[radial-gradient(circle_at_15%_0%,rgba(24,139,139,0.16),transparent_38%),linear-gradient(180deg,#FFFFFF_0%,#FCFEFF_100%)] px-6 py-8 sm:px-8 sm:py-10">
             <div className="inline-flex items-center gap-2 rounded-full bg-[#E8F9F8] px-4 py-2 text-sm font-semibold text-[#188B8B]">
               <ShieldCheck className="h-4 w-4" />
-              Support Page
+              {t("support.supportPageBadge")}
             </div>
 
             <h1 className="mt-5 text-4xl font-bold text-[#0F1729]">
               {page?.title || definition.title}
             </h1>
             <p className="mt-3 max-w-3xl text-base leading-8 text-[#65758B]">
-              {page?.summary || fallbackPage?.summary || "Information will appear here soon."}
+              {page?.summary || fallbackPage?.summary || t("support.infoSoon")}
             </p>
             {loading ? (
-              <p className="mt-3 text-sm text-[#8A94A6]">Loading page content...</p>
+              <p className="mt-3 text-sm text-[#8A94A6]">{t("support.loadingContent")}</p>
             ) : null}
             {!loading && error ? (
               <p className="mt-3 text-sm text-[#8A94A6]">
-                Showing the saved default content because the latest page data could not be loaded.
+                {t("support.fallbackNotice")}
               </p>
             ) : null}
           </div>
@@ -190,7 +192,7 @@ export default function SupportContentPage({ pageKey }) {
                           className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left"
                         >
                           <p className="text-base font-semibold leading-7 text-[#0F1729]">
-                            {item.heading || `Question ${index + 1}`}
+                            {item.heading || t("support.questionPlaceholder", { number: index + 1 })}
                           </p>
                           <ChevronDown
                             className={`h-5 w-5 shrink-0 text-[#65758B] transition-transform ${
@@ -202,7 +204,7 @@ export default function SupportContentPage({ pageKey }) {
                         {isOpen ? (
                           <div className="border-t border-[#E2E8F0] px-5 py-5">
                             <p className="text-sm leading-7 text-[#4E5D72]">
-                              {item.content || "Answer will be added soon."}
+                              {item.content || t("support.answerSoon")}
                             </p>
                           </div>
                         ) : null}
@@ -212,7 +214,7 @@ export default function SupportContentPage({ pageKey }) {
                 </div>
               ) : (
                 <div className="rounded-[22px] border border-dashed border-[#D8E6EC] bg-[#FBFCFD] px-5 py-8 text-center text-sm text-[#65758B]">
-                  No FAQ entries have been added for this page yet.
+                  {t("support.noFaqEntries")}
                 </div>
               )
             ) : visibleItems.length ? (
@@ -233,7 +235,7 @@ export default function SupportContentPage({ pageKey }) {
               </div>
             ) : (
               <div className="rounded-[22px] border border-dashed border-[#D8E6EC] bg-[#FBFCFD] px-5 py-8 text-center text-sm text-[#65758B]">
-                No content has been added for this page yet.
+                {t("support.noContent")}
               </div>
             )}
           </div>

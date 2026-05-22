@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { Navigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { AuthContext } from "../context/AuthContext";
 
 export default function ProtectedRoute({
@@ -7,13 +8,14 @@ export default function ProtectedRoute({
   requiredRole = "",
   unauthorizedTo = "/",
 }) {
+  const { t } = useTranslation();
   const { user, token, loading } = useContext(AuthContext);
   const location = useLocation();
 
   if (loading) {
     return (
       <div className="flex h-screen w-full items-center justify-center text-lg">
-        Loading...
+        {t("protectedRoute.checkingAccess")}
       </div>
     );
   }

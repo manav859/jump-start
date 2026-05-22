@@ -28,8 +28,21 @@ const packageSchema = new mongoose.Schema(
           {
             questionId: { type: String, default: "" },
             text: { type: String, required: true },
+            // Gujarati translation of the question stem. Empty string
+            // when no translation has been added yet — the frontend
+            // (Livetest.jsx) falls back silently to `text` in that
+            // case, so the bank can be translated question-by-question
+            // without breaking the live experience.
+            text_gu: { type: String, default: "" },
             type: { type: String, enum: ["likert", "single"], default: "likert" },
             options: [{ type: String }],
+            // Parallel array of Gujarati option translations indexed
+            // identically to `options`. An empty / missing entry at a
+            // given index falls back to the English option. Kept as a
+            // sibling array rather than promoting `options` to objects
+            // so existing data and the scorer (which reads `options`
+            // by index) stay byte-for-byte compatible.
+            options_gu: { type: [String], default: [] },
             correctOption: { type: String, default: "" },
             reverseScored: { type: Boolean, default: false },
             weight: { type: Number, default: 1, min: 0.1 },

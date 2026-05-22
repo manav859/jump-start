@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   CircleAlert,
   Clock3,
@@ -9,28 +10,12 @@ import {
 } from "lucide-react";
 import api from "../api/api";
 
-const timingRules = [
-  "Each section is timed individually.",
-  "Your progress is saved automatically after each answer.",
-  "The timer continues from where you left off if you resume later.",
-  "Finish every section before submitting the final assessment.",
-];
-
-const technicalRequirements = [
-  "Use a stable internet connection for the smoothest experience.",
-  "Keep your browser updated to the latest version.",
-  "Desktop or laptop is recommended, but mobile is supported.",
-  "Avoid opening extra tabs or pop-up blockers during the test.",
-];
-
-const importantRules = [
-  "Answer honestly. There are no right or wrong answers for many sections.",
-  "Once your final assessment is submitted, it will be used to generate your report.",
-  "Do not refresh the page repeatedly during a section.",
-  "Take the test in a calm environment without distractions.",
-];
+const TIMING_KEYS = ["pretest.timing1", "pretest.timing2", "pretest.timing3", "pretest.timing4"];
+const TECH_KEYS = ["pretest.tech1", "pretest.tech2", "pretest.tech3", "pretest.tech4"];
+const RULES_KEYS = ["pretest.rule1", "pretest.rule2", "pretest.rule3", "pretest.rule4"];
 
 export default function Pretest() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -48,9 +33,10 @@ export default function Pretest() {
         setSections(pkgRes?.data?.data?.sections || []);
       })
       .catch((err) => {
-        setError(err?.response?.data?.msg || "Failed to load pre-test instructions.");
+        setError(err?.response?.data?.msg || t("pretest.loadFailed"));
       })
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const totalQuestions = useMemo(
@@ -73,7 +59,7 @@ export default function Pretest() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
-        <p className="text-[#65758B]">Loading pre-test instructions...</p>
+        <p className="text-[#65758B]">{t("pretest.loading")}</p>
       </div>
     );
   }
@@ -83,17 +69,17 @@ export default function Pretest() {
       <div className="min-h-screen bg-[#fafafa] px-4 py-8 flex items-center justify-center">
         <div className="w-full max-w-xl rounded-2xl border border-gray-100 bg-white p-8 text-center">
           <h2 className="text-2xl font-bold text-[#0F1729]">
-            Test Setup Unavailable
+            {t("pretest.setupUnavailableTitle")}
           </h2>
           <p className="mt-3 text-[#65758B]">
-            {error || "We could not load your purchased assessment right now."}
+            {error || t("pretest.setupUnavailableBody")}
           </p>
           <button
             type="button"
             onClick={() => navigate("/dashboard", { replace: true })}
             className="mt-6 rounded-xl bg-[#188B8B] px-6 py-3 font-semibold text-white transition hover:bg-teal-700"
           >
-            Back to Dashboard
+            {t("pretest.backToDashboard")}
           </button>
         </div>
       </div>
@@ -105,14 +91,13 @@ export default function Pretest() {
       <div className="mx-auto max-w-4xl">
         <div className="mb-8">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#188B8B]">
-            Pre-Test Instructions
+            {t("pretest.preTestBadge")}
           </p>
           <h1 className="mt-3 text-3xl font-bold text-[#0F1729] sm:text-4xl">
-            Before You Begin
+            {t("pretest.title")}
           </h1>
           <p className="mt-2 text-base text-[#65758B]">
-            Please review these important instructions carefully before starting
-            your assessment.
+            {t("pretest.introBody")}
           </p>
         </div>
 
@@ -123,22 +108,22 @@ export default function Pretest() {
                 <FileText className="h-5 w-5" />
               </div>
               <div className="w-full">
-                <h2 className="text-xl font-semibold text-[#0F1729]">Test Overview</h2>
+                <h2 className="text-xl font-semibold text-[#0F1729]">{t("pretest.testOverview")}</h2>
                 <div className="mt-5 space-y-3 text-sm text-[#65758B]">
                   <div className="flex items-center justify-between gap-4 border-b border-[#E1E7EF] pb-3">
-                    <span>Total Sections</span>
-                    <span className="font-semibold text-[#0F1729]">{sections.length} Sections</span>
+                    <span>{t("pretest.totalSectionsLabel")}</span>
+                    <span className="font-semibold text-[#0F1729]">{t("pretest.sectionsCount", { count: sections.length })}</span>
                   </div>
                   <div className="flex items-center justify-between gap-4 border-b border-[#E1E7EF] pb-3">
-                    <span>Total Questions</span>
-                    <span className="font-semibold text-[#0F1729]">{totalQuestions} Questions</span>
+                    <span>{t("pretest.totalQuestionsLabel2")}</span>
+                    <span className="font-semibold text-[#0F1729]">{t("pretest.questionsCount2", { count: totalQuestions })}</span>
                   </div>
                   <div className="flex items-center justify-between gap-4 border-b border-[#E1E7EF] pb-3">
-                    <span>Total Duration</span>
-                    <span className="font-semibold text-[#0F1729]">{totalDuration} Minutes</span>
+                    <span>{t("pretest.totalDurationLabel")}</span>
+                    <span className="font-semibold text-[#0F1729]">{t("pretest.durationCount", { count: totalDuration })}</span>
                   </div>
                   <div className="flex items-start justify-between gap-4">
-                    <span>Sections</span>
+                    <span>{t("pretest.sectionsLabel")}</span>
                     <span className="max-w-[60%] text-right font-semibold text-[#0F1729]">
                       {sectionNames}
                     </span>
@@ -154,10 +139,10 @@ export default function Pretest() {
                 <Clock3 className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-[#0F1729]">Timing & Progress</h2>
+                <h2 className="text-xl font-semibold text-[#0F1729]">{t("pretest.timingHeading")}</h2>
                 <ul className="mt-4 space-y-2 text-sm text-[#65758B]">
-                  {timingRules.map((rule) => (
-                    <li key={rule}>• {rule}</li>
+                  {TIMING_KEYS.map((key) => (
+                    <li key={key}>• {t(key)}</li>
                   ))}
                 </ul>
               </div>
@@ -170,10 +155,10 @@ export default function Pretest() {
                 <LaptopMinimal className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-[#0F1729]">Technical Requirements</h2>
+                <h2 className="text-xl font-semibold text-[#0F1729]">{t("pretest.techHeading")}</h2>
                 <ul className="mt-4 space-y-2 text-sm text-[#65758B]">
-                  {technicalRequirements.map((rule) => (
-                    <li key={rule}>• {rule}</li>
+                  {TECH_KEYS.map((key) => (
+                    <li key={key}>• {t(key)}</li>
                   ))}
                 </ul>
               </div>
@@ -186,10 +171,10 @@ export default function Pretest() {
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-[#0F1729]">Important Rules</h2>
+                <h2 className="text-xl font-semibold text-[#0F1729]">{t("pretest.rulesHeading")}</h2>
                 <ul className="mt-4 space-y-2 text-sm text-[#65758B]">
-                  {importantRules.map((rule) => (
-                    <li key={rule}>• {rule}</li>
+                  {RULES_KEYS.map((key) => (
+                    <li key={key}>• {t(key)}</li>
                   ))}
                 </ul>
               </div>
@@ -208,7 +193,7 @@ export default function Pretest() {
               className="mt-1 h-4 w-4 rounded border border-[#188B8B] text-[#188B8B] focus:ring-[#188B8B]"
             />
             <span className="text-sm text-[#0F1729]">
-              I have checked my internet connection and browser compatibility.
+              {t("pretest.checkConnection")}
             </span>
           </label>
           <label className="mt-4 flex items-start gap-3 cursor-pointer">
@@ -221,7 +206,7 @@ export default function Pretest() {
               className="mt-1 h-4 w-4 rounded border border-[#188B8B] text-[#188B8B] focus:ring-[#188B8B]"
             />
             <span className="text-sm text-[#0F1729]">
-              I have read and understood all the instructions and rules.
+              {t("pretest.checkRules")}
             </span>
           </label>
         </div>
@@ -239,13 +224,13 @@ export default function Pretest() {
           disabled={!canStart}
           className="mt-6 w-full rounded-xl bg-[#F6C465] px-6 py-3.5 font-semibold text-[#0F1729] transition hover:bg-[#EDB84A] disabled:cursor-not-allowed disabled:bg-[#F6DCA1] disabled:text-[#8A7449]"
         >
-          I'm Ready to Start
+          {t("pretest.imReady")}
         </button>
 
         <p className="mt-3 text-sm text-[#65758B]">
-          Package:{" "}
+          {t("pretest.packageLabel")}{" "}
           <span className="font-semibold text-[#0F1729]">
-            {packageInfo?.title || "Selected assessment"}
+            {packageInfo?.title || t("pretest.selectedAssessment")}
           </span>
         </p>
       </div>

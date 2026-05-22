@@ -1,5 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   AlertTriangle,
   BadgeCheck,
@@ -26,38 +27,45 @@ const formatDateOfBirth = (value) => {
   });
 };
 
-const studentProfileFields = (sp = {}) => [
-  { label: "Date of Birth", value: formatDateOfBirth(sp.dateOfBirth) },
-  { label: "Gender", value: sp.gender || "-" },
-  { label: "Phone", value: sp.phone || "-" },
-  { label: "School / College", value: sp.schoolOrCollege || "-" },
-  { label: "Class / Grade", value: sp.classOrGrade || "-" },
-  { label: "Stream", value: sp.stream || "-" },
-  { label: "Board / University", value: sp.board || "-" },
-  { label: "City", value: sp.city || "-" },
-  { label: "State / UT", value: sp.state || "-" },
+// Field factories take `t` so labels translate live with the locale.
+const studentProfileFields = (sp = {}, t) => [
+  { label: t("profileExtra.fieldDateOfBirth"), value: formatDateOfBirth(sp.dateOfBirth) },
+  { label: t("profileExtra.fieldGender"), value: sp.gender || "-" },
+  { label: t("profileExtra.phone"), value: sp.phone || "-" },
+  { label: t("profileExtra.fieldSchoolCollege"), value: sp.schoolOrCollege || "-" },
+  { label: t("profileExtra.fieldClassGrade"), value: sp.classOrGrade || "-" },
+  { label: t("profileExtra.fieldStream"), value: sp.stream || "-" },
+  { label: t("profileExtra.fieldBoard"), value: sp.board || "-" },
+  { label: t("profileExtra.fieldCity"), value: sp.city || "-" },
+  { label: t("profileExtra.fieldState"), value: sp.state || "-" },
 ];
 
 const formatUserId = (id) =>
   id ? `JS${String(id).slice(-6).toUpperCase()}` : "JS000000";
 
-const profileFields = (profile) => [
-  { label: "User ID", value: formatUserId(profile?._id || profile?.id) },
-  { label: "Account", value: profile?.isSuspended ? "Suspended" : "Active" },
-  { label: "Full Name", value: profile?.name || "-" },
-  { label: "Email Id", value: profile?.email || "-" },
-  { label: "Phone Number", value: profile?.mobile || "-" },
-  { label: "City", value: profile?.city || "-" },
+const profileFields = (profile, t) => [
+  { label: t("profileExtra.fieldUserId"), value: formatUserId(profile?._id || profile?.id) },
+  {
+    label: t("profileExtra.fieldAccount"),
+    value: profile?.isSuspended
+      ? t("profileExtra.statusSuspended")
+      : t("profileExtra.statusActive"),
+  },
+  { label: t("profileExtra.fieldFullName"), value: profile?.name || "-" },
+  { label: t("profileExtra.fieldEmailId"), value: profile?.email || "-" },
+  { label: t("profileExtra.fieldPhoneNumber"), value: profile?.mobile || "-" },
+  { label: t("profileExtra.fieldCity"), value: profile?.city || "-" },
 ];
 
-const extraProfileFields = (profile) => [
-  { label: "Date of Birth", value: profile?.dateOfBirth || "-" },
-  { label: "School Name", value: profile?.schoolName || "-" },
-  { label: "School Location", value: profile?.schoolLocation || "-" },
-  { label: "Residential Address", value: profile?.residentialAddress || "-" },
+const extraProfileFields = (profile, t) => [
+  { label: t("profileExtra.fieldDateOfBirth"), value: profile?.dateOfBirth || "-" },
+  { label: t("profileExtra.fieldSchoolName"), value: profile?.schoolName || "-" },
+  { label: t("profileExtra.fieldSchoolLocation"), value: profile?.schoolLocation || "-" },
+  { label: t("profileExtra.fieldAddress"), value: profile?.residentialAddress || "-" },
 ];
 
 export default function Profile() {
+  const { t } = useTranslation();
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
   // Prompt-9 Fix 1: copy-to-clipboard for the Jumpstart ID. `copied`
@@ -74,9 +82,10 @@ export default function Profile() {
         setProfile(res?.data?.data?.user || null);
       })
       .catch((err) => {
-        setError(err?.response?.data?.msg || "Failed to load profile.");
+        setError(err?.response?.data?.msg || t("profileExtra.loadFailed"));
       })
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fullName = profile?.name || user?.name || "User";
@@ -85,7 +94,7 @@ export default function Profile() {
   if (loading) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center bg-white px-4">
-        <p className="text-[#65758B]">Loading profile...</p>
+        <p className="text-[#65758B]">{t("profileExtra.loading")}</p>
       </div>
     );
   }
@@ -94,31 +103,31 @@ export default function Profile() {
     return (
       <div className="flex min-h-[70vh] items-center justify-center bg-white px-4">
         <div className="surface-card w-full max-w-xl rounded-[28px] p-8 text-center">
-          <h1 className="text-3xl font-bold text-[#0F1729]">Profile Unavailable</h1>
+          <h1 className="text-3xl font-bold text-[#0F1729]">{t("profileExtra.unavailableHeading")}</h1>
           <p className="mt-3 text-[#65758B]">{error}</p>
           <Link to="/dashboard" className="primary-btn mt-6">
-            Back to Dashboard
+            {t("profileExtra.backToDashboard")}
           </Link>
         </div>
       </div>
     );
   }
 
-  const fields = profileFields(profile || user || {});
-  const extraFields = extraProfileFields(profile || user || {});
+  const fields = profileFields(profile || user || {}, t);
+  const extraFields = extraProfileFields(profile || user || {}, t);
 
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-[#0F1729]">My Profile</h1>
+            <h1 className="text-4xl font-bold text-[#0F1729]">{t("profileExtra.myProfileHeading")}</h1>
             <p className="mt-2 text-base text-[#65758B]">
-              Keep your personal details updated for a smoother assessment experience.
+              {t("profileExtra.myProfileSubtitle")}
             </p>
           </div>
           <Link to="/profile/edit" className="secondary-btn">
-            Edit Profile
+            {t("profileExtra.editProfileCta")}
           </Link>
         </div>
 
@@ -139,14 +148,13 @@ export default function Profile() {
               </span>
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#188B8B]">
-                  Your Jumpstart ID
+                  {t("profileExtra.yourJumpstartId")}
                 </p>
                 <p className="mt-1 font-mono text-xl font-bold text-[#0F1729]">
                   {profile?.jumpstartId || user?.jumpstartId}
                 </p>
                 <p className="mt-1 text-xs text-[#65758B]">
-                  Quote this ID when contacting Jumpstart support or your
-                  counsellor — it identifies your account uniquely.
+                  {t("profileExtra.jumpstartIdHelper")}
                 </p>
               </div>
             </div>
@@ -174,17 +182,17 @@ export default function Profile() {
                 }
               }}
               className="inline-flex items-center gap-2 rounded-[12px] border border-[#188B8B] bg-white px-4 py-2 text-sm font-semibold text-[#188B8B] transition hover:bg-[#F6FDFC]"
-              aria-label="Copy your Jumpstart ID to the clipboard"
+              aria-label={t("profileExtra.copyAriaLabel")}
             >
               {copiedJumpstartId ? (
                 <>
                   <Check className="h-4 w-4" />
-                  Copied
+                  {t("profileExtra.copiedShort")}
                 </>
               ) : (
                 <>
                   <Copy className="h-4 w-4" />
-                  Copy ID
+                  {t("profileExtra.copyShort")}
                 </>
               )}
             </button>
@@ -196,14 +204,14 @@ export default function Profile() {
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[#F59F0A]" />
             <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm font-medium leading-6">
-                Please complete your student profile to unlock the assessment.
+                {t("profileExtra.completeStudentBanner")}
               </p>
               <Link
                 to="/profile/student"
                 state={{ returnTo: "/profile" }}
                 className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#F59F0A] px-4 py-1.5 text-xs font-semibold text-[#0F1729] hover:bg-[#E89206]"
               >
-                Complete now
+                {t("profileExtra.completeNow")}
               </Link>
             </div>
           </div>
@@ -226,12 +234,12 @@ export default function Profile() {
                   {field.label}
                 </p>
                 <div className="flex min-h-[58px] items-center rounded-2xl border border-[#E1E7EF] bg-white px-4 text-sm text-[#0F1729] shadow-sm">
-                  {field.label === "Phone Number" && field.value && field.value !== "-" ? (
+                  {field.label === t("profileExtra.fieldPhoneNumber") && field.value && field.value !== "-" ? (
                     <div className="flex w-full items-center justify-between gap-3">
                       <span>{field.value}</span>
                       <span className="inline-flex items-center gap-1 rounded-full bg-[#E8F9F8] px-3 py-1 text-xs font-semibold text-[#188B8B]">
                         <BadgeCheck className="h-3 w-3" />
-                        Verified
+                        {t("profileExtra.verified")}
                       </span>
                     </div>
                   ) : (
@@ -247,35 +255,35 @@ export default function Profile() {
           <div className="surface-card rounded-[26px] p-6">
             <div className="flex items-center gap-3">
               <Mail className="h-5 w-5 text-[#188B8B]" />
-              <h2 className="text-lg font-semibold text-[#0F1729]">Email Contact</h2>
+              <h2 className="text-lg font-semibold text-[#0F1729]">{t("profileExtra.emailContact")}</h2>
             </div>
             <p className="mt-4 text-sm leading-7 text-[#65758B]">
-              {profile?.email || user?.email || "No email added yet."}
+              {profile?.email || user?.email || t("profileExtra.noEmail")}
             </p>
           </div>
           <div className="surface-card rounded-[26px] p-6">
             <div className="flex items-center gap-3">
               <Phone className="h-5 w-5 text-[#188B8B]" />
-              <h2 className="text-lg font-semibold text-[#0F1729]">Phone</h2>
+              <h2 className="text-lg font-semibold text-[#0F1729]">{t("profileExtra.phone")}</h2>
             </div>
             <p className="mt-4 text-sm leading-7 text-[#65758B]">
-              {profile?.mobile || "Add your phone number to keep your account details complete."}
+              {profile?.mobile || t("profileExtra.addPhoneHelper")}
             </p>
           </div>
           <div className="surface-card rounded-[26px] p-6">
             <div className="flex items-center gap-3">
               <MapPin className="h-5 w-5 text-[#188B8B]" />
-              <h2 className="text-lg font-semibold text-[#0F1729]">Location</h2>
+              <h2 className="text-lg font-semibold text-[#0F1729]">{t("profileExtra.location")}</h2>
             </div>
             <p className="mt-4 text-sm leading-7 text-[#65758B]">
-              {profile?.city || "Add your city to personalize your profile and counselling follow-up."}
+              {profile?.city || t("profileExtra.addCityHelper")}
             </p>
           </div>
         </div>
 
         <div className="mt-12">
           <h2 className="text-3xl font-bold text-[#0F1729]">
-            Education & Location
+            {t("profileExtra.educationLocationHeading")}
           </h2>
           <div className="mt-6 grid gap-5 md:grid-cols-2">
             {extraFields.map((field) => (
@@ -299,18 +307,18 @@ export default function Profile() {
               </span>
               <div>
                 <h2 className="text-3xl font-bold text-[#0F1729]">
-                  Student Details
+                  {t("profileExtra.studentDetailsHeading")}
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-[#65758B]">
-                  The structured profile collected before your assessment.
+                  {t("profileExtra.studentDetailsSubtitle")}
                   {profile?.studentProfile?.isComplete ? (
                     <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-[#E2F8F7] px-2.5 py-0.5 text-[11px] font-semibold text-[#188B8B]">
                       <BadgeCheck className="h-3 w-3" />
-                      Complete
+                      {t("profileExtra.complete")}
                     </span>
                   ) : (
                     <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-[#FFF1D3] px-2.5 py-0.5 text-[11px] font-semibold text-[#B86D00]">
-                      Incomplete
+                      {t("profileExtra.incomplete")}
                     </span>
                   )}
                 </p>
@@ -321,12 +329,14 @@ export default function Profile() {
               state={{ returnTo: "/profile" }}
               className="secondary-btn shrink-0"
             >
-              {profile?.studentProfile?.isComplete ? "Edit" : "Complete now"}
+              {profile?.studentProfile?.isComplete
+                ? t("common.edit")
+                : t("profileExtra.completeNow")}
             </Link>
           </div>
 
           <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {studentProfileFields(profile?.studentProfile || {}).map(
+            {studentProfileFields(profile?.studentProfile || {}, t).map(
               (field) => (
                 <div key={field.label}>
                   <p className="mb-2 text-sm font-semibold text-[#344054]">

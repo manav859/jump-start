@@ -6,7 +6,8 @@ import React, {
   useState,
 } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { CheckCircle2, Clock3, Pause, Save } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { AlertCircle, CheckCircle2, Clock3, Pause, Save, X } from "lucide-react";
 import api from "../api/api";
 import { getApiV1Url } from "../config/env";
 import {
@@ -29,21 +30,23 @@ import {
   isSpatialQuestionId,
 } from "../data/spatialQuestionMedia";
 
-const LIKERT_OPTIONS = [
-  { label: "Strongly Disagree", value: 1 },
-  { label: "Disagree", value: 2 },
-  { label: "Neutral", value: 3 },
-  { label: "Agree", value: 4 },
-  { label: "Strongly Agree", value: 5 },
-];
+// Likert + Interest scale labels are computed inside the component
+// from i18n keys so they re-render when the student toggles language.
+// Keys live under livetest.likert.* and livetest.interest.* below.
+const LIKERT_VALUES = [1, 2, 3, 4, 5];
+const INTEREST_VALUES = [1, 2, 3, 4, 5];
 
-const INTEREST_ASSESSMENT_OPTIONS = [
-  { label: "1: No Interest", value: 1 },
-  { label: "2: Little Interest", value: 2 },
-  { label: "3: Moderate Interest", value: 3 },
-  { label: "4: Strong Interest", value: 4 },
-  { label: "5: Very Strong Interest", value: 5 },
-];
+// Pick the best display string for a question or option, preferring the
+// Gujarati variant when the active language is `gu` AND a translation
+// has been entered. Falls back silently to English so a partially
+// translated bank never renders a blank prompt.
+const pickLocalizedString = (lang, primary, gujarati) => {
+  if (lang === "gu") {
+    const guText = String(gujarati || "").trim();
+    if (guText) return guText;
+  }
+  return String(primary || "").trim();
+};
 
 const formatTime = (seconds) => {
   const mins = Math.floor(seconds / 60);
@@ -172,7 +175,31 @@ function SpatialAssetFigure({
 export default function Livetest() {
   const { sectionId: sectionIdParam } = useParams();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const sectionId = Number(sectionIdParam || 1);
+
+  // Scale option labels — rebuilt when language toggles via the
+  // useTranslation re-render.
+  const LIKERT_OPTIONS = useMemo(
+    () => [
+      { label: t("livetest.likert.stronglyDisagree"), value: 1 },
+      { label: t("livetest.likert.disagree"), value: 2 },
+      { label: t("livetest.likert.neutral"), value: 3 },
+      { label: t("livetest.likert.agree"), value: 4 },
+      { label: t("livetest.likert.stronglyAgree"), value: 5 },
+    ],
+    [t]
+  );
+  const INTEREST_ASSESSMENT_OPTIONS = useMemo(
+    () => [
+      { label: t("livetest.interest.no"), value: 1 },
+      { label: t("livetest.interest.little"), value: 2 },
+      { label: t("livetest.interest.moderate"), value: 3 },
+      { label: t("livetest.interest.strong"), value: 4 },
+      { label: t("livetest.interest.veryStrong"), value: 5 },
+    ],
+    [t]
+  );
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -190,9 +217,13 @@ export default function Livetest() {
   const [questionError, setQuestionError] = useState("");
   const [saveState, setSaveState] = useState("saved");
   const [pauseSaving, setPauseSaving] = useState(false);
+  const [flashQuestionIndex, setFlashQuestionIndex] = useState(null);
+  const [showUnansweredModal, setShowUnansweredModal] = useState(false);
+  const [showSectionCompleteModal, setShowSectionCompleteModal] = useState(false);
   const latestProgressRef = useRef(progress);
   const latestTimeRef = useRef(timeLeft);
   const initialResumeScrollDoneRef = useRef(false);
+  const sectionCompleteTimerRef = useRef(null);
 
   const answerKey = useCallback(
     (questionIndex) => `${sectionId}-${questionIndex}`,
@@ -253,8 +284,51 @@ export default function Livetest() {
     [answerKey, progress.answers, questions]
   );
 
+  const unansweredIndexes = useMemo(
+    () =>
+      questions.reduce((acc, question, index) => {
+        const rawAnswer = progress.answers?.[answerKey(index)];
+        if (!isAnswered(question, rawAnswer)) acc.push(index);
+        return acc;
+      }, []),
+    [answerKey, progress.answers, questions]
+  );
+
   const progressPercent = Math.round(
     (answeredCount / Math.max(1, totalQuestions)) * 100
+  );
+
+  const scrollToAndFlash = useCallback(
+    (questionIndex) => {
+      scrollToQuestionCard(questionIndex, "smooth", "center");
+      setFlashQuestionIndex(questionIndex);
+    },
+    [scrollToQuestionCard]
+  );
+
+  useEffect(() => {
+    if (flashQuestionIndex == null) return undefined;
+    const timer = window.setTimeout(() => setFlashQuestionIndex(null), 1000);
+    return () => window.clearTimeout(timer);
+  }, [flashQuestionIndex]);
+
+  // If the unanswered modal is open and the student answers the last
+  // remaining question (e.g. via a chip click), close the modal so the
+  // student isn't blocked behind a now-stale dialog.
+  useEffect(() => {
+    if (showUnansweredModal && unansweredIndexes.length === 0) {
+      setShowUnansweredModal(false);
+    }
+  }, [showUnansweredModal, unansweredIndexes.length]);
+
+  useEffect(
+    () => () => {
+      if (sectionCompleteTimerRef.current) {
+        window.clearTimeout(sectionCompleteTimerRef.current);
+        sectionCompleteTimerRef.current = null;
+      }
+    },
+    []
   );
 
   useEffect(() => {
@@ -331,34 +405,33 @@ export default function Livetest() {
       .finally(() => setLoading(false));
   }, [findFirstUnansweredIndex, navigate, sectionId]);
 
+  // Initial / resume scroll: when a section loads (fresh or after pause),
+  // scroll to the first unanswered question. If every question is already
+  // answered (-1), scroll to the top of the page so the student lands at
+  // Q1 and can review before submitting.
   useEffect(() => {
     if (loading || !section || !questions.length) return;
     if (initialResumeScrollDoneRef.current) return;
 
-    const hasAnsweredQuestions = questions.some((question, index) => {
-      const rawAnswer = progress.answers?.[answerKey(index)];
-      return isAnswered(question, rawAnswer);
-    });
-
     initialResumeScrollDoneRef.current = true;
-    if (!hasAnsweredQuestions) return;
 
     const firstUnansweredIndex = findFirstUnansweredIndex(
       questions,
       progress.answers || {}
     );
-    const targetIndex =
-      firstUnansweredIndex >= 0
-        ? firstUnansweredIndex
-        : clampQuestionIndex(progress.questionIndex || 0, questions.length);
 
-    scrollToQuestionCard(targetIndex, "smooth", "start");
+    if (firstUnansweredIndex < 0) {
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      return;
+    }
+
+    scrollToQuestionCard(firstUnansweredIndex, "smooth", "start");
   }, [
-    answerKey,
     findFirstUnansweredIndex,
     loading,
     progress.answers,
-    progress.questionIndex,
     questions,
     scrollToQuestionCard,
     section,
@@ -392,9 +465,65 @@ export default function Livetest() {
     [buildProgressPayload]
   );
 
+  // Debounced auto-save. Rapid keyboard/click answering (one PATCH per
+  // change) used to flood the backend with up to ~5 writes per second
+  // during the personality section. With this wrapper, only the latest
+  // payload survives the 800ms window before being committed. The 15s
+  // interval autosave and pagehide fallback below still guarantee
+  // durability if the student navigates away before the timer fires.
+  const debounceTimerRef = useRef(null);
+  const pendingDebouncedSaveRef = useRef(null);
+
+  const flushDebouncedSave = useCallback(() => {
+    if (debounceTimerRef.current) {
+      window.clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+    const pending = pendingDebouncedSaveRef.current;
+    pendingDebouncedSaveRef.current = null;
+    if (!pending) return;
+    persistProgress(pending).catch((err) => {
+      console.error("Failed to save answer", err);
+      setSaveState("error");
+    });
+  }, [persistProgress]);
+
+  const persistProgressDebounced = useCallback(
+    (nextProgress) => {
+      pendingDebouncedSaveRef.current = nextProgress;
+      setSaveState("saving");
+      if (debounceTimerRef.current) {
+        window.clearTimeout(debounceTimerRef.current);
+      }
+      debounceTimerRef.current = window.setTimeout(() => {
+        debounceTimerRef.current = null;
+        flushDebouncedSave();
+      }, 800);
+    },
+    [flushDebouncedSave]
+  );
+
+  useEffect(
+    () => () => {
+      // On unmount / section change: flush any in-flight debounced
+      // save so the answer the student just gave never gets dropped.
+      flushDebouncedSave();
+    },
+    [flushDebouncedSave]
+  );
+
   const completeSection = useCallback(
     (remainingSeconds = 0) => {
       if (saving) return;
+
+      // Cancel any pending debounced save — completeSection writes
+      // its own authoritative payload below; we don't want a stale
+      // debounce to clobber it after this PATCH completes.
+      if (debounceTimerRef.current) {
+        window.clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
+      }
+      pendingDebouncedSaveRef.current = null;
 
       const completedSectionIds = [
         ...new Set([...(progress.completedSectionIds || []), sectionId]),
@@ -563,25 +692,40 @@ export default function Livetest() {
     setQuestionError("");
     setProgress(nextProgress);
 
-    persistProgress(nextProgress).catch((err) => {
-      console.error("Failed to save answer", err);
-      setSaveState("error");
-    });
+    // Debounced save (800ms). flushDebouncedSave() runs on
+    // section completion, unmount, and the 15s interval autosave below
+    // so durability is preserved while the network stays quiet.
+    persistProgressDebounced(nextProgress);
   };
 
   const handleCompleteSection = () => {
-    const firstUnansweredIndex = questions.findIndex((question, index) => {
-      const rawAnswer = progress.answers?.[answerKey(index)];
-      return !isAnswered(question, rawAnswer);
-    });
-
-    if (firstUnansweredIndex >= 0) {
-      setQuestionError("Please answer all questions in this section before continuing.");
-      scrollToQuestionCard(firstUnansweredIndex, "smooth", "center");
+    if (unansweredIndexes.length > 0) {
+      setShowUnansweredModal(true);
       return;
     }
 
-    completeSection(timeLeft);
+    setQuestionError("");
+    setShowSectionCompleteModal(true);
+    if (sectionCompleteTimerRef.current) {
+      window.clearTimeout(sectionCompleteTimerRef.current);
+    }
+    sectionCompleteTimerRef.current = window.setTimeout(() => {
+      sectionCompleteTimerRef.current = null;
+      completeSection(Number(latestTimeRef.current) || 0);
+    }, 1500);
+  };
+
+  const handleProceedNow = () => {
+    if (sectionCompleteTimerRef.current) {
+      window.clearTimeout(sectionCompleteTimerRef.current);
+      sectionCompleteTimerRef.current = null;
+    }
+    completeSection(Number(latestTimeRef.current) || 0);
+  };
+
+  const handleJumpToUnanswered = (questionIndex) => {
+    setShowUnansweredModal(false);
+    scrollToAndFlash(questionIndex);
   };
 
   const handlePauseTest = async () => {
@@ -619,7 +763,7 @@ export default function Livetest() {
   if (loading || !section) {
     return (
       <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
-        <p className="text-[#65758B]">Loading section...</p>
+        <p className="text-[#65758B]">{t("loading.section")}</p>
       </div>
     );
   }
@@ -629,18 +773,17 @@ export default function Livetest() {
       <div className="min-h-screen bg-[#FAFAFA] px-4 py-8 flex items-center justify-center">
         <div className="w-full max-w-xl rounded-2xl border border-[#E1E7EF] bg-white p-8 text-center">
           <h2 className="text-2xl font-bold text-[#0F1729]">
-            This Section Has No Questions
+            {t("livetest.noQuestionsHeading")}
           </h2>
           <p className="mt-3 text-[#65758B]">
-            The selected package is missing question data for Section {sectionId}.
-            Please go back and choose another section or package.
+            {t("livetest.noQuestionsBody", { sectionId })}
           </p>
           <button
             type="button"
             onClick={() => navigate("/pretest/sections", { replace: true })}
             className="mt-6 rounded-xl bg-[#188B8B] px-6 py-3 font-semibold text-white transition hover:bg-teal-700"
           >
-            Back to Sections
+            {t("livetest.backToSections")}
           </button>
         </div>
       </div>
@@ -651,6 +794,33 @@ export default function Livetest() {
     ? formatTime(Number(timeLeft))
     : "--:--";
 
+  // The section title in the DB is stored in English (it's the
+  // canonical key). Translate it via the `section.*` locale keys when
+  // available — unknown titles fall through to the raw DB value so
+  // future packages render without code changes.
+  const SECTION_TITLE_TRANSLATION_KEYS = {
+    "Personality Assessment": "section.personality",
+    "Multiple Intelligence Assessment": "section.intelligence",
+    "Multiple Intelligence & EQ": "section.intelligence",
+    "Interest Assessment": "section.interest",
+    "Aptitude Battery": "section.aptitude",
+    "Personality & Values": "section.values",
+  };
+  const sectionTitleKey = SECTION_TITLE_TRANSLATION_KEYS[section.title];
+  const localizedSectionTitle = sectionTitleKey ? t(sectionTitleKey) : section.title;
+
+  // Unanswered chip-row visibility:
+  //   - hide entirely until the student answers at least one question
+  //     (no point flooding the header with 120 chips before the first
+  //     interaction)
+  //   - cap at 10 visible chips; surface the remainder as a single
+  //     "+N more" counter so the row never wraps into 5+ lines
+  const UNANSWERED_CHIP_LIMIT = 10;
+  const shouldShowUnanswered = answeredCount > 0 && unansweredIndexes.length > 0;
+  const visibleUnansweredChips = unansweredIndexes.slice(0, UNANSWERED_CHIP_LIMIT);
+  const unansweredRemainingCount =
+    unansweredIndexes.length - visibleUnansweredChips.length;
+
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       <div className="sticky top-0 z-30 border-b border-[#E1E7EF] bg-[#FAFAFA]/95 backdrop-blur">
@@ -659,11 +829,13 @@ export default function Livetest() {
             <div className="flex flex-wrap items-start justify-between gap-2 border-b border-[#E1E7EF] px-3 py-2.5 sm:items-center sm:px-5 sm:py-3">
               <div>
                 <h1 className="text-[15px] font-bold leading-tight text-[#0F1729] sm:text-[20px] md:text-[24px]">
-                  Section {section.sectionId}: {section.title}
+                  {t("livetest.sectionN", { number: section.sectionId })}: {localizedSectionTitle}
                 </h1>
                 <p className="mt-0.5 text-[11px] text-[#65758B] sm:mt-1 sm:text-sm">
-                  Section {Math.max(currentSectionIndex + 1, 1)} of{" "}
-                  {Math.max(orderedSections.length, 1)}
+                  {t("livetest.sectionXofY", {
+                    current: Math.max(currentSectionIndex + 1, 1),
+                    total: Math.max(orderedSections.length, 1),
+                  })}
                 </p>
               </div>
 
@@ -679,7 +851,7 @@ export default function Livetest() {
                   className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[#188B8B] px-2.5 py-1.5 text-[11px] font-semibold text-[#188B8B] transition hover:bg-teal-50 disabled:cursor-not-allowed disabled:opacity-70 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
                 >
                   <Pause className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  {pauseSaving ? "Pausing..." : "Pause Test"}
+                  {pauseSaving ? t("livetest.pausing") : t("livetest.pauseTest")}
                 </button>
               </div>
             </div>
@@ -689,31 +861,35 @@ export default function Livetest() {
                 <div className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#0F1729] sm:gap-2 sm:text-sm">
                   <Save className="h-3.5 w-3.5 text-[#65758B] sm:h-4 sm:w-4" />
                   {saveState === "saving"
-                    ? "Saving..."
+                    ? t("livetest.autoSaving")
                     : saveState === "error"
-                      ? "Save pending"
-                      : "Auto-saved"}
+                      ? t("livetest.savePending")
+                      : t("livetest.autoSaved")}
                 </div>
 
                 <div className="text-[11px] font-semibold text-[#0F1729] sm:hidden">
-                  {answeredCount}/{totalQuestions}
+                  {t("livetest.answeredCountShort", {
+                    answered: answeredCount,
+                    total: totalQuestions,
+                  })}
                 </div>
               </div>
 
               <div className="text-[11px] leading-4 text-[#65758B] sm:hidden">
-                Progress auto-saves. Pause and continue later.
+                {t("livetest.autoSaveExplanationShort")}
               </div>
 
               <div className="hidden rounded-2xl bg-[#E8F9F8] px-4 py-2.5 text-center text-sm text-[#65758B] sm:block">
-                {saveState === "saving"
-                  ? "Your latest answer is being saved."
-                  : saveState === "error"
-                    ? "Saving is delayed. Keep going and we will retry."
-                    : "Your progress is automatically saved. You can pause the section and return later."}
+                {saveState === "error"
+                  ? t("errors.saveFailed")
+                  : t("livetest.autoSaveExplanation")}
               </div>
 
               <div className="hidden text-xs font-semibold text-[#0F1729] sm:block sm:text-right sm:text-sm">
-                {answeredCount}/{totalQuestions} answered
+                {t("livetest.answeredCount", {
+                  answered: answeredCount,
+                  total: totalQuestions,
+                })}
               </div>
             </div>
 
@@ -725,8 +901,32 @@ export default function Livetest() {
                 />
               </div>
               <p className="mt-1 text-right text-[10px] font-semibold text-[#65758B] sm:mt-2 sm:text-xs">
-                {progressPercent}% complete
+                {t("livetest.completePercent", { percent: progressPercent })}
               </p>
+
+              {shouldShowUnanswered ? (
+                <div className="mt-2 flex flex-wrap items-center gap-1.5 sm:mt-3 sm:gap-2">
+                  <span className="text-[11px] font-semibold text-[#B45309] sm:text-xs">
+                    {t("livetest.unansweredLabel")}
+                  </span>
+                  {visibleUnansweredChips.map((index) => (
+                    <button
+                      key={`unanswered-${index}`}
+                      type="button"
+                      onClick={() => scrollToAndFlash(index)}
+                      className="inline-flex cursor-pointer items-center rounded-full border border-[#F5D9A6] bg-[#FFF6E4] px-2.5 py-0.5 text-[11px] font-semibold text-[#B45309] transition hover:border-[#E8B36A] hover:bg-[#FFEDC9] sm:px-3 sm:py-1 sm:text-xs"
+                      aria-label={t("livetest.jumpToQuestion", { number: index + 1 })}
+                    >
+                      Q{index + 1}
+                    </button>
+                  ))}
+                  {unansweredRemainingCount > 0 ? (
+                    <span className="text-[11px] font-semibold text-[#B45309] sm:text-xs">
+                      {t("livetest.unansweredMore", { count: unansweredRemainingCount })}
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
@@ -737,10 +937,10 @@ export default function Livetest() {
           {showInterestInstructionHeading ? (
             <section className="rounded-[26px] border border-[#B7DDE3] bg-[#F1FDFF] p-5 shadow-sm sm:p-6">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#188B8B]">
-                Interest Assessment Instruction
+                {t("livetest.instructionInterestHeading")}
               </p>
               <h2 className="mt-3 text-lg font-semibold leading-8 text-[#0F1729] sm:text-[22px]">
-                Instruction: Rate your interest in each activity from 1 (No Interest) to 5 (Very Strong Interest)
+                {t("livetest.instructionInterest1")}
               </h2>
             </section>
           ) : null}
@@ -769,7 +969,7 @@ export default function Livetest() {
               ? getMechanicalStimulusSrc(numericQuestionId)
               : null;
 
-            const questionText = getQuestionText(
+            const baseQuestionText = getQuestionText(
               question,
               isSpatialImageQuestion
                 ? "Study the figure and choose the correct answer."
@@ -778,6 +978,16 @@ export default function Livetest() {
                   : isMechanicalImageQuestion && mechanicalStimulusSrc
                     ? "Study the diagram and choose the correct answer."
                     : `Question ${index + 1}`
+            );
+            // Language-aware question text. When the active locale is
+            // Gujarati AND the admin has filled in `text_gu` for this
+            // question, render the translation. Otherwise fall back to
+            // the English string silently — a partially translated bank
+            // never shows a blank prompt.
+            const questionText = pickLocalizedString(
+              i18n.language,
+              baseQuestionText,
+              question?.text_gu
             );
             const spatialStimulusSrc = isSpatialImageQuestion
               ? getSpatialStimulusSource(question, numericQuestionId)
@@ -824,7 +1034,11 @@ export default function Livetest() {
 
                 <section
                   id={`question-card-${index}`}
-                  className="rounded-[26px] border border-[#E1E7EF] bg-white p-5 shadow-sm sm:p-6"
+                  className={`rounded-[26px] border bg-white p-5 shadow-sm transition-all duration-300 sm:p-6 ${
+                    flashQuestionIndex === index
+                      ? "border-yellow-400 ring-4 ring-yellow-300/60"
+                      : "border-[#E1E7EF]"
+                  }`}
                 >
                   <h2 className="whitespace-pre-line text-lg font-semibold leading-8 text-[#0F1729] sm:text-[22px]">
                     {index + 1}.{" "}
@@ -934,8 +1148,35 @@ export default function Livetest() {
                           question.type === "single"
                             ? String.fromCharCode(65 + optionIndex)
                             : option.value;
-                        const label =
-                          question.type === "single" ? option : option.label;
+                        // Option labels:
+                        //  - single-type options are stored as plain
+                        //    strings (question.options[i]) with optional
+                        //    Gujarati translations in the parallel
+                        //    `question.options_gu[i]` array. The
+                        //    AssessmentConfig schema keeps both arrays
+                        //    index-aligned so the scorer (which reads
+                        //    options by index) is unaffected by
+                        //    translation rollout.
+                        //  - likert/interest scale options come from
+                        //    LIKERT_OPTIONS / INTEREST_ASSESSMENT_OPTIONS
+                        //    above, which are already built from t()
+                        //    keys, so no per-option fallback needed.
+                        const rawLabel =
+                          question.type === "single"
+                            ? typeof option === "string"
+                              ? option
+                              : option?.text || option?.label || ""
+                            : option.label;
+                        const guLabel =
+                          question.type === "single" &&
+                          Array.isArray(question?.options_gu)
+                            ? question.options_gu[optionIndex] || ""
+                            : "";
+                        const label = pickLocalizedString(
+                          i18n.language,
+                          rawLabel,
+                          guLabel
+                        );
                         const selected =
                           question.type === "single"
                             ? String(currentAnswer) === String(value)
@@ -982,13 +1223,13 @@ export default function Livetest() {
             <div>
               <div className="inline-flex items-center gap-2 text-sm font-semibold text-[#188B8B]">
                 <CheckCircle2 className="h-4 w-4" />
-                Section Progress Saved
+                {t("livetest.sectionProgressSaved")}
               </div>
               <h3 className="mt-3 text-2xl font-bold text-[#0F1729]">
-                Ready to continue?
+                {t("livetest.readyToContinue")}
               </h3>
               <p className="mt-2 text-sm leading-7 text-[#65758B]">
-                Complete all questions in this section, then continue to the next section.
+                {t("livetest.readyHelper")}
               </p>
             </div>
 
@@ -998,11 +1239,110 @@ export default function Livetest() {
               disabled={saving || pauseSaving}
               className="inline-flex items-center justify-center rounded-[14px] bg-[#F6C465] px-6 py-3 text-sm font-semibold text-[#0F1729] transition-all duration-200 enabled:hover:-translate-y-0.5 enabled:hover:bg-[#EDB84A] enabled:hover:shadow-[0_12px_24px_rgba(246,196,101,0.28)] disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {nextSection ? "Continue to Next Section" : "Complete Section"}
+              {nextSection
+                ? t("livetest.continueToNext")
+                : t("livetest.completeSection")}
             </button>
           </div>
         </div>
       </div>
+
+      {showUnansweredModal && unansweredIndexes.length > 0 ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="unanswered-modal-title"
+        >
+          <div className="w-full max-w-md rounded-[20px] bg-white p-5 shadow-xl sm:p-6">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#FFF6E4] text-[#B45309]">
+                <AlertCircle className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <h3
+                  id="unanswered-modal-title"
+                  className="text-base font-bold text-[#0F1729] sm:text-lg"
+                >
+                  {t("livetest.unansweredModalTitle", {
+                    count: unansweredIndexes.length,
+                  })}
+                </h3>
+                <p className="mt-1.5 text-sm leading-6 text-[#65758B]">
+                  {t("livetest.unansweredModalBody")}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {unansweredIndexes.map((index) => (
+                    <button
+                      key={`modal-unanswered-${index}`}
+                      type="button"
+                      onClick={() => handleJumpToUnanswered(index)}
+                      className="inline-flex cursor-pointer items-center rounded-full border border-[#F5D9A6] bg-[#FFF6E4] px-3 py-1 text-xs font-semibold text-[#B45309] transition hover:border-[#E8B36A] hover:bg-[#FFEDC9]"
+                    >
+                      Q{index + 1}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowUnansweredModal(false)}
+                aria-label={t("common.close")}
+                className="-mr-1 -mt-1 inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-[#65758B] transition hover:bg-[#F1F5F9]"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="mt-5 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowUnansweredModal(false)}
+                className="inline-flex cursor-pointer items-center justify-center rounded-[12px] bg-[#188B8B] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#157A7A]"
+              >
+                {t("livetest.unansweredModalCta")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {showSectionCompleteModal ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="section-complete-modal-title"
+        >
+          <div className="w-full max-w-md rounded-[20px] bg-white p-6 text-center shadow-xl sm:p-7">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#E8F9F8] text-[#188B8B]">
+              <CheckCircle2 className="h-7 w-7" />
+            </div>
+            <h3
+              id="section-complete-modal-title"
+              className="mt-4 text-xl font-bold text-[#0F1729] sm:text-2xl"
+            >
+              {t("livetest.sectionCompleteTitle")}
+            </h3>
+            <p className="mt-2 text-sm leading-7 text-[#65758B]">
+              {t("livetest.sectionCompleteBody", {
+                answered: answeredCount,
+                total: totalQuestions,
+              })}
+            </p>
+            <button
+              type="button"
+              onClick={handleProceedNow}
+              disabled={saving}
+              className="mt-5 inline-flex w-full cursor-pointer items-center justify-center rounded-[14px] bg-[#188B8B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#157A7A] disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {saving ? t("common.save") + "…" : t("livetest.sectionCompleteContinue")}
+            </button>
+            <p className="mt-2 text-xs text-[#8A94A6]">
+              {t("livetest.sectionCompleteAuto")}
+            </p>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

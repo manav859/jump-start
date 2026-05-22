@@ -1,46 +1,45 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ArrowRight, CheckCircle2, Sparkles, Star } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 import takeTestImg from "../assets/Take-the-Test.png";
 import getResultsImg from "../assets/Get-Results.png";
 import counsellingImg from "../assets/Expert-Counselling.png";
 
-const journeyCards = [
-  {
-    title: "Take the Test",
-    description:
-      "Answer psychologist-designed assessments that measure aptitude, interests, and personality.",
-    image: takeTestImg,
-    link: "/test",
-  },
-  {
-    title: "Get Results",
-    description:
-      "See your strengths, section scores, and top-matched career directions in one place.",
-    image: getResultsImg,
-    link: "/result",
-  },
-  {
-    title: "Expert Counselling",
-    description:
-      "Book a guided session to understand your report and plan the right next step.",
-    image: counsellingImg,
-    link: "/bookcounselling",
-  },
-];
-
-const stats = [
-  { label: "Students Assessed", value: "50K+" },
-  { label: "Satisfaction Rate", value: "98%" },
-  { label: "Career Paths", value: "200+" },
-  { label: "Expert Support", value: "15+" },
-];
-
 export default function Home() {
+  const { t } = useTranslation();
   const { user } = useContext(AuthContext);
   const primaryDestination = user ? "/test" : "/signup";
   const secondaryDestination = user ? "/dashboard" : "/test";
+
+  const journeyCards = [
+    {
+      title: t("home.takeTheTest"),
+      description: t("home.takeTheTestBody"),
+      image: takeTestImg,
+      link: "/test",
+    },
+    {
+      title: t("home.getResults"),
+      description: t("home.getResultsBody"),
+      image: getResultsImg,
+      link: "/result",
+    },
+    {
+      title: t("home.expertCounselling"),
+      description: t("home.expertCounsellingBody"),
+      image: counsellingImg,
+      link: "/bookcounselling",
+    },
+  ];
+
+  const stats = [
+    { label: t("home.statStudents"), value: "50K+" },
+    { label: t("home.statSatisfaction"), value: "98%" },
+    { label: t("home.statCareerPaths"), value: "200+" },
+    { label: t("home.statExpertSupport"), value: "15+" },
+  ];
 
   return (
     <div className="bg-white">
@@ -49,36 +48,34 @@ export default function Home() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-[#BAECEA] bg-white/80 px-4 py-2 text-sm font-semibold text-[#188B8B] shadow-sm">
               <Sparkles className="h-4 w-4" />
-              Career Aptitude Assessment
+              {t("home.heroPillow")}
             </div>
 
             <h1 className="mt-6 max-w-xl text-4xl font-bold leading-tight text-[#0F1729] sm:text-5xl lg:text-6xl">
-              Discover Your Perfect Career Path
+              {t("home.heroBigHeading")}
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-8 text-[#65758B]">
-              Take scientifically-designed aptitude tests and get personalized
-              career guidance from expert psychologists that help you move with
-              clarity.
+              {t("home.heroBigBody")}
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link to={primaryDestination} className="primary-btn gap-2">
-                Start Your Test
+                {t("home.startYourTest")}
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link to={secondaryDestination} className="secondary-btn gap-2">
-                View Dashboard
+                {t("home.viewDashboard")}
               </Link>
             </div>
 
             <div className="mt-8 flex flex-wrap gap-6 text-sm font-semibold text-[#4B5565]">
               <div className="inline-flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-[#188B8B]" />
-                Scientifically validated
+                {t("home.scientificallyValidated")}
               </div>
               <div className="inline-flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-[#188B8B]" />
-                Expert guidance
+                {t("home.expertGuidance")}
               </div>
             </div>
           </div>
@@ -89,23 +86,23 @@ export default function Home() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="rounded-[28px] bg-[linear-gradient(180deg,#E8FBFA_0%,#F8FEFE_100%)] p-6">
                   <p className="text-sm font-semibold text-[#188B8B]">
-                    Personalized Insights
+                    {t("home.personalizedInsights")}
                   </p>
                   <p className="mt-2 text-3xl font-bold text-[#0F1729]">
                     92%
                   </p>
                   <p className="mt-3 text-sm leading-6 text-[#65758B]">
-                    Match your strengths with future-ready career choices.
+                    {t("home.matchStrengths")}
                   </p>
                 </div>
                 <div className="rounded-[28px] bg-[#0F1729] p-6 text-white">
                   <p className="text-sm font-semibold text-white/70">
-                    What you unlock
+                    {t("home.whatYouUnlock")}
                   </p>
                   <ul className="mt-4 space-y-3 text-sm text-white/90">
-                    <li>Career fit report</li>
-                    <li>Section-wise progress tracking</li>
-                    <li>Action-oriented next steps</li>
+                    <li>{t("home.unlockCareerReport")}</li>
+                    <li>{t("home.unlockSectionProgress")}</li>
+                    <li>{t("home.unlockActionSteps")}</li>
                   </ul>
                 </div>
               </div>
@@ -114,28 +111,28 @@ export default function Home() {
                 <div className="rounded-3xl border border-[#E6EFF5] bg-[#F8FAFC] p-5">
                   <Star className="h-5 w-5 text-[#F59F0A]" />
                   <p className="mt-4 text-sm font-semibold text-[#0F1729]">
-                    Aptitude
+                    {t("home.aptitude")}
                   </p>
                   <p className="mt-1 text-sm leading-6 text-[#65758B]">
-                    Understand how you solve, reason, and learn.
+                    {t("home.aptitudeBody")}
                   </p>
                 </div>
                 <div className="rounded-3xl border border-[#E6EFF5] bg-[#F8FAFC] p-5">
                   <Star className="h-5 w-5 text-[#188B8B]" />
                   <p className="mt-4 text-sm font-semibold text-[#0F1729]">
-                    Interests
+                    {t("home.interests")}
                   </p>
                   <p className="mt-1 text-sm leading-6 text-[#65758B]">
-                    See what environments and roles energize you.
+                    {t("home.interestsBody")}
                   </p>
                 </div>
                 <div className="rounded-3xl border border-[#E6EFF5] bg-[#F8FAFC] p-5">
                   <Star className="h-5 w-5 text-[#0F1729]" />
                   <p className="mt-4 text-sm font-semibold text-[#0F1729]">
-                    Guidance
+                    {t("home.guidance")}
                   </p>
                   <p className="mt-1 text-sm leading-6 text-[#65758B]">
-                    Turn assessment results into a real plan of action.
+                    {t("home.guidanceBody")}
                   </p>
                 </div>
               </div>
@@ -147,11 +144,10 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-[#0F1729] sm:text-4xl">
-            How Jumpstart Works
+            {t("home.howWorks")}
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-base text-[#65758B]">
-            A simple, scientifically-backed process to discover your ideal
-            career path.
+            {t("home.howWorksBody")}
           </p>
         </div>
 
@@ -200,20 +196,19 @@ export default function Home() {
             <Sparkles className="h-6 w-6" />
           </div>
           <h2 className="mt-5 text-3xl font-bold text-[#0F1729] sm:text-4xl">
-            Ready to Find Your Calling?
+            {t("home.ctaHeadingReady")}
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-[#65758B]">
-            Join thousands of students who have discovered their best career
-            path through our scientifically calibrated aptitude assessments.
+            {t("home.ctaBodyReady")}
           </p>
 
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Link to={primaryDestination} className="primary-btn gap-2">
-              Explore Packages
+              {t("home.explorePackages")}
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link to="/bookcounselling" className="secondary-btn">
-              Schedule a Counselling Call
+              {t("home.scheduleCall")}
             </Link>
           </div>
         </div>

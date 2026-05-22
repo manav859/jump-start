@@ -1,4 +1,8 @@
-const COMPREHENSIVE_500_PACKAGE = {
+// AUTO-GENERATED — comprehensive 500-question package with Gujarati translations.
+// Regenerate via:  npm run translate:questions:gu  OR  node scripts/applyGujaratiTranslations.mjs
+// Last updated: 2026-05-22T12:56:10.444Z
+
+const PACKAGE = {
   "id": "complete-aptitude-500q",
   "title": "Complete Aptitude Test (500Q)",
   "badge": "Comprehensive",
@@ -31,7 +35,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું એવો વ્યક્તિ છું જે વાચાળ અને બહિર્મુખ છે.",
+          "options_gu": []
         },
         {
           "questionId": "2",
@@ -42,7 +48,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "conscientiousness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું યોજનાને વળગી રહેવા કરતાં મારા વિકલ્પો ખુલ્લા રાખવાનું પસંદ કરું છું.",
+          "options_gu": []
         },
         {
           "questionId": "3",
@@ -53,7 +61,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "emotionalStability",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને સરળતાથી તણાવ થાય છે અને ઘણી બાબતો વિશે ચિંતા થાય છે.",
+          "options_gu": []
         },
         {
           "questionId": "4",
@@ -64,7 +74,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને નવી વસ્તુઓ શીખવાનું અને નવા વિચારો જાણવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "5",
@@ -75,7 +87,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું સામાન્ય રીતે અન્ય લોકો પર ભરોસો રાખું છું અને તેમની સાથે સહકારથી કામ કરું છું.",
+          "options_gu": []
         },
         {
           "questionId": "6",
@@ -86,7 +100,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારી જાતને એવા વ્યક્તિ તરીકે જોઉં છું જે અંતર્મુખી અને શાંત છે.",
+          "options_gu": []
         },
         {
           "questionId": "7",
@@ -97,7 +113,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "conscientiousness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને દરેક વસ્તુ વ્યવસ્થિત અને તેની યોગ્ય જગ્યાએ રાખવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "8",
@@ -108,7 +126,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "emotionalStability",
-          "notes": ""
+          "notes": "",
+          "text_gu": "તણાવપૂર્ણ પરિસ્થિતિઓમાં હું શાંત રહું છું.",
+          "options_gu": []
         },
         {
           "questionId": "9",
@@ -119,7 +139,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને ઘણી જુદી જુદી બાબતો વિશે જિજ્ઞાસા થાય છે.",
+          "options_gu": []
         },
         {
           "questionId": "10",
@@ -130,7 +152,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું બીજાઓમાં સહેલાઈથી ખામી શોધી કાઢું છું.",
+          "options_gu": []
         },
         {
           "questionId": "11",
@@ -141,7 +165,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું ઊર્જા અને ઉત્સાહથી ભરપૂર છું.",
+          "options_gu": []
         },
         {
           "questionId": "12",
@@ -152,7 +178,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "conscientiousness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું ક્યારેક બેદરકાર અને અવ્યવસ્થિત હોઈ શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "13",
@@ -163,7 +191,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "emotionalStability",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું જુદી જુદી બાબતો વિશે ખૂબ ચિંતા કરું છું.",
+          "options_gu": []
         },
         {
           "questionId": "14",
@@ -174,7 +204,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મારી પાસે સક્રિય કલ્પનાશક્તિ છે અને હું સર્જનાત્મક રીતે વિચારું છું.",
+          "options_gu": []
         },
         {
           "questionId": "15",
@@ -185,7 +217,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું બીજાઓ પ્રત્યે મદદગાર અને નિઃસ્વાર્થ છું.",
+          "options_gu": []
         },
         {
           "questionId": "16",
@@ -196,7 +230,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "સામાજિક પરિસ્થિતિઓમાં હું શરમાળ અને એકાંતપ્રિય રહું છું.",
+          "options_gu": []
         },
         {
           "questionId": "17",
@@ -207,7 +243,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "conscientiousness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યાં સુધી કાર્ય પૂર્ણ ન થાય ત્યાં સુધી હું મહેનત કરતો રહું છું.",
+          "options_gu": []
         },
         {
           "questionId": "18",
@@ -218,7 +256,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "emotionalStability",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું હળવો રહું છું અને તણાવને સારી રીતે સંભાળું છું.",
+          "options_gu": []
         },
         {
           "questionId": "19",
@@ -229,7 +269,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું કલાત્મક અને સૌંદર્યલક્ષી અનુભવોને મહત્વ આપું છું.",
+          "options_gu": []
         },
         {
           "questionId": "20",
@@ -240,7 +282,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું બીજાઓ પ્રત્યે ઠંડો અને દૂરત્વ રાખનાર હોઈ શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "21",
@@ -251,7 +295,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને મોટા મેળાવડા અને સામાજિક પ્રસંગો પસંદ છે.",
+          "options_gu": []
         },
         {
           "questionId": "22",
@@ -262,7 +308,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "conscientiousness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું આળસુ બની જઉં છું અને કાર્યોને ટાળું છું.",
+          "options_gu": []
         },
         {
           "questionId": "23",
@@ -273,7 +321,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "emotionalStability",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને સહેલાઈથી નર્વસ અને બેચેની થઈ જાય છે.",
+          "options_gu": []
         },
         {
           "questionId": "24",
@@ -284,7 +334,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને વિચારો વિશે મંથન કરવાનું અને તેમની સાથે રમવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "25",
@@ -295,7 +347,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મારો સ્વભાવ ક્ષમાશીલ છે અને હું ભૂલોને નજરઅંદાજ કરું છું.",
+          "options_gu": []
         },
         {
           "questionId": "26",
@@ -306,7 +360,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું બીજાઓમાં ખૂબ ઉત્સાહ ઊભો કરું છું.",
+          "options_gu": []
         },
         {
           "questionId": "27",
@@ -317,7 +373,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "conscientiousness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું યોજનાઓ બનાવું છું અને તેને પૂરી કરું છું.",
+          "options_gu": []
         },
         {
           "questionId": "28",
@@ -328,7 +386,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "emotionalStability",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને ભાગ્યે જ ઉદાસી કે હતાશા અનુભવાય છે.",
+          "options_gu": []
         },
         {
           "questionId": "29",
@@ -339,7 +399,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને રૂટિન અને અનુમાનિત કાર્ય ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "30",
@@ -350,7 +412,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું સામાન્ય રીતે અન્ય લોકોના ઇરાદાઓ પર ભરોસો રાખું છું.",
+          "options_gu": []
         },
         {
           "questionId": "31",
@@ -361,7 +425,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "નવા લોકો સાથે વાતચીત શરૂ કરવી મારા માટે સહેલી છે.",
+          "options_gu": []
         },
         {
           "questionId": "32",
@@ -372,7 +438,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને એવી સમસ્યાઓ પર કામ કરવાનું ગમે છે જેમાં અમૂર્ત વિચારશક્તિ જરૂરી હોય.",
+          "options_gu": []
         },
         {
           "questionId": "33",
@@ -383,7 +451,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "emotionalStability",
-          "notes": ""
+          "notes": "",
+          "text_gu": "દબાણ અને તણાવ હેઠળ હું શાંત રહું છું.",
+          "options_gu": []
         },
         {
           "questionId": "34",
@@ -394,7 +464,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને જૂથ પ્રવૃત્તિઓમાં નેતા બનવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "35",
@@ -405,7 +477,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને ઘણા લોકોની વચ્ચે રહેવાનું અને સામાજિક મેળાવડાઓમાં જવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "36",
@@ -416,7 +490,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને વ્યવહારિક બાબતો કરતાં વિચારોમાં વધારે રસ છે.",
+          "options_gu": []
         },
         {
           "questionId": "37",
@@ -427,7 +503,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મોટાભાગની સામાજિક પરિસ્થિતિઓમાં હું આત્મવિશ્વાસ અનુભવું છું.",
+          "options_gu": []
         },
         {
           "questionId": "38",
@@ -438,7 +516,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "conscientiousness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને નિયમો અને સ્થાપિત પ્રક્રિયાઓને અનુસરવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "39",
@@ -449,7 +529,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને જોખમો લેવાનું અને નવા સાહસ અજમાવવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "40",
@@ -460,7 +542,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું બીજાઓની લાગણીઓ અને ભાવનાઓ પ્રત્યે સંવેદનશીલ છું.",
+          "options_gu": []
         },
         {
           "questionId": "41",
@@ -471,7 +555,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "conscientiousness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને પરિસ્થિતિઓ પર નિયંત્રણ રાખવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "42",
@@ -482,7 +568,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને જૂથોમાં કામ કરવા કરતાં એકલા કામ કરવાનું વધારે ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "43",
@@ -493,7 +581,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને બૌદ્ધિક ચર્ચાઓ અને વાદવિવાદ ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "44",
@@ -504,7 +594,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "emotionalStability",
-          "notes": ""
+          "notes": "",
+          "text_gu": "બીજાઓના વિચારોથી મારા પર સહેલાઈથી અસર થાય છે.",
+          "options_gu": []
         },
         {
           "questionId": "45",
@@ -515,7 +607,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "conscientiousness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને અગાઉથી યોજના બનાવવાનું અને વ્યવસ્થિત રહેવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "46",
@@ -526,7 +620,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "બધાનું ધ્યાન મારા પર હોય તેવી પરિસ્થિતિમાં હું સહજ રહું છું.",
+          "options_gu": []
         },
         {
           "questionId": "47",
@@ -537,7 +633,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને સૈદ્ધાંતિક ઉકેલો કરતાં વ્યવહારિક ઉકેલો વધારે ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "48",
@@ -548,7 +646,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારી અંતઃપ્રેરણા અને ગુટ ફીલિંગ પર ભરોસો રાખું છું.",
+          "options_gu": []
         },
         {
           "questionId": "49",
@@ -559,7 +659,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને સ્પર્ધાત્મક પ્રવૃત્તિઓ અને પડકારો ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "50",
@@ -570,7 +672,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "emotionalStability",
-          "notes": ""
+          "notes": "",
+          "text_gu": "બીજાઓ મારા વિશે શું વિચારશે તેની મને ચિંતા થાય છે.",
+          "options_gu": []
         },
         {
           "questionId": "51",
@@ -581,7 +685,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને પ્રયોગ કરવાનું અને જુદા જુદા અભિગમો અજમાવવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "52",
@@ -592,7 +698,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને શાંત અને ધીમું વાતાવરણ વધારે ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "53",
@@ -603,7 +711,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને જટિલ સમસ્યાઓનું વિશ્લેષણ કરવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "54",
@@ -614,7 +724,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "emotionalStability",
-          "notes": ""
+          "notes": "",
+          "text_gu": "ટીકાથી મને સહેલાઈથી મન દુખે છે.",
+          "options_gu": []
         },
         {
           "questionId": "55",
@@ -625,7 +737,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "conscientiousness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને સ્પષ્ટ સમયમર્યાદા અને માળખું હોય તે ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "56",
@@ -636,7 +750,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને નવા લોકોને મળવાનું અને મિત્રો બનાવવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "57",
@@ -647,7 +763,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને અમૂર્ત સિદ્ધાંતો કરતાં નક્કર તથ્યો વધારે ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "58",
@@ -658,7 +776,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "emotionalStability",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું ઝડપથી અને આત્મવિશ્વાસથી નિર્ણયો લઉં છું.",
+          "options_gu": []
         },
         {
           "questionId": "59",
@@ -669,7 +789,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને ટીમનો ભાગ બનવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "60",
@@ -680,7 +802,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "emotionalStability",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું અવાજ અને ધ્યાનભંગ કરનારી બાબતો પ્રત્યે સંવેદનશીલ છું.",
+          "options_gu": []
         },
         {
           "questionId": "61",
@@ -691,7 +815,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને વિચારો પર પ્રશ્ન કરવાનું અને તેમને પડકારવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "62",
@@ -702,7 +828,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "emotionalStability",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યાં મારી ટીકા થાય તેવી પરિસ્થિતિઓને હું ટાળું છું.",
+          "options_gu": []
         },
         {
           "questionId": "63",
@@ -713,7 +841,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "conscientiousness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને કડક સમયપત્રક કરતાં લવચીકતા વધારે ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "64",
@@ -724,7 +854,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "સામાજિક વાર્તાલાપથી હું ઊર્જા અનુભવું છું.",
+          "options_gu": []
         },
         {
           "questionId": "65",
@@ -735,7 +867,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું સિદ્ધાંતો કરતાં વ્યવહારિક અનુપ્રયોગો પર ધ્યાન કેન્દ્રિત કરું છું.",
+          "options_gu": []
         },
         {
           "questionId": "66",
@@ -746,7 +880,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "conscientiousness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "એક વાર નિર્ણય લઈ લીધા પછી હું તેને વળગી રહું છું.",
+          "options_gu": []
         },
         {
           "questionId": "67",
@@ -757,7 +893,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને બીજાઓને તેમની સમસ્યાઓ ઉકેલવામાં મદદ કરવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "68",
@@ -768,7 +906,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": true,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "સામાજિક પ્રસંગો પછી મને રિચાર્જ થવા માટે શાંતિનો સમય જોઈએ છે.",
+          "options_gu": []
         },
         {
           "questionId": "69",
@@ -779,7 +919,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "openness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને દાર્શનિક પ્રશ્નોની શોધખોળ કરવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "70",
@@ -790,7 +932,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "emotionalStability",
-          "notes": ""
+          "notes": "",
+          "text_gu": "ભૂલો કરવા વિશે મને ચિંતા થાય છે.",
+          "options_gu": []
         },
         {
           "questionId": "71",
@@ -801,7 +945,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "conscientiousness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને મારા વિકલ્પો ખુલ્લા રાખવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "72",
@@ -812,7 +958,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "વ્યસ્ત અને સક્રિય વાતાવરણમાં હું ખીલું છું.",
+          "options_gu": []
         },
         {
           "questionId": "73",
@@ -827,7 +975,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું આ રીતે કામ કરવાનું પસંદ કરું છું:",
+          "options_gu": [
+            "એકલા સ્વતંત્ર પ્રોજેક્ટ્સ પર",
+            "2-4 લોકોની નાની ટીમમાં",
+            "મોટા જૂથો અથવા ટીમોમાં"
+          ]
         },
         {
           "questionId": "74",
@@ -842,7 +996,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મારું આદર્શ કામનું વાતાવરણ આવું હશે:",
+          "options_gu": [
+            "શાંત અને માળખાગત",
+            "સહકારી અને સામાજિક",
+            "ગતિશીલ અને બદલાતું"
+          ]
         },
         {
           "questionId": "75",
@@ -857,7 +1017,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને એવા કાર્યો ગમે છે જે:",
+          "options_gu": [
+            "રૂટિન અને અનુમાનિત હોય",
+            "થોડું માળખું ધરાવતા વૈવિધ્યસભર હોય",
+            "સંપૂર્ણપણે અણધાર્યા અને પડકારજનક હોય"
+          ]
         },
         {
           "questionId": "76",
@@ -872,7 +1038,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "સમયમર્યાદાનો સામનો કરતી વખતે, હું:",
+          "options_gu": [
+            "વહેલા શરૂ કરું છું અને સ્થિર ગતિએ કામ કરું છું",
+            "ઊર્જાના ધક્કાઓમાં કામ કરું છું",
+            "છેલ્લી ઘડીએ દબાણ હેઠળ સારી રીતે કામ કરું છું"
+          ]
         },
         {
           "questionId": "77",
@@ -887,7 +1059,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું શ્રેષ્ઠ રીતે આ રીતે શીખું છું:",
+          "options_gu": [
+            "સ્વતંત્ર રીતે વાંચીને અને અભ્યાસ કરીને",
+            "ચર્ચા અને જૂથ કાર્ય દ્વારા",
+            "પ્રત્યક્ષ અનુભવ અને અભ્યાસ દ્વારા"
+          ]
         },
         {
           "questionId": "78",
@@ -902,7 +1080,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મારું આદર્શ કામનું સમયપત્રક આવું હશે:",
+          "options_gu": [
+            "દરરોજ એક જ સમયે નિશ્ચિત કલાકો",
+            "નિર્ધારિત મર્યાદામાં લવચીક કલાકો",
+            "મારું પોતાનું સમયપત્રક નક્કી કરવાની સંપૂર્ણ સ્વતંત્રતા"
+          ]
         },
         {
           "questionId": "79",
@@ -917,7 +1101,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "સમસ્યાઓ ઉકેલતી વખતે, હું પસંદ કરું છું:",
+          "options_gu": [
+            "સ્થાપિત પ્રક્રિયાઓને અનુસરવાનું",
+            "પ્રયોગસિદ્ધ પદ્ધતિઓ અને સર્જનાત્મકતાનું મિશ્રણ",
+            "સંપૂર્ણપણે નવા અને નવીન ઉકેલો શોધવાનું"
+          ]
         },
         {
           "questionId": "80",
@@ -932,7 +1122,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું સૌથી વધુ ઉત્પાદક ત્યારે હોઉં છું જ્યારે:",
+          "options_gu": [
+            "એક સમયે એક જ કાર્ય પર કામ કરું છું",
+            "થોડા જુદા જુદા પ્રોજેક્ટ્સ સંભાળું છું",
+            "એક સાથે અનેક કાર્યો વ્યવસ્થાપિત કરું છું"
+          ]
         },
         {
           "questionId": "81",
@@ -947,7 +1143,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને એવો પ્રતિસાદ ગમે છે જે:",
+          "options_gu": [
+            "વિગતવાર અને ચોક્કસ હોય",
+            "પ્રશંસા અને સૂચનો સાથે સંતુલિત હોય",
+            "ટૂંકો અને મુદ્દાસર હોય"
+          ]
         },
         {
           "questionId": "82",
@@ -962,7 +1164,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મારી આદર્શ કામની જગ્યા આવી હશે:",
+          "options_gu": [
+            "ઓછા ધ્યાનભંગ સાથેની ખાનગી ઓફિસ",
+            "ખુલ્લી જગ્યા જ્યાં હું સહકર્મીઓ સાથે વાર્તાલાપ કરી શકું",
+            "લવચીક જગ્યા જે હું મારી જરૂરિયાત મુજબ ગોઠવી શકું"
+          ]
         },
         {
           "questionId": "83",
@@ -977,7 +1185,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને એવી સૂચનાઓ ગમે છે જે:",
+          "options_gu": [
+            "ખૂબ વિગતવાર અને પગલાંવાર હોય",
+            "સ્પષ્ટ હોય સાથે અર્થઘટન માટે થોડી જગ્યા હોય",
+            "સામાન્ય માર્ગદર્શિકા હોય જેને હું અનુકૂળ કરી શકું"
+          ]
         },
         {
           "questionId": "84",
@@ -992,7 +1206,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "લાંબા ગાળાના પ્રોજેક્ટ્સ પર કામ કરતી વખતે, હું:",
+          "options_gu": [
+            "વિગતવાર સમયરેખા બનાવું છું અને તેને વળગી રહું છું",
+            "મુખ્ય સીમાચિહ્નો નક્કી કરું છું અને જરૂર પડે ત્યારે અનુકૂળ થાઉં છું",
+            "અંતઃપ્રેરણાથી કામ કરું છું અને જતા જતા અનુકૂળ થાઉં છું"
+          ]
         },
         {
           "questionId": "85",
@@ -1007,7 +1227,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને સૌથી વધુ પ્રેરણા આનાથી મળે છે:",
+          "options_gu": [
+            "વ્યક્તિગત સિદ્ધિ અને માન્યતા",
+            "ટીમની સફળતા અને સહકાર",
+            "બીજાઓ પર સકારાત્મક અસર પાડવી"
+          ]
         },
         {
           "questionId": "86",
@@ -1022,7 +1248,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે હું આ કરી શકું ત્યારે હું તણાવનો શ્રેષ્ઠ રીતે સામનો કરું છું:",
+          "options_gu": [
+            "અગાઉથી યોજના બનાવી અને સંપૂર્ણ તૈયારી કરી",
+            "બીજાઓ સાથે સમસ્યાઓ વિશે વાત કરી",
+            "વિરામ લઈ અને મારી ઊર્જાનું વ્યવસ્થાપન કરી"
+          ]
         },
         {
           "questionId": "87",
@@ -1037,7 +1269,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને એવી મીટિંગ્સ ગમે છે જે:",
+          "options_gu": [
+            "સ્પષ્ટ એજન્ડા સાથે સારી રીતે માળખાગત હોય",
+            "જૂથ ભાગીદારી સાથે ઇન્ટરેક્ટિવ હોય",
+            "ટૂંકી અને નિર્ણયો પર કેન્દ્રિત હોય"
+          ]
         },
         {
           "questionId": "88",
@@ -1052,7 +1290,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "નવી કુશળતા શીખતી વખતે, હું પસંદ કરું છું:",
+          "options_gu": [
+            "ઔપચારિક તાલીમ અને માળખાગત અભ્યાસક્રમો",
+            "માર્ગદર્શન અને નોકરી પર શીખવાનું",
+            "સ્વયં-નિર્દેશિત શોધખોળ અને અભ્યાસ"
+          ]
         },
         {
           "questionId": "89",
@@ -1067,7 +1311,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું એવા સુપરવાઈઝર્સ સાથે શ્રેષ્ઠ રીતે કામ કરું છું જે:",
+          "options_gu": [
+            "સ્પષ્ટ અપેક્ષાઓ અને નિયમિત ચેક-ઇન આપે",
+            "સ્વતંત્રતા આપતી વખતે સહકાર પૂરો પાડે",
+            "મને સંપૂર્ણ સ્વાયત્તતા આપે"
+          ]
         },
         {
           "questionId": "90",
@@ -1082,7 +1332,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મારી આદર્શ કાર્યગતિ આવી છે:",
+          "options_gu": [
+            "સ્થિર અને સતત",
+            "પ્રોજેક્ટ આધારે વૈવિધ્યસભર",
+            "આરામના સમયગાળા સાથે તીવ્ર"
+          ]
         },
         {
           "questionId": "91",
@@ -1097,7 +1353,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું આ રીતે વાતચીત કરવાનું પસંદ કરું છું:",
+          "options_gu": [
+            "લેખિત અહેવાલો અને દસ્તાવેજો દ્વારા",
+            "પ્રત્યક્ષ વાતચીત દ્વારા",
+            "ઝડપી સંદેશા અને ટૂંકા અપડેટ્સ દ્વારા"
+          ]
         },
         {
           "questionId": "92",
@@ -1112,7 +1374,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "કામ પર નિર્ણયો લેતી વખતે, હું:",
+          "options_gu": [
+            "પ્રથમ વ્યાપક માહિતી એકત્રિત કરું છું",
+            "નિર્ણય લેતા પહેલા બીજાઓ સાથે સલાહ લઉં છું",
+            "મારી અંતઃપ્રેરણા પર ભરોસો કરી ઝડપથી નક્કી કરું છું"
+          ]
         },
         {
           "questionId": "93",
@@ -1127,7 +1395,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું સૌથી વધુ સંતુષ્ટ ત્યારે હોઉં છું જ્યારે મારું કામ:",
+          "options_gu": [
+            "સ્પષ્ટ ધોરણો અને પ્રક્રિયાઓને અનુસરે",
+            "માર્ગદર્શિકાઓની અંદર સર્જનાત્મકતાની છૂટ આપે",
+            "નવી ઘરડ ઉઘાડે અને ધોરણોને પડકારે"
+          ]
         },
         {
           "questionId": "94",
@@ -1142,7 +1416,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને એવી માન્યતા ગમે છે જે:",
+          "options_gu": [
+            "ખાનગી અને વ્યક્તિગત હોય",
+            "મારી તાત્કાલિક ટીમ સાથે વહેંચાય",
+            "જાહેર અને બધાને દેખાય તેવી હોય"
+          ]
         },
         {
           "questionId": "95",
@@ -1157,7 +1437,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે કામ પર સંઘર્ષ થાય ત્યારે, હું:",
+          "options_gu": [
+            "યોગ્ય માર્ગો દ્વારા તેને સંભાળવાનું પસંદ કરું છું",
+            "મધ્યસ્થી કરવાનો અને સમાધાન શોધવાનો પ્રયાસ કરું છું",
+            "તેને સીધો અને તરત જ સંભાળું છું"
+          ]
         },
         {
           "questionId": "96",
@@ -1172,7 +1458,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મારો આદર્શ કારકિર્દી માર્ગ આનો સમાવેશ કરશે:",
+          "options_gu": [
+            "એક જ સંસ્થામાં સ્થિર પ્રગતિ",
+            "વૈવિધ્યસભર અનુભવો દ્વારા વૃદ્ધિ",
+            "મારી પોતાની તકો અને સાહસો ઊભા કરવા"
+          ]
         },
         {
           "questionId": "97",
@@ -1183,7 +1475,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જૂથમાં કામ કરતી વખતે, હું કુદરતી રીતે જવાબદારી લઉં છું.",
+          "options_gu": []
         },
         {
           "questionId": "98",
@@ -1194,7 +1488,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને બીજાઓ માટે કાર્યક્રમો અને પ્રવૃત્તિઓનું આયોજન કરવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "99",
@@ -1205,7 +1501,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "લોકો ઘણીવાર મારી પાસે સલાહ અને માર્ગદર્શન માટે આવે છે.",
+          "options_gu": []
         },
         {
           "questionId": "100",
@@ -1216,7 +1514,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મોટા જૂથો સામે બોલવામાં મને સહજતા લાગે છે.",
+          "options_gu": []
         },
         {
           "questionId": "101",
@@ -1227,7 +1527,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું બીજાઓને એક ધ્યેય તરફ કામ કરવા સહેલાઈથી પ્રેરિત કરી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "102",
@@ -1238,7 +1540,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને સત્તાને બદલે સમજાવટ દ્વારા બીજાઓને પ્રભાવિત કરવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "103",
@@ -1249,7 +1553,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને બીજાઓને શીખવવાનું અને માર્ગદર્શન આપવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "104",
@@ -1260,7 +1566,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું લોકો વચ્ચેના સંઘર્ષમાં મધ્યસ્થી કરવામાં સારો છું.",
+          "options_gu": []
         },
         {
           "questionId": "105",
@@ -1271,7 +1579,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારી ટીમની સફળતા માટે જવાબદારી અનુભવું છું.",
+          "options_gu": []
         },
         {
           "questionId": "106",
@@ -1282,7 +1592,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારી વાતચીતની શૈલીને જુદા જુદા લોકો અનુસાર બદલી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "107",
@@ -1293,7 +1605,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે જૂથમાં કોઈને બાજુ પર રાખવામાં આવે ત્યારે હું તેને ધ્યાનમાં લઉં છું.",
+          "options_gu": []
         },
         {
           "questionId": "108",
@@ -1304,7 +1618,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું બીજાઓને તેમના વિચારો અને અભિપ્રાય વહેંચવા પ્રોત્સાહિત કરું છું.",
+          "options_gu": []
         },
         {
           "questionId": "109",
@@ -1315,7 +1631,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે જરૂરી હોય ત્યારે હું અપ્રિય નિર્ણયો લેવા તૈયાર છું.",
+          "options_gu": []
         },
         {
           "questionId": "110",
@@ -1326,7 +1644,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "emotionalStability",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે બીજાઓ ગુસ્સે કે દુઃખી હોય ત્યારે હું શાંત રહી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "111",
@@ -1337,7 +1657,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને સામાન્ય ધ્યેયો માટે લોકોને એકસાથે લાવવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "112",
@@ -1348,7 +1670,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું બીજાઓને કાર્યો સોંપવામાં સારો છું.",
+          "options_gu": []
         },
         {
           "questionId": "113",
@@ -1359,7 +1683,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું લોકોમાં એવી શક્યતા જોઈ શકું છું જે બીજાઓ ચૂકી જાય.",
+          "options_gu": []
         },
         {
           "questionId": "114",
@@ -1370,7 +1696,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "સત્તાના સ્થાનો પર હોવામાં હું સહજ છું.",
+          "options_gu": []
         },
         {
           "questionId": "115",
@@ -1381,7 +1709,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને નેટવર્કિંગ અને વ્યાવસાયિક સંબંધો બાંધવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "116",
@@ -1392,7 +1722,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું બીજાઓની લાગણીઓને ઠેસ પહોંચાડ્યા વિના રચનાત્મક ટીકા આપી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "117",
@@ -1403,7 +1735,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "extraversion",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું સામાજિક પરિસ્થિતિઓ અને જૂથ ગતિશીલતા વાંચવામાં સારો છું.",
+          "options_gu": []
         },
         {
           "questionId": "118",
@@ -1414,7 +1748,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે કંઈક કરવાની જરૂર હોય તેવું દેખાય ત્યારે હું પહેલ કરું છું.",
+          "options_gu": []
         },
         {
           "questionId": "119",
@@ -1425,7 +1761,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું જુદી જુદી પૃષ્ઠભૂમિના લોકો સાથે અસરકારક રીતે કામ કરી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "120",
@@ -1436,7 +1774,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "agreeableness",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને બીજાઓની સિદ્ધિઓ અને સફળતાઓની ઉજવણી કરવાનું ગમે છે.",
+          "options_gu": []
         }
       ]
     },
@@ -1457,7 +1797,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને ગાણિતિક કોયડાઓ અને બુદ્ધિના કોયડા ઉકેલવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "122",
@@ -1468,7 +1810,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું સંખ્યાઓ અને ક્રમમાં પેટર્ન સહેલાઈથી જોઈ શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "123",
@@ -1479,7 +1823,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને સમસ્યાઓનું પગલાં-વાર વિશ્લેષણ કરવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "124",
@@ -1490,7 +1836,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને આંકડાશાસ્ત્ર અને ડેટા સાથે કામ કરવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "125",
@@ -1501,7 +1849,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને ગણિતના ખ્યાલો રસપ્રદ અને આકર્ષક લાગે છે.",
+          "options_gu": []
         },
         {
           "questionId": "126",
@@ -1512,7 +1862,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું જથ્થા અને માપનો ચોક્કસ અંદાજ લગાવી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "127",
@@ -1523,7 +1875,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને એવી રમતો ગમે છે જેમાં વ્યૂહરચના અને તર્કનો સમાવેશ થાય.",
+          "options_gu": []
         },
         {
           "questionId": "128",
@@ -1534,7 +1888,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને વસ્તુઓ યાંત્રિક રીતે કેવી રીતે કામ કરે છે તે સમજવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "129",
@@ -1545,7 +1901,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું તાર્કિક વિચારણાનો ઉપયોગ કરી સમસ્યાઓ ઉકેલી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "130",
@@ -1556,7 +1914,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને માહિતીને શ્રેણીઓ અને પ્રણાલીઓમાં વ્યવસ્થિત કરવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "131",
@@ -1567,7 +1927,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને પુસ્તકો અને લેખિત સામગ્રી વાંચવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "132",
@@ -1578,7 +1940,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મારા વિચારોને લેખનમાં વ્યક્ત કરવા મારા માટે સહેલું છે.",
+          "options_gu": []
         },
         {
           "questionId": "133",
@@ -1589,7 +1953,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મારી પાસે સારી શબ્દભંડોળ છે અને નવા શબ્દો શીખવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "134",
@@ -1600,7 +1966,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને વાર્તાઓ કહેવાનું અને અનુભવો મૌખિક રીતે વહેંચવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "135",
@@ -1611,7 +1979,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને શબ્દોની રમતો, ક્રોસવર્ડ અને કોયડાઓ ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "136",
@@ -1622,7 +1992,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું અવતરણો, કહેવતો અને કવિતાઓ સહેલાઈથી યાદ રાખી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "137",
@@ -1633,7 +2005,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને જુદા જુદા વિષયો પર ચર્ચાઓ અને વાદવિવાદ ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "138",
@@ -1644,7 +2018,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને જર્નલ કે ડાયરી રાખવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "139",
@@ -1655,7 +2031,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું જટિલ વિચારોને બીજાઓને સ્પષ્ટ રીતે સમજાવી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "140",
@@ -1666,7 +2044,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને વિદેશી ભાષાઓ શીખવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "141",
@@ -1677,7 +2057,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું વસ્તુઓ જુદા જુદા ખૂણાઓથી કેવી દેખાય તેની સહેલાઈથી કલ્પના કરી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "142",
@@ -1688,7 +2070,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને ચિત્રકામ, પેઇન્ટિંગ અથવા ડિઝાઇન જેવી પ્રવૃત્તિઓ ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "143",
@@ -1699,7 +2083,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને દિશાનું સારું જ્ઞાન છે અને હું ભાગ્યે જ ભૂલો પડું છું.",
+          "options_gu": []
         },
         {
           "questionId": "144",
@@ -1710,7 +2096,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારા મનમાં વસ્તુઓની સ્પષ્ટ કલ્પના કરી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "145",
@@ -1721,7 +2109,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું રંગો, આકારો અને દૃશ્ય વિગતો જોઈ શકું છું જે બીજાઓ ચૂકી જાય.",
+          "options_gu": []
         },
         {
           "questionId": "146",
@@ -1732,7 +2122,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને નકશા, ચાર્ટ અને ડાયાગ્રામ સાથે કામ કરવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "147",
@@ -1743,7 +2135,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું સૂચનાઓ જોયા વિના વસ્તુઓ જોડી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "148",
@@ -1754,7 +2148,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું શબ્દોને બદલે ચિત્રોમાં વિચારું છું.",
+          "options_gu": []
         },
         {
           "questionId": "149",
@@ -1765,7 +2161,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને જગ્યાઓ સજાવવાનું અને ગોઠવવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "150",
@@ -1776,7 +2174,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું અંતર અને અવકાશી સંબંધોનો સારી રીતે અંદાજ લગાવી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "151",
@@ -1787,7 +2187,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું સૂરો અને ગીતો સહેલાઈથી યાદ રાખી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "152",
@@ -1798,7 +2200,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે કોઈ ખોટા સૂરમાં ગાય કે વગાડે ત્યારે હું તે ધ્યાનમાં લઉં છું.",
+          "options_gu": []
         },
         {
           "questionId": "153",
@@ -1809,7 +2213,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને સંગીત સાંભળવાનું ગમે છે અને મારી મનપસંદ શૈલીઓ છે.",
+          "options_gu": []
         },
         {
           "questionId": "154",
@@ -1820,7 +2226,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું સંગીત સાથે તાલ રાખી શકું છું અને મારી પાસે સારી લય છે.",
+          "options_gu": []
         },
         {
           "questionId": "155",
@@ -1831,7 +2239,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મારા મગજમાં ઘણીવાર ગીતો વાગતા હોય છે.",
+          "options_gu": []
         },
         {
           "questionId": "156",
@@ -1842,7 +2252,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું અવાજ પરથી જુદા જુદા સંગીત વાદ્યોને ઓળખી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "157",
@@ -1853,7 +2265,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને ગાવાનું અથવા સંગીત વાદ્યો વગાડવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "158",
@@ -1864,7 +2278,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું સહેલાઈથી લય અને બીટ બનાવી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "159",
@@ -1875,7 +2291,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "સંગીત મારા મૂડ અને લાગણીઓને મજબૂત રીતે અસર કરે છે.",
+          "options_gu": []
         },
         {
           "questionId": "160",
@@ -1886,7 +2304,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું ગીતોને સાંભળીને ઝડપથી શીખી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "161",
@@ -1897,7 +2317,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે હું ફરી શકું અને મારા હાથનો ઉપયોગ કરી શકું ત્યારે હું વધુ સારી રીતે શીખું છું.",
+          "options_gu": []
         },
         {
           "questionId": "162",
@@ -1908,7 +2330,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું રમતગમત અને શારીરિક પ્રવૃત્તિઓમાં સારો છું.",
+          "options_gu": []
         },
         {
           "questionId": "163",
@@ -1919,7 +2343,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને મારા હાથથી કામ કરવાનું અને વસ્તુઓ બનાવવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "164",
@@ -1930,7 +2356,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું ગતિવિધિઓ અને હાવભાવ સહેલાઈથી નકલ કરી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "165",
@@ -1941,7 +2369,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મારી પાસે સારું સંકલન અને સંતુલન છે.",
+          "options_gu": []
         },
         {
           "questionId": "166",
@@ -1952,7 +2382,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને શારીરિક પડકારો અને પ્રવૃત્તિઓ ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "167",
@@ -1963,7 +2395,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું હલનચલન અને નૃત્ય દ્વારા મારી જાતને વ્યક્ત કરી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "168",
@@ -1974,7 +2408,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને સાંભળવા કરતાં કરીને શીખવાનું વધારે ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "169",
@@ -1985,7 +2421,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું હસ્તકલા અને હાથ-આધારિત પ્રોજેક્ટ્સમાં સારો છું.",
+          "options_gu": []
         },
         {
           "questionId": "170",
@@ -1996,7 +2434,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું અવકાશમાં મારું શરીર કેવી રીતે અનુભવે છે અને કેવી રીતે ફરે છે તે પારખી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "171",
@@ -2007,7 +2447,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું સહેલાઈથી પારખી શકું છું કે બીજાઓ શું અનુભવી રહ્યા છે.",
+          "options_gu": []
         },
         {
           "questionId": "172",
@@ -2018,7 +2460,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "લોકો ઘણીવાર તેમની સમસ્યાઓની સલાહ માટે મારી પાસે આવે છે.",
+          "options_gu": []
         },
         {
           "questionId": "173",
@@ -2029,7 +2473,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને બીજાઓ સાથે કામ કરવાનું અને ટીમનો ભાગ બનવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "174",
@@ -2040,7 +2486,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું જુદા જુદા દૃષ્ટિકોણને સહેલાઈથી સમજી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "175",
@@ -2051,7 +2499,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું લોકો વચ્ચેના સંઘર્ષનું નિરાકરણ લાવવામાં સારો છું.",
+          "options_gu": []
         },
         {
           "questionId": "176",
@@ -2062,7 +2512,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને નવા લોકોને મળવાનું અને મિત્રો બનાવવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "177",
@@ -2073,7 +2525,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું લોકોના મૂડ અને લાગણીઓને ચોક્કસપણે વાંચી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "178",
@@ -2084,7 +2538,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને બીજાઓને તેમના લક્ષ્યો પ્રાપ્ત કરવામાં મદદ કરવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "179",
@@ -2095,7 +2551,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "સામાજિક પરિસ્થિતિઓમાં હું સહજ છું.",
+          "options_gu": []
         },
         {
           "questionId": "180",
@@ -2106,7 +2564,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારા વર્તનને જુદા જુદા સામાજિક સંદર્ભો અનુસાર બદલી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "181",
@@ -2117,7 +2577,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મારી શક્તિઓ અને નબળાઈઓ વિશે મારી પાસે સ્પષ્ટ સમજ છે.",
+          "options_gu": []
         },
         {
           "questionId": "182",
@@ -2128,7 +2590,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મારા વિચારો વહેંચતા પહેલા હું તેમના પર મંથન કરવાનું પસંદ કરું છું.",
+          "options_gu": []
         },
         {
           "questionId": "183",
@@ -2139,7 +2603,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારી લાગણીઓ અને તેમના કારણો વિશે જાગૃત છું.",
+          "options_gu": []
         },
         {
           "questionId": "184",
@@ -2150,7 +2616,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને એકલા વિચારવામાં અને ચિંતન કરવામાં સમય ગાળવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "185",
@@ -2161,7 +2629,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મારી પાસે મજબૂત વ્યક્તિગત મૂલ્યો અને માન્યતાઓ છે.",
+          "options_gu": []
         },
         {
           "questionId": "186",
@@ -2172,7 +2642,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારા લક્ષ્યો પ્રાપ્ત કરવા માટે મારી જાતને પ્રેરિત કરી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "187",
@@ -2183,7 +2655,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારી ભૂલો અને અનુભવોમાંથી શીખું છું.",
+          "options_gu": []
         },
         {
           "questionId": "188",
@@ -2194,7 +2668,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "એકાંત અને શાંતિના સમય સાથે હું સહજ છું.",
+          "options_gu": []
         },
         {
           "questionId": "189",
@@ -2205,7 +2681,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારી શીખવાની શૈલી અને પસંદગીઓ સમજું છું.",
+          "options_gu": []
         },
         {
           "questionId": "190",
@@ -2216,7 +2694,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારી લાગણીઓ અને પ્રતિક્રિયાઓને સારી રીતે વ્યવસ્થાપિત કરી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "191",
@@ -2227,7 +2707,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને કુદરત અને બહારના વાતાવરણમાં સમય ગાળવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "192",
@@ -2238,7 +2720,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું જુદા જુદા છોડ, પ્રાણીઓ અથવા કુદરતી ઘટનાઓને સહેલાઈથી ઓળખી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "193",
@@ -2249,7 +2733,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "પર્યાવરણીય મુદ્દાઓ વિશે મને ચિંતા છે.",
+          "options_gu": []
         },
         {
           "questionId": "194",
@@ -2260,7 +2746,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને કેમ્પિંગ, હાઇકિંગ અથવા અન્ય બહારની પ્રવૃત્તિઓ ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "195",
@@ -2271,7 +2759,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું હવામાનમાં થતા પેટર્ન અને ફેરફારોને ધ્યાનમાં લઉં છું.",
+          "options_gu": []
         },
         {
           "questionId": "196",
@@ -2282,7 +2772,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને કુદરતમાંથી વસ્તુઓ (પથ્થરો, પાંદડાં વગેરે) એકત્ર કરવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "197",
@@ -2293,7 +2785,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું કુદરતમાં જુદા જુદા અવાજો વચ્ચે તફાવત કરી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "198",
@@ -2304,7 +2798,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને બાગાયત અથવા છોડ સાથે કામ કરવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "199",
@@ -2315,7 +2811,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને શહેરી વાતાવરણ કરતાં કુદરતી સ્થળો વધારે ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "200",
@@ -2326,7 +2824,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું કુદરતી વસ્તુઓને સહેલાઈથી શ્રેણીબદ્ધ અને વર્ગીકૃત કરી શકું છું.",
+          "options_gu": []
         }
       ]
     },
@@ -2345,7 +2845,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ફર્નિચર બનાવવું અથવા મશીનો રિપેર કરવા",
+          "options_gu": []
         },
         {
           "questionId": "202",
@@ -2354,7 +2856,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ખેતી અથવા વનસંવર્ધનમાં બહાર કામ કરવું",
+          "options_gu": []
         },
         {
           "questionId": "203",
@@ -2363,7 +2867,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ભારે મશીનરી અથવા ઉપકરણ ચલાવવા",
+          "options_gu": []
         },
         {
           "questionId": "204",
@@ -2372,7 +2878,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ઈલેક્ટ્રોનિક ઉપકરણો અથવા સાધનો રિપેર કરવા",
+          "options_gu": []
         },
         {
           "questionId": "205",
@@ -2381,7 +2889,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ઓજારો અને યાંત્રિક વસ્તુઓ સાથે કામ કરવું",
+          "options_gu": []
         },
         {
           "questionId": "206",
@@ -2390,7 +2900,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "વાહનોની જાળવણી અને સર્વિસ કરવી",
+          "options_gu": []
         },
         {
           "questionId": "207",
@@ -2399,7 +2911,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "વૈજ્ઞાનિક સંશોધન પ્રયોગો કરવા",
+          "options_gu": []
         },
         {
           "questionId": "208",
@@ -2408,7 +2922,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ડેટાનું વિશ્લેષણ કરવું અને જટિલ સમસ્યાઓ ઉકેલવી",
+          "options_gu": []
         },
         {
           "questionId": "209",
@@ -2417,7 +2933,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "વૈજ્ઞાનિક જર્નલ અને પ્રકાશનો વાંચવાં",
+          "options_gu": []
         },
         {
           "questionId": "210",
@@ -2426,7 +2944,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "પ્રયોગશાળાના વાતાવરણમાં કામ કરવું",
+          "options_gu": []
         },
         {
           "questionId": "211",
@@ -2435,7 +2955,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કુદરતી ઘટનાઓ અને પ્રક્રિયાઓનો અભ્યાસ કરવો",
+          "options_gu": []
         },
         {
           "questionId": "212",
@@ -2444,7 +2966,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સિદ્ધાંતો વિકસાવવા અને પૂર્વધારણાઓની ચકાસણી કરવી",
+          "options_gu": []
         },
         {
           "questionId": "213",
@@ -2453,7 +2977,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મૂળ કલાકૃતિ અથવા ડિઝાઇન બનાવવી",
+          "options_gu": []
         },
         {
           "questionId": "214",
@@ -2462,7 +2988,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "વાર્તાઓ, કવિતાઓ અથવા લેખો લખવા",
+          "options_gu": []
         },
         {
           "questionId": "215",
@@ -2471,7 +2999,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સંગીત, નૃત્ય અથવા નાટકનું પ્રદર્શન કરવું",
+          "options_gu": []
         },
         {
           "questionId": "216",
@@ -2480,7 +3010,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "વેબસાઇટ્સ, ગ્રાફિક્સ અથવા મીડિયા ડિઝાઇન કરવા",
+          "options_gu": []
         },
         {
           "questionId": "217",
@@ -2489,7 +3021,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જગ્યાઓને સર્જનાત્મક રીતે સજાવવી અને ગોઠવવી",
+          "options_gu": []
         },
         {
           "questionId": "218",
@@ -2498,7 +3032,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ફેશન અથવા સર્જનાત્મક ઉદ્યોગોમાં કામ કરવું",
+          "options_gu": []
         },
         {
           "questionId": "219",
@@ -2507,7 +3043,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "બીજાઓને શીખવવું અને શિક્ષણ આપવું",
+          "options_gu": []
         },
         {
           "questionId": "220",
@@ -2516,7 +3054,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "લોકોને તેમની સમસ્યાઓમાં કાઉન્સેલિંગ આપવું અને મદદ કરવી",
+          "options_gu": []
         },
         {
           "questionId": "221",
@@ -2525,7 +3065,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આરોગ્ય સંભાળ અને તબીબી ક્ષેત્રોમાં કામ કરવું",
+          "options_gu": []
         },
         {
           "questionId": "222",
@@ -2534,7 +3076,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સામુદાયિક કાર્યક્રમો અને પ્રવૃત્તિઓનું આયોજન કરવું",
+          "options_gu": []
         },
         {
           "questionId": "223",
@@ -2543,7 +3087,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સામાજિક હેતુઓ અને મુદ્દાઓ માટે પ્રચાર કરવો",
+          "options_gu": []
         },
         {
           "questionId": "224",
@@ -2552,7 +3098,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ગ્રાહક સેવા અને સહાય પૂરી પાડવી",
+          "options_gu": []
         },
         {
           "questionId": "225",
@@ -2561,7 +3109,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "પોતાનો વ્યવસાય શરૂ કરવો અને ચલાવવો",
+          "options_gu": []
         },
         {
           "questionId": "226",
@@ -2570,7 +3120,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ટીમોનું નેતૃત્વ કરવું અને પ્રોજેક્ટ્સનું વ્યવસ્થાપન કરવું",
+          "options_gu": []
         },
         {
           "questionId": "227",
@@ -2579,7 +3131,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ગ્રાહકોને ઉત્પાદનો અથવા સેવાઓ વેચવી",
+          "options_gu": []
         },
         {
           "questionId": "228",
@@ -2588,7 +3142,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સોદાઓ અને કરારોની વાટાઘાટ કરવી",
+          "options_gu": []
         },
         {
           "questionId": "229",
@@ -2597,7 +3153,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "પ્રેઝન્ટેશન આપવા અને જાહેર બોલવું",
+          "options_gu": []
         },
         {
           "questionId": "230",
@@ -2606,7 +3164,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "બીજાઓને પ્રભાવિત અને સમજાવવા",
+          "options_gu": []
         },
         {
           "questionId": "231",
@@ -2615,7 +3175,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ફાઇલો, રેકોર્ડ અને ડેટાબેઝનું આયોજન કરવું",
+          "options_gu": []
         },
         {
           "questionId": "232",
@@ -2624,7 +3186,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સંખ્યાઓ અને નાણાકીય ડેટા સાથે કામ કરવું",
+          "options_gu": []
         },
         {
           "questionId": "233",
@@ -2633,7 +3197,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સ્થાપિત પ્રક્રિયાઓ અને પ્રણાલીઓને અનુસરવી",
+          "options_gu": []
         },
         {
           "questionId": "234",
@@ -2642,7 +3208,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સમયપત્રક અને વહીવટી કાર્યોનું વ્યવસ્થાપન કરવું",
+          "options_gu": []
         },
         {
           "questionId": "235",
@@ -2651,7 +3219,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ચોકસાઈ અને વિગતો પર ધ્યાન સુનિશ્ચિત કરવું",
+          "options_gu": []
         },
         {
           "questionId": "236",
@@ -2660,7 +3230,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "માળખાગત, સંગઠિત વાતાવરણમાં કામ કરવું",
+          "options_gu": []
         },
         {
           "questionId": "237",
@@ -2669,7 +3241,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ગણિત અને આંકડાશાસ્ત્ર",
+          "options_gu": []
         },
         {
           "questionId": "238",
@@ -2678,7 +3252,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ભૌતિકશાસ્ત્ર અને રસાયણશાસ્ત્ર",
+          "options_gu": []
         },
         {
           "questionId": "239",
@@ -2687,7 +3263,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જીવવિજ્ઞાન અને જીવન વિજ્ઞાન",
+          "options_gu": []
         },
         {
           "questionId": "240",
@@ -2696,7 +3274,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કમ્પ્યુટર સાયન્સ અને ટેકનોલોજી",
+          "options_gu": []
         },
         {
           "questionId": "241",
@@ -2705,7 +3285,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "એન્જિનિયરિંગ અને એપ્લાઇડ સાયન્સ",
+          "options_gu": []
         },
         {
           "questionId": "242",
@@ -2714,7 +3296,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સાહિત્ય અને ભાષા કલા",
+          "options_gu": []
         },
         {
           "questionId": "243",
@@ -2723,7 +3307,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ઇતિહાસ અને સામાજિક અભ્યાસ",
+          "options_gu": []
         },
         {
           "questionId": "244",
@@ -2732,7 +3318,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મનોવિજ્ઞાન અને માનવ વર્તન",
+          "options_gu": []
         },
         {
           "questionId": "245",
@@ -2741,7 +3329,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કલા અને સર્જનાત્મક અભિવ્યક્તિ",
+          "options_gu": []
         },
         {
           "questionId": "246",
@@ -2750,7 +3340,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સંગીત અને પ્રદર્શન કલા",
+          "options_gu": []
         },
         {
           "questionId": "247",
@@ -2759,7 +3351,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "શારીરિક શિક્ષણ અને રમતગમત",
+          "options_gu": []
         },
         {
           "questionId": "248",
@@ -2768,7 +3362,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "વ્યવસાય અને અર્થશાસ્ત્ર",
+          "options_gu": []
         },
         {
           "questionId": "249",
@@ -2777,7 +3373,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "વિદેશી ભાષાઓ",
+          "options_gu": []
         },
         {
           "questionId": "250",
@@ -2786,7 +3384,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ફિલસૂફી અને નૈતિકતા",
+          "options_gu": []
         },
         {
           "questionId": "251",
@@ -2795,7 +3395,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "પર્યાવરણ વિજ્ઞાન",
+          "options_gu": []
         },
         {
           "questionId": "252",
@@ -2804,7 +3406,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "દવા અને આરોગ્ય વિજ્ઞાન",
+          "options_gu": []
         },
         {
           "questionId": "253",
@@ -2813,7 +3417,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કાયદો અને કાનૂની અભ્યાસ",
+          "options_gu": []
         },
         {
           "questionId": "254",
@@ -2822,7 +3428,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "options": [],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સંદેશાવ્યવહાર અને મીડિયા",
+          "options_gu": []
         },
         {
           "questionId": "255",
@@ -2835,7 +3443,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મને સૌથી વધારે ગમશે:",
+          "options_gu": [
+            "વેબસાઇટ અથવા મોબાઈલ એપ્લિકેશન ડિઝાઇન કરવી",
+            "ચેરિટી ભંડોળ સંગ્રહ કાર્યક્રમનું આયોજન કરવું",
+            "રસાયણશાસ્ત્રનો પ્રયોગ કરવો"
+          ]
         },
         {
           "questionId": "256",
@@ -2848,7 +3462,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "વીકએન્ડ પ્રવૃત્તિ માટે, હું પસંદ કરીશ:",
+          "options_gu": [
+            "વિજ્ઞાન સંગ્રહાલયની મુલાકાત લેવી",
+            "કોન્સર્ટ અથવા કલા પ્રદર્શનમાં હાજરી આપવી",
+            "રમતગમતની સ્પર્ધામાં ભાગ લેવો"
+          ]
         },
         {
           "questionId": "257",
@@ -2861,7 +3481,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "હું પસંદ કરીશ:",
+          "options_gu": [
+            "જે વિષય મને ગમે છે તેના પર સંશોધન પત્ર લખવો",
+            "વ્યવસાય દરખાસ્ત માટે પ્રેઝન્ટેશન બનાવવું",
+            "નવી શોધનું મોડેલ અથવા પ્રોટોટાઇપ બનાવવું"
+          ]
         },
         {
           "questionId": "258",
@@ -2874,7 +3500,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આ વિકલ્પોમાંથી, હું પસંદ કરીશ:",
+          "options_gu": [
+            "નાના વિદ્યાર્થીઓને ગણિતમાં ટ્યુટરિંગ આપવું",
+            "શાળાના નાટક અથવા સંગીતમાં પ્રદર્શન કરવું",
+            "વિદ્યાર્થી સરકાર ઝુંબેશનું નેતૃત્વ કરવું"
+          ]
         },
         {
           "questionId": "259",
@@ -2887,7 +3519,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મને સૌથી વધારે રસ હશે:",
+          "options_gu": [
+            "માર્કેટ રિસર્ચ માટે સર્વે ડેટાનું વિશ્લેષણ કરવામાં",
+            "થિયેટર નિર્માણ માટે વેશભૂષા ડિઝાઇન કરવામાં",
+            "યુવા સ્પોર્ટ્સ ટીમને કોચિંગ આપવામાં"
+          ]
         },
         {
           "questionId": "260",
@@ -2900,7 +3538,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ઉનાળાની મારી પસંદગીની પ્રવૃત્તિ આ હશે:",
+          "options_gu": [
+            "ટેકનોલોજી કંપનીમાં ઇન્ટર્નશિપ કરવી",
+            "હોસ્પિટલ અથવા ક્લિનિકમાં સ્વયંસેવા આપવી",
+            "આર્ટ ગેલેરી અથવા સંગ્રહાલયમાં કામ કરવું"
+          ]
         },
         {
           "questionId": "261",
@@ -2913,7 +3557,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મને ગમશે:",
+          "options_gu": [
+            "વર્તમાન ઘટનાઓ અને રાજકીય મુદ્દાઓ પર વાદવિવાદ કરવો",
+            "ડિજિટલ આર્ટવર્ક અથવા એનિમેશન બનાવવા",
+            "મુખ્ય કાર્યક્રમનું આયોજન અને વ્યવસ્થાપન કરવું"
+          ]
         },
         {
           "questionId": "262",
@@ -2926,7 +3576,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જૂથ પ્રોજેક્ટ માટે, હું કરવા માંગીશ:",
+          "options_gu": [
+            "સંશોધન અને માહિતી એકત્રિત કરવાનું",
+            "વર્ગ સામે તારણો રજૂ કરવાનું",
+            "દૃશ્ય સામગ્રી અને ડિસ્પ્લે ડિઝાઇન કરવાનું"
+          ]
         },
         {
           "questionId": "263",
@@ -2939,7 +3595,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "હું સમય ગાળવાનું પસંદ કરીશ:",
+          "options_gu": [
+            "વૈજ્ઞાનિક શોધો વિશે વાંચીને",
+            "ઐતિહાસિક સ્થળો અને સ્મારકોની મુલાકાત લઈને",
+            "કુદરત અને બહારના વાતાવરણની શોધખોળ કરીને"
+          ]
         },
         {
           "questionId": "264",
@@ -2952,7 +3614,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આ વિકલ્પોમાંથી, હું પસંદ કરીશ:",
+          "options_gu": [
+            "નવી પ્રોગ્રામિંગ ભાષા શીખવી",
+            "સર્જનાત્મક લેખન વર્કશોપમાં ભાગ લેવો",
+            "વાદવિવાદ સ્પર્ધામાં ભાગ લેવો"
+          ]
         },
         {
           "questionId": "265",
@@ -2965,7 +3633,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "હું સૌથી વધારે ઉત્સાહિત રહીશ:",
+          "options_gu": [
+            "એક દિવસ માટે ડોક્ટર અથવા નર્સને નિહાળવાનું",
+            "વ્યવસાય ઉદ્યોગસાહસિક વર્કશોપમાં હાજરી આપવાનું",
+            "પર્યાવરણ સંરક્ષણ પ્રોજેક્ટમાં જોડાવાનું"
+          ]
         },
         {
           "questionId": "266",
@@ -2978,7 +3652,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મારી આદર્શ અભ્યાસેતર પ્રવૃત્તિ આ હશે:",
+          "options_gu": [
+            "વિજ્ઞાન ઓલિમ્પિયાડ અથવા ગણિત સ્પર્ધા",
+            "ડ્રામા ક્લબ અથવા શાળાનું અખબાર",
+            "વિદ્યાર્થી પરિષદ અથવા સામુદાયિક સેવા ક્લબ"
+          ]
         },
         {
           "questionId": "267",
@@ -2991,7 +3671,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "હું પસંદ કરીશ:",
+          "options_gu": [
+            "કોયડાઓ અને બુદ્ધિના કોયડા ઉકેલવા",
+            "સંગીત પ્લેલિસ્ટ અને મિક્સ બનાવવા",
+            "સામાજિક કાર્યક્રમો અને પાર્ટીઓનું આયોજન કરવું"
+          ]
         },
         {
           "questionId": "268",
@@ -3004,7 +3690,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કારકિર્દી શોધખોળની તક માટે, હું પસંદ કરીશ:",
+          "options_gu": [
+            "એન્જિનિયર અથવા આર્કિટેક્ટની નોકરી નિહાળવી",
+            "સામાજિક સેવા સંસ્થામાં સ્વયંસેવા આપવી",
+            "માર્કેટિંગ અથવા જાહેરાત કંપનીમાં ઇન્ટર્નશિપ કરવી"
+          ]
         },
         {
           "questionId": "269",
@@ -3017,7 +3709,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મને સૌથી વધારે ગમશે:",
+          "options_gu": [
+            "રોબોટ્સ બનાવવા અને પ્રોગ્રામ કરવા",
+            "પ્રકાશન માટે લેખન અને સંપાદન કરવું",
+            "બજેટનું આયોજન અને વ્યવસ્થાપન કરવું"
+          ]
         },
         {
           "questionId": "270",
@@ -3030,7 +3728,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આ પ્રવૃત્તિઓમાંથી, હું પસંદ કરીશ:",
+          "options_gu": [
+            "વિજ્ઞાન મેળામાં ભાગ લેવો",
+            "સાંસ્કૃતિક વિનિમય કાર્યક્રમમાં જોડાવું",
+            "નાનો વ્યવસાય અથવા ઉદ્યોગસાહસિક સાહસ શરૂ કરવું"
+          ]
         },
         {
           "questionId": "271",
@@ -3043,7 +3747,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "હું પસંદ કરીશ:",
+          "options_gu": [
+            "વિદેશી સંસ્કૃતિઓ અને ભાષાઓનો અભ્યાસ કરવો",
+            "નવી ટેકનોલોજીઓ સાથે પ્રયોગ કરવો",
+            "સ્વયંસેવક પ્રવૃત્તિઓનું સંકલન કરવું"
+          ]
         },
         {
           "questionId": "272",
@@ -3056,7 +3766,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મારો પસંદગીનો શિક્ષણ અનુભવ આ હશે:",
+          "options_gu": [
+            "પ્રત્યક્ષ પ્રયોગશાળાનું કામ",
+            "જૂથ ચર્ચાઓ અને સેમિનાર્સ",
+            "વ્યક્તિગત સંશોધન પ્રોજેક્ટ્સ"
+          ]
         },
         {
           "questionId": "273",
@@ -3069,7 +3785,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મારું આદર્શ કામનું સ્થળ આ હશે:",
+          "options_gu": [
+            "પ્રયોગશાળા અથવા સંશોધન સુવિધા",
+            "નિયમિત વ્યવસાય કલાકો સાથેની ઓફિસ",
+            "બહાર અથવા વારંવાર પ્રવાસ કરવો"
+          ]
         },
         {
           "questionId": "274",
@@ -3082,7 +3804,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "હું કામ કરવાનું પસંદ કરીશ:",
+          "options_gu": [
+            "શાંત, ધ્યાન કેન્દ્રિત વાતાવરણમાં",
+            "સહકારી, સામાજિક વાતાવરણમાં",
+            "ઝડપી ગતિએ ચાલતા, ગતિશીલ વાતાવરણમાં"
+          ]
         },
         {
           "questionId": "275",
@@ -3095,20 +3823,32 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "હું કામ કરવાનું પસંદ કરીશ:",
+          "options_gu": [
+            "મોટી, સ્થાપિત કોર્પોરેશન માટે",
+            "નાની, એકબીજાથી જોડાયેલી સંસ્થા માટે",
+            "મારી પોતાની માટે એક ઉદ્યોગસાહસિક તરીકે"
+          ]
         },
         {
           "questionId": "276",
           "text": "My preferred work schedule would be:",
           "type": "single",
           "options": [
-            "Standard 9 5 weekday hours",
+            "Standard 9 to 5 weekday hours",
             "Flexible hours with some remote work",
             "Variable schedule based on projects"
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મારું પસંદગીનું કામનું સમયપત્રક આ હશે:",
+          "options_gu": [
+            "પ્રમાણભૂત 9 થી 5 અઠવાડિયાના કલાકો",
+            "થોડા રિમોટ વર્ક સાથે લવચીક કલાકો",
+            "પ્રોજેક્ટ આધારે વૈવિધ્યસભર સમયપત્રક"
+          ]
         },
         {
           "questionId": "277",
@@ -3121,7 +3861,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મને કામ કરવાનું ગમશે:",
+          "options_gu": [
+            "અદ્યતન ટેકનોલોજી અને સાધનો સાથે",
+            "ગ્રાહકો સાથે પ્રત્યક્ષ",
+            "સર્જનાત્મક સામગ્રી અને ઓજારો સાથે"
+          ]
         },
         {
           "questionId": "278",
@@ -3134,7 +3880,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મને એવા કાર્યસ્થળો ગમે છે જે:",
+          "options_gu": [
+            "ખૂબ માળખાગત અને સંગઠિત હોય",
+            "માળખું અને લવચીકતા વચ્ચે સંતુલિત હોય",
+            "સર્જનાત્મક અને નવીન હોય"
+          ]
         },
         {
           "questionId": "279",
@@ -3147,7 +3899,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "હું કામ કરવાનું પસંદ કરીશ:",
+          "options_gu": [
+            "વિશિષ્ટ પ્રોજેક્ટ્સ પર સ્વતંત્ર રીતે",
+            "વૈવિધ્યસભર ટીમના ભાગ તરીકે",
+            "બીજાઓને દિશા આપતા નેતૃત્વ ભૂમિકાઓમાં"
+          ]
         },
         {
           "questionId": "280",
@@ -3160,7 +3918,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મારું આદર્શ કામનું સ્થાન આ હશે:",
+          "options_gu": [
+            "ઘણી તકો સાથેના મોટા શહેરમાં",
+            "સારા કાર્ય-જીવન સંતુલન સાથેના ઉપનગરીય વિસ્તારમાં",
+            "ગ્રામીણ અથવા કુદરતી વાતાવરણમાં"
+          ]
         },
         {
           "questionId": "281",
@@ -3173,7 +3937,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મને એવી નોકરી ગમશે જે:",
+          "options_gu": [
+            "સ્થિરતા અને સુરક્ષા આપે",
+            "પ્રગતિ માટેની તકો આપે",
+            "સર્જનાત્મકતા અને સ્વ-અભિવ્યક્તિ માટે જગ્યા આપે"
+          ]
         },
         {
           "questionId": "282",
@@ -3186,7 +3956,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મને કામ કરવાનું ગમશે:",
+          "options_gu": [
+            "હોસ્પિટલ અથવા આરોગ્ય સંભાળ સુવિધામાં",
+            "શાળા અથવા શૈક્ષણિક સંસ્થામાં",
+            "વ્યવસાય અથવા કોર્પોરેટ વાતાવરણમાં"
+          ]
         },
         {
           "questionId": "283",
@@ -3199,7 +3975,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મને એવું કામ ગમે છે જે:",
+          "options_gu": [
+            "સ્થાપિત પ્રક્રિયાઓ અને પ્રોટોકોલ્સને અનુસરે",
+            "મને નવી પદ્ધતિઓ અને અભિગમો વિકસાવવા દે",
+            "બીજાઓની મદદ અને સેવા કરવાનો સમાવેશ કરે"
+          ]
         },
         {
           "questionId": "284",
@@ -3212,7 +3994,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મારું આદર્શ કામનું વાતાવરણ આ હશે:",
+          "options_gu": [
+            "શાંત અને નિરાંતભર્યું",
+            "ઊર્જાસભર અને ઉત્તેજક",
+            "સહાયક અને સહકારી"
+          ]
         },
         {
           "questionId": "285",
@@ -3225,7 +4013,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "હું કામ કરવાનું પસંદ કરીશ:",
+          "options_gu": [
+            "ડેટા, સંખ્યાઓ અને વિશ્લેષણ સાથે",
+            "લોકો અને સંબંધો સાથે",
+            "વિચારો અને ખ્યાલો સાથે"
+          ]
         },
         {
           "questionId": "286",
@@ -3238,7 +4032,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મને એવી નોકરીઓ ગમે છે જે:",
+          "options_gu": [
+            "સ્પષ્ટ અપેક્ષાઓ અને જરૂરિયાતો ધરાવે",
+            "સર્જનાત્મકતા અને નવીનતા માટે જગ્યા આપે",
+            "સમાજ પર સકારાત્મક અસર કરે"
+          ]
         },
         {
           "questionId": "287",
@@ -3251,7 +4051,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મને કામ કરવાનું ગમશે:",
+          "options_gu": [
+            "મહત્વપૂર્ણ પ્રોજેક્ટ્સ પર પડદા પાછળ",
+            "જાહેર માન્યતા સાથે મુખ્ય ભૂમિકામાં",
+            "સહકર્મીઓ અને ગ્રાહકો સાથે ભાગીદારીમાં"
+          ]
         },
         {
           "questionId": "288",
@@ -3264,7 +4070,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મારી પસંદગીની કાર્ય સંસ્કૃતિ આ હશે:",
+          "options_gu": [
+            "વ્યાવસાયિક અને ઔપચારિક",
+            "આકસ્મિક અને હળવી",
+            "મિશન-આધારિત અને હેતુપૂર્ણ"
+          ]
         },
         {
           "questionId": "289",
@@ -3277,7 +4089,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મને એવી નોકરી ગમશે જે:",
+          "options_gu": [
+            "મને બૌદ્ધિક રીતે પડકાર આપે",
+            "મને મારી સર્જનાત્મકતા વ્યક્ત કરવા દે",
+            "મને દુનિયામાં ફેરફાર લાવવામાં મદદ કરે"
+          ]
         },
         {
           "questionId": "290",
@@ -3290,7 +4108,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મને એવા કાર્ય વાતાવરણ ગમે છે જે:",
+          "options_gu": [
+            "ટેકનોલોજી-કેન્દ્રિત અને નવીન હોય",
+            "લોકો-કેન્દ્રિત અને સંબંધ-આધારિત હોય",
+            "પરિણામ-લક્ષી અને સિદ્ધિ-કેન્દ્રિત હોય"
+          ]
         }
       ]
     },
@@ -3314,7 +4138,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "BOOK : READING જે રીતે છે, તે જ રીતે FORK : ?",
+          "options_gu": [
+            "KITCHEN",
+            "EATING",
+            "METAL",
+            "COOKING"
+          ]
         },
         {
           "questionId": "292",
@@ -3328,7 +4159,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો બધા ગુલાબ ફૂલો છે, અને કેટલાક ફૂલો લાલ છે, તો:",
+          "options_gu": [
+            "All roses are red",
+            "Some roses might be red",
+            "No roses are red",
+            "All red things are flowers"
+          ]
         },
         {
           "questionId": "293",
@@ -3342,7 +4180,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "\"GENEROUS\" નો સૌથી વિરુદ્ધાર્થી શબ્દ શોધો:",
+          "options_gu": [
+            "KIND",
+            "STINGY",
+            "WEALTHY",
+            "GIVING"
+          ]
         },
         {
           "questionId": "294",
@@ -3356,7 +4201,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સામ્યતા પૂરી કરો: TEACHER : STUDENT જે રીતે છે, તે જ રીતે DOCTOR : ?",
+          "options_gu": [
+            "HOSPITAL",
+            "PATIENT",
+            "MEDICINE",
+            "NURSE"
+          ]
         },
         {
           "questionId": "295",
@@ -3370,7 +4222,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આ જૂથમાં કયો શબ્દ બંધબેસતો નથી?",
+          "options_gu": [
+            "VIOLIN",
+            "TRUMPET",
+            "PIANO",
+            "PAINTING"
+          ]
         },
         {
           "questionId": "296",
@@ -3384,7 +4243,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો \"કેટલીક બિલાડીઓ કાળી છે\" અને \"બધી કાળી વસ્તુઓ ગરમી શોષે છે,\" તો:",
+          "options_gu": [
+            "All cats absorb heat",
+            "Some cats absorb heat",
+            "No cats absorb heat",
+            "Only black cats exist"
+          ]
         },
         {
           "questionId": "297",
@@ -3398,7 +4264,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "\"METICULOUS\" ને સૌથી મળતો આવતો શબ્દ પસંદ કરો:",
+          "options_gu": [
+            "CARELESS",
+            "DETAILED",
+            "QUICK",
+            "LOUD"
+          ]
         },
         {
           "questionId": "298",
@@ -3412,7 +4285,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "WHEEL : CAR જે રીતે છે, તે જ રીતે PROPELLER : ?",
+          "options_gu": [
+            "ENGINE",
+            "AIRPLANE",
+            "WIND",
+            "ROTATION"
+          ]
         },
         {
           "questionId": "299",
@@ -3426,7 +4306,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આ પૂર્ણ કરે તેવો શબ્દ શોધો: \"HAPPY : JOY જે રીતે છે, તે જ રીતે ANGRY : ____\"",
+          "options_gu": [
+            "MAD",
+            "FURY",
+            "UPSET",
+            "IRRITATED"
+          ]
         },
         {
           "questionId": "300",
@@ -3440,7 +4327,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કયું વાક્ય વ્યાકરણની દૃષ્ટિએ સાચું છે?",
+          "options_gu": [
+            "Me and John went to the store",
+            "John and I went to the store",
+            "John and me went to the store",
+            "I and John went to the store"
+          ]
         },
         {
           "questionId": "301",
@@ -3454,7 +4348,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો કોઈ પક્ષી સસ્તન પ્રાણી નથી, અને બધા ગરુડ પક્ષીઓ છે, તો:",
+          "options_gu": [
+            "Some eagles are mammals",
+            "No eagles are mammals",
+            "All eagles are mammals",
+            "Eagles might be mammals"
+          ]
         },
         {
           "questionId": "302",
@@ -3468,7 +4369,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આ વાક્યમાં શ્રેષ્ઠ બંધબેસતો શબ્દ પસંદ કરો: \"The student's _____ attention to detail impressed the teacher.\"",
+          "options_gu": [
+            "CARELESS",
+            "CAREFUL",
+            "METICULOUS",
+            "BASIC"
+          ]
         },
         {
           "questionId": "303",
@@ -3482,7 +4390,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "AUTHOR : BOOK જે રીતે છે, તે જ રીતે COMPOSER : ?",
+          "options_gu": [
+            "MUSIC",
+            "ORCHESTRA",
+            "PIANO",
+            "SYMPHONY"
+          ]
         },
         {
           "questionId": "304",
@@ -3496,7 +4411,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "\"CONFIDENT\" ને સમાનાર્થી કયો શબ્દ છે?",
+          "options_gu": [
+            "WORRIED",
+            "ASSURED",
+            "AFRAID",
+            "UNCERTAIN"
+          ]
         },
         {
           "questionId": "305",
@@ -3510,7 +4432,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ક્રમ પૂરો કરો: \"જો વરસાદ પડે, તો જમીન ભીની થાય. વરસાદ પડ્યો. તેથી:\"",
+          "options_gu": [
+            "It might rain again",
+            "The ground is wet",
+            "The ground is dry",
+            "We can't determine anything"
+          ]
         },
         {
           "questionId": "306",
@@ -3524,7 +4453,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "વિચિત્ર શબ્દ શોધો:",
+          "options_gu": [
+            "DEMOCRACY",
+            "MONARCHY",
+            "REPUBLIC",
+            "CITIZENSHIP"
+          ]
         },
         {
           "questionId": "307",
@@ -3538,7 +4474,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "LIBRARY : BOOKS જે રીતે છે, તે જ રીતે MUSEUM : ?",
+          "options_gu": [
+            "PEOPLE",
+            "ARTIFACTS",
+            "BUILDING",
+            "EDUCATION"
+          ]
         },
         {
           "questionId": "308",
@@ -3552,7 +4495,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આ વાક્યમાં શ્રેષ્ઠ બંધબેસતો શબ્દ પસંદ કરો: \"Her _____ for mathematics was evident in her high scores.\"",
+          "options_gu": [
+            "DISLIKE",
+            "APTITUDE",
+            "FEAR",
+            "CONFUSION"
+          ]
         },
         {
           "questionId": "309",
@@ -3566,7 +4516,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો \"બધા વિદ્યાર્થીઓ અભ્યાસ કરે છે\" અને \"મેરી એક વિદ્યાર્થી છે,\" તો:",
+          "options_gu": [
+            "Mary might study",
+            "Mary studies",
+            "Mary doesn't study",
+            "We need more information"
+          ]
         },
         {
           "questionId": "310",
@@ -3580,7 +4537,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સૌથી યોગ્ય શબ્દ પસંદ કરો: \"The scientist's _____ research led to important discoveries.\"",
+          "options_gu": [
+            "LAZY",
+            "RUSHED",
+            "THOROUGH",
+            "CARELESS"
+          ]
         },
         {
           "questionId": "311",
@@ -3594,7 +4558,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "CAPTAIN : SHIP જે રીતે છે, તે જ રીતે PRINCIPAL : ?",
+          "options_gu": [
+            "TEACHER",
+            "STUDENT",
+            "SCHOOL",
+            "OFFICE"
+          ]
         },
         {
           "questionId": "312",
@@ -3608,7 +4579,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કયું વાક્ય \"affect\" નો યોગ્ય ઉપયોગ કરે છે?",
+          "options_gu": [
+            "The rain will effect our picnic plans",
+            "The rain will affect our picnic plans",
+            "The rain will have an affect on our plans",
+            "The affect of rain on our plans is significant"
+          ]
         },
         {
           "questionId": "313",
@@ -3622,7 +4600,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "\"DILIGENT\" ને સૌથી મળતો આવતો શબ્દ શોધો:",
+          "options_gu": [
+            "LAZY",
+            "HARDWORKING",
+            "SMART",
+            "FAST"
+          ]
         },
         {
           "questionId": "314",
@@ -3636,7 +4621,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો \"કોઈ બિલાડી કૂતરા નથી\" અને \"કેટલાક પાળતુ પ્રાણીઓ બિલાડીઓ છે,\" તો:",
+          "options_gu": [
+            "Some pets are dogs",
+            "Some pets are not dogs",
+            "All pets are cats",
+            "No pets are dogs"
+          ]
         },
         {
           "questionId": "315",
@@ -3650,7 +4642,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "SURGEON : SCALPEL જે રીતે છે, તે જ રીતે CARPENTER : ?",
+          "options_gu": [
+            "WOOD",
+            "HOUSE",
+            "HAMMER",
+            "BUILDING"
+          ]
         },
         {
           "questionId": "316",
@@ -3664,7 +4663,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો 3x + 7 = 22, તો x ની કિંમત શું છે:",
+          "options_gu": [
+            "3",
+            "5",
+            "7",
+            "9"
+          ]
         },
         {
           "questionId": "317",
@@ -3678,7 +4684,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "25% ડિસ્કાઉન્ટ પછી શર્ટની કિંમત $45 છે. મૂળ કિંમત શું હતી?",
+          "options_gu": [
+            "$56.25",
+            "$60",
+            "$67.50",
+            "$75"
+          ]
         },
         {
           "questionId": "318",
@@ -3692,7 +4705,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "240 ના 15% કેટલા થાય?",
+          "options_gu": [
+            "36",
+            "42",
+            "48",
+            "54"
+          ]
         },
         {
           "questionId": "319",
@@ -3706,7 +4726,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો કોઈ સંખ્યાનો 2/3 ભાગ 48 છે, તો સંખ્યા શું છે?",
+          "options_gu": [
+            "32",
+            "64",
+            "72",
+            "96"
+          ]
         },
         {
           "questionId": "320",
@@ -3720,7 +4747,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "વર્ગમાં છોકરા-છોકરીઓનો ગુણોત્તર 3:4 છે. જો કુલ 28 વિદ્યાર્થીઓ હોય, તો છોકરા કેટલા?",
+          "options_gu": [
+            "12",
+            "14",
+            "16",
+            "18"
+          ]
         },
         {
           "questionId": "321",
@@ -3734,7 +4768,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ક્રમમાં આગળ શું આવશે: 2, 6, 18, 54, ?",
+          "options_gu": [
+            "108",
+            "162",
+            "216",
+            "324"
+          ]
         },
         {
           "questionId": "322",
@@ -3748,7 +4789,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો ટ્રેન 3 કલાકમાં 180 માઈલ મુસાફરી કરે, તો સરેરાશ ગતિ શું છે?",
+          "options_gu": [
+            "50 mph",
+            "55 mph",
+            "60 mph",
+            "65 mph"
+          ]
         },
         {
           "questionId": "323",
@@ -3762,7 +4810,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "7² - 3² + 2² કેટલા થાય?",
+          "options_gu": [
+            "44",
+            "45",
+            "46",
+            "47"
+          ]
         },
         {
           "questionId": "324",
@@ -3776,7 +4831,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો 4y - 3 = 2y + 11, તો y ની કિંમત શું છે:",
+          "options_gu": [
+            "6",
+            "7",
+            "8",
+            "9"
+          ]
         },
         {
           "questionId": "325",
@@ -3790,7 +4852,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "લંબચોરસની લંબાઈ 12 અને પહોળાઈ 8 છે. તેનું ક્ષેત્રફળ શું છે?",
+          "options_gu": [
+            "20",
+            "40",
+            "96",
+            "192"
+          ]
         },
         {
           "questionId": "326",
@@ -3804,7 +4873,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "(3/4) × (2/5) કેટલા થાય?",
+          "options_gu": [
+            "3/10",
+            "6/20",
+            "3/10",
+            "6/9"
+          ]
         },
         {
           "questionId": "327",
@@ -3818,7 +4894,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો કોઈ સંખ્યાનો 20% 15 છે, તો તે સંખ્યાનો 80% શું છે?",
+          "options_gu": [
+            "50",
+            "60",
+            "70",
+            "75"
+          ]
         },
         {
           "questionId": "328",
@@ -3832,7 +4915,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "85, 92, 78, 96, અને 89 ની સરેરાશ શું છે?",
+          "options_gu": [
+            "87",
+            "88",
+            "89",
+            "90"
+          ]
         },
         {
           "questionId": "329",
@@ -3846,7 +4936,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો 5x + 3 = 3x + 15, તો x ની કિંમત શું છે:",
+          "options_gu": [
+            "4",
+            "5",
+            "6",
+            "7"
+          ]
         },
         {
           "questionId": "330",
@@ -3860,7 +4957,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "વર્તુળની ત્રિજ્યા 5 છે. તેનું ક્ષેત્રફળ શું છે? (π = 3.14 લો)",
+          "options_gu": [
+            "78.5",
+            "79.5",
+            "31.4",
+            "15.7"
+          ]
         },
         {
           "questionId": "331",
@@ -3874,7 +4978,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "150 ના 40% કેટલા થાય?",
+          "options_gu": [
+            "50",
+            "55",
+            "60",
+            "65"
+          ]
         },
         {
           "questionId": "332",
@@ -3888,7 +4999,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો 3 પેન્સિલની કિંમત $2.40 છે, તો 8 પેન્સિલની કિંમત કેટલી?",
+          "options_gu": [
+            "$6.00",
+            "$6.40",
+            "$6.80",
+            "$7.20"
+          ]
         },
         {
           "questionId": "333",
@@ -3902,7 +5020,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આગળની સંખ્યા શું છે: 1, 4, 9, 16, 25, ?",
+          "options_gu": [
+            "30",
+            "35",
+            "36",
+            "49"
+          ]
         },
         {
           "questionId": "334",
@@ -3916,7 +5041,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો a = 3 અને b = 4, તો a² + b² કેટલા થાય?",
+          "options_gu": [
+            "24",
+            "25",
+            "49",
+            "144"
+          ]
         },
         {
           "questionId": "335",
@@ -3930,7 +5062,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "(2/3) + (1/4) કેટલા થાય?",
+          "options_gu": [
+            "3/7",
+            "11/12",
+            "8/12",
+            "5/6"
+          ]
         },
         {
           "questionId": "336",
@@ -3944,7 +5083,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો 6x - 4 = 2x + 12, તો x ની કિંમત શું છે:",
+          "options_gu": [
+            "3",
+            "4",
+            "5",
+            "6"
+          ]
         },
         {
           "questionId": "337",
@@ -3958,7 +5104,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "200 ના 35% કેટલા થાય?",
+          "options_gu": [
+            "65",
+            "70",
+            "75",
+            "80"
+          ]
         },
         {
           "questionId": "338",
@@ -3972,7 +5125,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ત્રિકોણની બાજુઓ 3, 4 અને 5 છે. તેની પરિમિતિ શું છે?",
+          "options_gu": [
+            "10",
+            "12",
+            "15",
+            "60"
+          ]
         },
         {
           "questionId": "339",
@@ -3986,7 +5146,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો 7y + 2 = 5y + 18, તો y ની કિંમત શું છે:",
+          "options_gu": [
+            "6",
+            "7",
+            "8",
+            "9"
+          ]
         },
         {
           "questionId": "340",
@@ -4000,7 +5167,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "144 નું વર્ગમૂળ શું છે?",
+          "options_gu": [
+            "11",
+            "12",
+            "13",
+            "14"
+          ]
         },
         {
           "questionId": "341",
@@ -4014,7 +5188,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "○□○□○ ક્રમમાં, આગળ શું આવશે?",
+          "options_gu": [
+            "○",
+            "□",
+            "△",
+            "◇"
+          ]
         },
         {
           "questionId": "342",
@@ -4028,7 +5209,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કયો આકાર બીજાઓથી અલગ છે?",
+          "options_gu": [
+            "●",
+            "■",
+            "▲",
+            "◆"
+          ]
         },
         {
           "questionId": "343",
@@ -4042,7 +5230,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો ↑→↓←↑→ પેટર્નને ચાલુ રાખે, તો આગળ શું છે?",
+          "options_gu": [
+            "↑",
+            "→",
+            "↓",
+            "←"
+          ]
         },
         {
           "questionId": "344",
@@ -4056,7 +5251,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "પેટર્ન પૂર્ણ કરો: 1A, 3B, 5C, 7D, ?",
+          "options_gu": [
+            "8E",
+            "9E",
+            "8F",
+            "9F"
+          ]
         },
         {
           "questionId": "345",
@@ -4070,7 +5272,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કયો આકાર પેટર્ન પૂર્ણ કરે છે? ◇○□◇○?",
+          "options_gu": [
+            "◇",
+            "○",
+            "□",
+            "△"
+          ]
         },
         {
           "questionId": "346",
@@ -4084,7 +5293,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "AZ, BY, CX, DW ક્રમમાં, આગળ શું આવશે?",
+          "options_gu": [
+            "EV",
+            "EW",
+            "FV",
+            "FW"
+          ]
         },
         {
           "questionId": "347",
@@ -4098,7 +5314,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કઈ સંખ્યા બંધબેસતી નથી: 2, 4, 6, 9, 8?",
+          "options_gu": [
+            "2",
+            "4",
+            "6",
+            "9"
+          ]
         },
         {
           "questionId": "348",
@@ -4112,7 +5335,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "પૂર્ણ કરો: ●○●○●○?",
+          "options_gu": [
+            "●",
+            "○",
+            "◐",
+            "◑"
+          ]
         },
         {
           "questionId": "349",
@@ -4126,7 +5356,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો RED 1, BLUE 2, GREEN 3, તો YELLOW શું છે?",
+          "options_gu": [
+            "4",
+            "5",
+            "6",
+            "7"
+          ]
         },
         {
           "questionId": "350",
@@ -4140,7 +5377,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આગળ શું આવશે: AB, CD, EF, GH, ?",
+          "options_gu": [
+            "IJ",
+            "IK",
+            "JK",
+            "HI"
+          ]
         },
         {
           "questionId": "351",
@@ -4154,7 +5398,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "પેટર્ન પૂર્ણ કરો: ▲▼▲▼▲?",
+          "options_gu": [
+            "▲",
+            "▼",
+            "►",
+            "◄"
+          ]
         },
         {
           "questionId": "352",
@@ -4168,7 +5419,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "1, 1, 2, 3, 5, 8 માં, આગળ શું છે?",
+          "options_gu": [
+            "11",
+            "12",
+            "13",
+            "15"
+          ]
         },
         {
           "questionId": "353",
@@ -4182,7 +5440,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કયું અલગ છે: Monday, Tuesday, March, Thursday?",
+          "options_gu": [
+            "Monday",
+            "Tuesday",
+            "March",
+            "Thursday"
+          ]
         },
         {
           "questionId": "354",
@@ -4196,7 +5461,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "પૂર્ણ કરો: 2, 4, 8, 16, ?",
+          "options_gu": [
+            "24",
+            "32",
+            "20",
+            "18"
+          ]
         },
         {
           "questionId": "355",
@@ -4210,7 +5482,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો cat = dog અને dog = mouse, તો cat = ?",
+          "options_gu": [
+            "dog",
+            "mouse",
+            "cat",
+            "animal"
+          ]
         },
         {
           "questionId": "356",
@@ -4224,7 +5503,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "પેટર્ન ચાલુ રાખનાર કયું છે: XYZ, WXY, VWX, ?",
+          "options_gu": [
+            "UVW",
+            "VWX",
+            "UWV",
+            "TUV"
+          ]
         },
         {
           "questionId": "357",
@@ -4238,7 +5524,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "પૂર્ણ કરો: ○●○●○●?",
+          "options_gu": [
+            "○",
+            "●",
+            "◐",
+            "◑"
+          ]
         },
         {
           "questionId": "358",
@@ -4252,7 +5545,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "3, 6, 12, 24 માં, આગળ શું આવશે?",
+          "options_gu": [
+            "36",
+            "48",
+            "30",
+            "42"
+          ]
         },
         {
           "questionId": "359",
@@ -4266,7 +5566,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કયું બંધબેસતું નથી: apple, orange, car, banana?",
+          "options_gu": [
+            "apple",
+            "orange",
+            "car",
+            "banana"
+          ]
         },
         {
           "questionId": "360",
@@ -4280,7 +5587,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "પૂર્ણ કરો: A1, B2, C3, D4, ?",
+          "options_gu": [
+            "E5",
+            "E4",
+            "F5",
+            "D5"
+          ]
         },
         {
           "questionId": "361",
@@ -4294,7 +5608,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આગળ કયો આકાર આવશે: ○□△○□?",
+          "options_gu": [
+            "○",
+            "□",
+            "△",
+            "◇"
+          ]
         },
         {
           "questionId": "362",
@@ -4308,7 +5629,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "10, 8, 6, 4 માં, આગળ શું છે?",
+          "options_gu": [
+            "3",
+            "2",
+            "1",
+            "0"
+          ]
         },
         {
           "questionId": "363",
@@ -4322,7 +5650,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "પેટર્ન પૂર્ણ કરો: AB, BA, CD, DC, ?",
+          "options_gu": [
+            "EF",
+            "FE",
+            "EG",
+            "GE"
+          ]
         },
         {
           "questionId": "364",
@@ -4336,11 +5671,18 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કઈ સંખ્યા અલગ છે: 7, 14, 21, 29, 35?",
+          "options_gu": [
+            "7",
+            "14",
+            "29",
+            "35"
+          ]
         },
         {
           "questionId": "365",
-          "text": "If × = +, + = -, - = ÷, then 8 4 2 6 ?",
+          "text": "If × = +, + = -, - = ÷, then 8 × 4 + 2 - 6 ?",
           "type": "single",
           "options": [
             "1",
@@ -4350,7 +5692,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો × = +, + = -, - = ÷, તો 8 4 2 6 ?",
+          "options_gu": [
+            "1",
+            "2",
+            "10",
+            "15"
+          ]
         },
         {
           "questionId": "366",
@@ -4364,7 +5713,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "જ્યારે એકસાથે મૂકવામાં આવે, ત્યારે તમને કયો 3-પરિમાણીય આકાર મળશે?",
+          "options_gu": [
+            "Pattern A",
+            "Pattern B",
+            "Pattern C",
+            "Pattern D"
+          ]
         },
         {
           "questionId": "367",
@@ -4378,7 +5734,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "ગડી કરવામાં આવે ત્યારે કયો પેટર્ન શક્ય છે?",
+          "options_gu": [
+            "⅃",
+            "Γ",
+            "⌐",
+            "└"
+          ]
         },
         {
           "questionId": "368",
@@ -4392,7 +5755,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "નીચેના ટુકડાઓના જોડાણને કયો આકાર રજૂ કરે છે?",
+          "options_gu": [
+            "View A",
+            "View B",
+            "View C",
+            "View D"
+          ]
         },
         {
           "questionId": "369",
@@ -4406,7 +5776,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "નીચેના આકારને ગડી કરવાથી કયો ઘન મળે છે?",
+          "options_gu": [
+            "6",
+            "7",
+            "8",
+            "9"
+          ]
         },
         {
           "questionId": "370",
@@ -4420,7 +5797,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "નીચેના આકારને ગડી કરવાથી કયો ઘન મળે છે?",
+          "options_gu": [
+            "Piece A",
+            "Piece B",
+            "Piece C",
+            "Piece D"
+          ]
         },
         {
           "questionId": "371",
@@ -4434,7 +5818,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "ઉઘાડેલા ઘનના આધારે કયો ઘન બની શકતો નથી?",
+          "options_gu": [
+            "P",
+            "q",
+            "b",
+            "d"
+          ]
         },
         {
           "questionId": "372",
@@ -4448,7 +5839,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "ઉઘાડેલા ઘનના આધારે કયો ઘન બની શકતો નથી?",
+          "options_gu": [
+            "Shadow A",
+            "Shadow B",
+            "Shadow C",
+            "Shadow D"
+          ]
         },
         {
           "questionId": "373",
@@ -4462,7 +5860,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "આપેલા આકારના પરિભ્રમણ સાથે કયો આકાર મળે છે?",
+          "options_gu": [
+            "12",
+            "13",
+            "14",
+            "15"
+          ]
         },
         {
           "questionId": "374",
@@ -4476,7 +5881,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "આપેલા આકારના પરિભ્રમણ સાથે કયો આકાર મળે છે?",
+          "options_gu": [
+            "Figure A",
+            "Figure B",
+            "Figure C",
+            "Figure D"
+          ]
         },
         {
           "questionId": "375",
@@ -4490,7 +5902,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "આપેલા આકારના પરિભ્રમણ સાથે કયો આકાર મળે છે?",
+          "options_gu": [
+            "Net A",
+            "Net B",
+            "Net C",
+            "Net D"
+          ]
         },
         {
           "questionId": "376",
@@ -4504,7 +5923,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "આપેલા આકારનું ઉપરથી દૃશ્ય કયો આકાર છે?",
+          "options_gu": [
+            "Piece A",
+            "Piece B",
+            "Piece C",
+            "Piece D"
+          ]
         },
         {
           "questionId": "377",
@@ -4518,7 +5944,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "ઘન બનાવવા માટે આપેલા આકાર સાથે કયો આકાર બંધબેસે છે?",
+          "options_gu": [
+            "Front",
+            "Back",
+            "Left",
+            "Right"
+          ]
         },
         {
           "questionId": "378",
@@ -4532,7 +5965,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "ચોરસ બનાવવા માટે માત્ર પરિભ્રમણથી આપેલા આકાર સાથે કયો આકાર બંધબેસે છે?",
+          "options_gu": [
+            "5",
+            "6",
+            "7",
+            "8"
+          ]
         },
         {
           "questionId": "379",
@@ -4546,7 +5986,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "ઉઘાડેલા ઘનના આધારે કયો ઘન બની શકતો નથી?",
+          "options_gu": [
+            "Shape A",
+            "Shape B",
+            "Shape C",
+            "Shape D"
+          ]
         },
         {
           "questionId": "380",
@@ -4560,7 +6007,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "આપેલા ઘનને કયો ટુકડો અનુરૂપ છે?",
+          "options_gu": [
+            "►",
+            "▲",
+            "▼",
+            "◄"
+          ]
         },
         {
           "questionId": "381",
@@ -4574,7 +6028,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "આપેલા આકારના પરિભ્રમણ સાથે કયો આકાર મળે છે?",
+          "options_gu": [
+            "Circle",
+            "Square",
+            "Triangle",
+            "Rectangle"
+          ]
         },
         {
           "questionId": "382",
@@ -4588,7 +6049,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "પ્રથમ આકારના પરિભ્રમણ સાથે રજૂ કરેલા 4 આકારોમાંથી (A, B, C, D) કયો છે?",
+          "options_gu": [
+            "6",
+            "8",
+            "10",
+            "12"
+          ]
         },
         {
           "questionId": "383",
@@ -4602,7 +6070,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "આપેલા ઘનને કયો ટુકડો અનુરૂપ છે?",
+          "options_gu": [
+            "View A",
+            "View B",
+            "View C",
+            "View D"
+          ]
         },
         {
           "questionId": "384",
@@ -4616,7 +6091,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "આપેલા ઘનને કયો ટુકડો અનુરૂપ છે?",
+          "options_gu": [
+            "Result A",
+            "Result B",
+            "Result C",
+            "Result D"
+          ]
         },
         {
           "questionId": "385",
@@ -4630,7 +6112,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "આપેલા આકારને ગડી કરીને કયો પદાર્થ બનાવી શકાય?",
+          "options_gu": [
+            "Turn left 90°",
+            "Turn right 90°",
+            "Turn 180°",
+            "Don't turn"
+          ]
         },
         {
           "questionId": "386",
@@ -4644,7 +6133,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "2D પરિભ્રમણથી કયો આકાર બનાવી શકાય?",
+          "options_gu": [
+            "6",
+            "8",
+            "10",
+            "12"
+          ]
         },
         {
           "questionId": "387",
@@ -4658,7 +6154,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "આપેલા ટુકડાઓથી કયો આકાર બનાવી શકાય?",
+          "options_gu": [
+            "Pattern A",
+            "Pattern B",
+            "Pattern C",
+            "Pattern D"
+          ]
         },
         {
           "questionId": "388",
@@ -4672,7 +6175,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "આપેલું ઉપરનું દૃશ્ય કયો પદાર્થ સાથે મેળ ખાય છે?",
+          "options_gu": [
+            "Position A",
+            "Position B",
+            "Position C",
+            "Position D"
+          ]
         },
         {
           "questionId": "389",
@@ -4686,7 +6196,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "x ધરી પર ઊભા પ્રતિબિંબ માટે કયો આકાર છે?",
+          "options_gu": [
+            "Cone",
+            "Cylinder",
+            "Pyramid",
+            "Prism"
+          ]
         },
         {
           "questionId": "390",
@@ -4700,7 +6217,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 0.1
+          "weight": 0.1,
+          "text_gu": "આપેલા આકારને ગડી કરીને કયો ઘન બનાવી શકાય?",
+          "options_gu": [
+            "1",
+            "2",
+            "3",
+            "6"
+          ]
         },
         {
           "questionId": "411",
@@ -4714,7 +6238,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કઈ જોડીઓ સમાન છે તે તપાસો. 1. 7849362 / 7849362 2. 4726193 / 4726139 3. 9384751 / 9384751 4. 5627384 / 5627348",
+          "options_gu": [
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical.",
+            "Pairs 2 and 4 are identical."
+          ]
         },
         {
           "questionId": "412",
@@ -4728,7 +6259,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કઈ જોડીઓ સમાન છે તે તપાસો. 1. MARTINEZ / MARTINEZ 2. JOHNSON / JONHSON 3. WILLIAMS / WILLIAMS 4. ANDERSON / ANDERSON",
+          "options_gu": [
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical.",
+            "Pairs 2 and 4 are identical."
+          ]
         },
         {
           "questionId": "413",
@@ -4742,7 +6280,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કઈ જોડીઓ સમાન છે તે તપાસો. 1. 392.847 / 392.847 2. 156.329 / 156.392 3. 748.516 / 748.516 4. 283.674 / 283.674",
+          "options_gu": [
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 2 and 4 are identical."
+          ]
         },
         {
           "questionId": "414",
@@ -4756,7 +6301,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કયા સરનામા સમાન છે તે તપાસો. 1. 123 Oak Street / 123 Oak Street 2. 456 Pine Avenue / 456 Pine Avenue 3. 789 Elm Drive / 789 Elm Drive 4. 321 Main Road / 321 Maine Road",
+          "options_gu": [
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical.",
+            "Pairs 1, 2, and 3 are identical."
+          ]
         },
         {
           "questionId": "415",
@@ -4770,7 +6322,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સમાન ફોન નંબર ચિહ્નિત કરો. 1. 555 123 4567 / 555 123 4567 2. 555 987 6543 / 555 987 6534 3. 555 246 8135 / 555 246 8135 4. 555 369 7428 / 555 369 7428",
+          "options_gu": [
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical.",
+            "Pairs 2 and 4 are identical."
+          ]
         },
         {
           "questionId": "416",
@@ -4784,7 +6343,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મેળ ખાતા કોડ ઓળખો. 1. ABC123XYZ / ABC123XYZ 2. DEF456UVW / DEF456UVW 3. GHI789RST / GHI789RST 4. JKL012MNO / JKL021MNO",
+          "options_gu": [
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 2, and 3 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical."
+          ]
         },
         {
           "questionId": "417",
@@ -4798,7 +6364,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સમાન તારીખો તપાસો. 1. 03/15/2023 / 03/15/2023 2. 07/22/2024 / 07/22/2024 3. 11/08/2025 / 11/08/2025 4. 09/14/2026 / 09/41/2026",
+          "options_gu": [
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1, 2, and 3 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical."
+          ]
         },
         {
           "questionId": "418",
@@ -4812,7 +6385,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મેળ ખાતી રકમ ચિહ્નિત કરો. 1. $1,247.83 / $1,247.83 2. $3,569.47 / $3,569.74 3. $2,834.59 / $2,834.59 4. $4,751.26 / $4,751.26",
+          "options_gu": [
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical.",
+            "Pairs 2 and 4 are identical.",
+            "Pairs 1, 3, and 4 are identical."
+          ]
         },
         {
           "questionId": "419",
@@ -4826,7 +6406,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સમાન ક્રમ શોધો. 1. QWERTY123 / QWERTY123 2. ASDFGH456 / ASDFGH456 3. ZXCVBN789 / ZXCVBN798 4. POIUYT321 / POIUYT321",
+          "options_gu": [
+            "Pairs 1, 2, and 4 are identical.",
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical."
+          ]
         },
         {
           "questionId": "420",
@@ -4840,7 +6427,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મેળ ખાતા નામો તપાસો. 1. MacDonald / MacDonald 2. O'Connor / O'Conner 3. Van Der Berg / Van Der Berg 4. De La Cruz / De La Cruz",
+          "options_gu": [
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical.",
+            "Pairs 2 and 4 are identical."
+          ]
         },
         {
           "questionId": "421",
@@ -4854,7 +6448,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સમાન સમય ચિહ્નિત કરો. 1. 10:45AM / 10:45AM 2. 02:30PM / 02:30PM 3. 08:15AM / 08:51AM 4. 11:20PM / 11:20PM",
+          "options_gu": [
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1, 2, and 4 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical."
+          ]
         },
         {
           "questionId": "422",
@@ -4868,7 +6469,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મેળ ખાતા ID નંબરો શોધો. 1. EMP001234 / EMP001234 2. STU567890 / STU567890 3. CUS098765 / CUS098756 4. VEN432109 / VEN432109",
+          "options_gu": [
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical.",
+            "Pairs 1, 2, and 4 are identical."
+          ]
         },
         {
           "questionId": "423",
@@ -4882,7 +6490,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સમાન ટકાવારી તપાસો. 1. 47.8% / 47.8% 2. 23.5% / 23.5% 3. 91.2% / 91.2% 4. 68.7% / 68.9%",
+          "options_gu": [
+            "Pairs 1, 2, and 3 are identical.",
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical."
+          ]
         },
         {
           "questionId": "424",
@@ -4896,7 +6511,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મેળ ખાતા ઈમેલ સરનામા ચિહ્નિત કરો. 1. john@email.com / john@email.com 2. mary@company.org / mary@company.org 3. bob@service.net / bob@service.net 4. lisa@business.edu / lisa@buisness.edu",
+          "options_gu": [
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 2, and 3 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical."
+          ]
         },
         {
           "questionId": "425",
@@ -4910,7 +6532,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સમાન માપ શોધો. 1. 15.75 inches / 15.75 inches 2. 23.40 feet / 23.04 feet 3. 8.625 yards / 8.625 yards 4. 12.33 meters / 12.33 meters",
+          "options_gu": [
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 2 and 4 are identical."
+          ]
         },
         {
           "questionId": "426",
@@ -4924,7 +6553,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મેળ ખાતા પ્રોડક્ટ કોડ તપાસો. 1. PRD 4587 A / PRD 4587 A 2. ITM 9321 B / ITM 9321 B 3. SKU 7654 C / SKU 7645 C 4. REF 2468 D / REF 2468 D",
+          "options_gu": [
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical.",
+            "Pairs 1, 2, and 4 are identical."
+          ]
         },
         {
           "questionId": "427",
@@ -4938,7 +6574,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સમાન સોશિયલ સિક્યુરિટી નંબરો ચિહ્નિત કરો. 1. 123 45 6789 / 123 45 6789 2. 987 65 4321 / 987 65 4321 3. 456 78 9123 / 456 78 9132 4. 789 12 3456 / 789 12 3456",
+          "options_gu": [
+            "Pairs 1, 2, and 4 are identical.",
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical."
+          ]
         },
         {
           "questionId": "428",
@@ -4952,7 +6595,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મેળ ખાતા ઝિપ કોડ શોધો. 1. 90210 1234 / 90210 1234 2. 10001 5678 / 10001 5678 3. 60601 9012 / 60601 9012 4. 30301 3456 / 30301 3465",
+          "options_gu": [
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 2, and 3 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical."
+          ]
         },
         {
           "questionId": "429",
@@ -4966,7 +6616,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સમાન લાયસન્સ પ્લેટ તપાસો. 1. ABC 1234 / ABC 1234 2. XYZ 5678 / XYZ 5678 3. DEF 9012 / DEF 9021 4. GHI 3456 / GHI 3456",
+          "options_gu": [
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1, 2, and 4 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical."
+          ]
         },
         {
           "questionId": "430",
@@ -4980,7 +6637,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "મેળ ખાતા એકાઉન્ટ નંબરો ચિહ્નિત કરો. 1. 4532 1678 9012 3456 / 4532 1678 9012 3456 2. 9876 5432 1098 7654 / 9876 5432 1098 7654 3. 1357 2468 9024 6810 / 1357 2468 9024 6801 4. 2468 1357 8024 9135 / 2468 1357 8024 9135",
+          "options_gu": [
+            "Pairs 1 and 3 are identical.",
+            "Pairs 1, 3, and 4 are identical.",
+            "Pairs 1, 2, 3, and 4 are identical.",
+            "Pairs 1, 2, and 4 are identical."
+          ]
         },
         {
           "questionId": "391",
@@ -4993,7 +6657,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો દરેક ગરગડીનું વજન ભારના સમાન હોય, તો ખેંચાણ બળ F અને ભાર L વચ્ચેનો ગુણોત્તર શું છે? (F / L = ?)",
+          "options_gu": [
+            "1/4",
+            "1/8",
+            "1"
+          ]
         },
         {
           "questionId": "392",
@@ -5006,7 +6676,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જ્યારે K 4 પરિભ્રમણ પૂર્ણ કરે છે, ત્યારે પૈડું M કેટલા પરિભ્રમણ કરે છે?",
+          "options_gu": [
+            "1",
+            "2",
+            "4"
+          ]
         },
         {
           "questionId": "393",
@@ -5019,7 +6695,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ઝરણાં (springs) વિશે કયું વિધાન ખોટું છે?",
+          "options_gu": [
+            "Springs are a kind of simple machines",
+            "Springs can be used as energy stores",
+            "Springs constant depends on the properties of material they are made of"
+          ]
         },
         {
           "questionId": "394",
@@ -5032,7 +6714,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આકૃતિમાં ભારને 28 ઈંચ ઉપાડવા માટે દોરડું કેટલા ઈંચ નીચે ખેંચવું પડે?",
+          "options_gu": [
+            "14 in",
+            "28 in",
+            "56 in"
+          ]
         },
         {
           "questionId": "395",
@@ -5045,7 +6733,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "પરિપથમાં ઈલેક્ટ્રોન જ્યાં __?__ ઈલેક્ટ્રોન હોય ત્યાંથી __?__ ઈલેક્ટ્રોન હોય ત્યાં વહે છે.",
+          "options_gu": [
+            "Less, More",
+            "Many, No",
+            "More, Less"
+          ]
         },
         {
           "questionId": "396",
@@ -5058,7 +6752,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ચોક્કસ ગેસનું દબાણ માપવા માટે આપણે __?__ નો ઉપયોગ કરીએ છીએ.",
+          "options_gu": [
+            "Barometer",
+            "Thermometer",
+            "Manometer"
+          ]
         },
         {
           "questionId": "397",
@@ -5071,7 +6771,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કઈ વસ્તુ ગિયર્સ સાથે સંબંધિત નથી?",
+          "options_gu": [
+            "Cogwheel",
+            "Pinion",
+            "Rack"
+          ]
         },
         {
           "questionId": "398",
@@ -5084,7 +6790,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સ્ક્રૂ આ બેનું સંયોજન છે:",
+          "options_gu": [
+            "Nail and wedge",
+            "Inclined plane and wedge",
+            "Inclined plane and cylinder"
+          ]
         },
         {
           "questionId": "399",
@@ -5097,7 +6809,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "નીચેનામાંથી કઈ સામગ્રી ચુંબક બની શકે છે?",
+          "options_gu": [
+            "Aluminum",
+            "Copper",
+            "Zinc"
+          ]
         },
         {
           "questionId": "400",
@@ -5110,7 +6828,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો મોટું પૈડું (A) ઘડિયાળની દિશામાં 3 વખત ફરે, તો નાનું પૈડું (B) કેટલી વાર અને કઈ દિશામાં ફરે છે?",
+          "options_gu": [
+            "3 times counter-clockwise",
+            "6 times counter-clockwise",
+            "6 times clockwise"
+          ]
         },
         {
           "questionId": "401",
@@ -5123,7 +6847,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આકૃતિમાં દર્શાવેલા પરિપથમાં મુખ્ય શાખામાંથી પસાર થતા પ્રવાહનું શું થાય જો એક બલ્બ ફૂટી જાય?",
+          "options_gu": [
+            "It becomes zero",
+            "It doubles",
+            "It decreases by a factor of 1.5"
+          ]
         },
         {
           "questionId": "402",
@@ -5136,7 +6866,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો ગિયર A ઘડિયાળની દિશામાં ફરે છે, તો પૈડાં B, C અને D ની દિશા શું હશે?",
+          "options_gu": [
+            "B clockwise, C clockwise, D counter-clockwise",
+            "B counter-clockwise, C clockwise, D clockwise",
+            "B counter-clockwise, C counter-clockwise, D counter-clockwise"
+          ]
         },
         {
           "questionId": "403",
@@ -5149,7 +6885,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "નીચેનામાંથી કયું ચાલવા માટે ચુંબકત્વનો ઉપયોગ નથી કરતું?",
+          "options_gu": [
+            "Compass",
+            "NMR apparatus",
+            "Vehicle"
+          ]
         },
         {
           "questionId": "404",
@@ -5162,7 +6904,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "પટ્ટા સામાન્ય રીતે એવી સામગ્રીઓથી બને છે જે ઘર્ષણને __?__.",
+          "options_gu": [
+            "Increase",
+            "Reduce",
+            "Don't change"
+          ]
         },
         {
           "questionId": "405",
@@ -5175,7 +6923,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આકૃતિમાં દર્શાવેલી હાઈડ્રોલિક ક્રેન કયા પ્રકારની લિવર છે?",
+          "options_gu": [
+            "First class lever",
+            "Second class lever",
+            "Third class lever"
+          ]
         },
         {
           "questionId": "406",
@@ -5188,7 +6942,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો ગુરુત્વાકર્ષણ બળમાં કોઈ ફેરફાર વગર એક વર્ષ 400 દિવસનું થઈ જાય, તો પૃથ્વી-સૂર્ય વચ્ચેના અંતરનું શું થશે?",
+          "options_gu": [
+            "Distance would increase",
+            "Distance would decrease",
+            "Distance would remain the same"
+          ]
         },
         {
           "questionId": "407",
@@ -5201,7 +6961,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કેન્દ્રગામી બળ આના સમપ્રમાણ છે…",
+          "options_gu": [
+            "Radius of curvature",
+            "Mass of the rotating object",
+            "Speed of rotation"
+          ]
         },
         {
           "questionId": "408",
@@ -5214,7 +6980,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "કયું વિધાન સાચું છે?",
+          "options_gu": [
+            "Linear motion is a special case of circular motion",
+            "Circular motion is a special case of linear motion",
+            "When linear motion stops, circular motion begins"
+          ]
         },
         {
           "questionId": "409",
@@ -5227,7 +6999,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ઝરણાં વિશે નીચેનું કયું વિધાન ખોટું છે?",
+          "options_gu": [
+            "Springs are simple machines as they make the object move",
+            "The extension or compression of springs always occur in the direction of the applied force",
+            "To increase the elasticity of a system of springs, we must combine them in series"
+          ]
         },
         {
           "questionId": "410",
@@ -5240,7 +7018,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "ઊંચાઈ h પર હવાના દબાણની ગણતરી માટે P = rho * g * h સમીકરણનો ઉપયોગ વાતાવરણના ઉપરના ભાગને સંદર્ભ સ્તર તરીકે લઈને કેમ થઈ શકતો નથી?",
+          "options_gu": [
+            "Because the atmosphere is very thick",
+            "Because the density of the atmosphere is not uniform",
+            "Because the atmosphere is not a fluid"
+          ]
         },
         {
           "questionId": "431",
@@ -5254,7 +7038,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "એક અભ્યાસ દર્શાવે છે કે જે વિદ્યાર્થીઓ નાસ્તો કરે છે તેઓ પરીક્ષામાં વધુ સ્કોર કરે છે. કયું તારણ સૌથી માન્ય છે?",
+          "options_gu": [
+            "Eating breakfast causes better test scores",
+            "There may be a correlation between breakfast and test scores",
+            "Students who don't eat breakfast are less intelligent",
+            "All students should be required to eat breakfast"
+          ]
         },
         {
           "questionId": "432",
@@ -5268,7 +7059,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "\"બધા પક્ષીઓ ઊડી શકે છે. પેંગ્વિન પક્ષીઓ છે. તેથી, પેંગ્વિન ઊડી શકે છે.\" આ વિચારણામાં શું ખોટું છે?",
+          "options_gu": [
+            "The conclusion doesn't follow from the premises",
+            "The first statement is false",
+            "The second statement is false",
+            "Nothing is wrong with the reasoning"
+          ]
         },
         {
           "questionId": "433",
@@ -5282,7 +7080,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો સ્ટોર A ની કિંમતો સ્ટોર B કરતાં ઓછી છે, અને સ્ટોર B ની કિંમતો સ્ટોર C કરતાં ઓછી છે, તો:",
+          "options_gu": [
+            "Store A definitely has the lowest prices overall",
+            "Store C has the highest prices of the three",
+            "Store B has average prices",
+            "We need more information to compare all stores"
+          ]
         },
         {
           "questionId": "434",
@@ -5296,7 +7101,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આ દલીલનું શ્રેષ્ઠ મૂલ્યાંકન કયું વિધાન કરે છે: \"મોટાભાગના સફળ લોકો વહેલા ઊઠે છે. તેથી, જો તમે સફળ થવા માંગો છો, તો તમારે વહેલા ઊઠવું જોઈએ.\"",
+          "options_gu": [
+            "The argument is logically sound",
+            "The argument assumes correlation implies causation",
+            "The argument is based on false premises",
+            "The argument is supported by sufficient evidence"
+          ]
         },
         {
           "questionId": "435",
@@ -5310,7 +7122,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "એક સર્વેમાં જાણવા મળ્યું કે 80% લોકો ચોકલેટ આઈસક્રીમ પસંદ કરે છે. કયું પરિબળ આ તારણની માન્યતા પર સૌથી વધુ અસર કરશે?",
+          "options_gu": [
+            "The survey method used",
+            "The sample size and selection",
+            "The time of year the survey was conducted",
+            "All of the above"
+          ]
         },
         {
           "questionId": "436",
@@ -5324,7 +7143,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "\"જો વરસાદ પડે, તો પિકનિક રદ થશે. પિકનિક રદ થઈ. તેથી, વરસાદ પડ્યો.\" આ વિચારણા છે:",
+          "options_gu": [
+            "Valid and sound",
+            "Valid but not sound",
+            "Invalid",
+            "Cannot be determined"
+          ]
         },
         {
           "questionId": "437",
@@ -5338,7 +7164,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આબોહવા પરિવર્તન વિશેની માહિતી માટે કયો સ્રોત સૌથી વિશ્વસનીય હશે?",
+          "options_gu": [
+            "A blog post by someone who experienced unusual weather",
+            "A peer-reviewed scientific journal article",
+            "A social media post with lots of shares",
+            "A news article quoting various opinions"
+          ]
         },
         {
           "questionId": "438",
@@ -5352,7 +7185,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "આ દાવાનું પરીક્ષણ કરો: \"વિડિયો ગેમ્સ હિંસાનું કારણ બને છે કારણ કે ઘણા હિંસક ગુનેગારો વિડિયો ગેમ્સ રમે છે.\" આ વિચારણામાં મુખ્ય ખામી શું છે?",
+          "options_gu": [
+            "It's based on insufficient data",
+            "It confuses correlation with causation",
+            "It uses emotional rather than logical appeals",
+            "It makes an unfair generalization"
+          ]
         },
         {
           "questionId": "439",
@@ -5366,7 +7206,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "D",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો કોઈ દવા 85% દર્દીઓ માટે અસરકારક હોય, અને એક દર્દીને દવા લીધા પછી પણ સુધારો ન થાય, તો આપણે શું તારણ કાઢી શકીએ?",
+          "options_gu": [
+            "The medication doesn't work",
+            "The patient is in the 15% for whom it's not effective",
+            "The patient didn't take it correctly",
+            "More information is needed to draw any conclusion"
+          ]
         },
         {
           "questionId": "440",
@@ -5380,7 +7227,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "સમાચાર લેખની વિશ્વસનીયતાનું મૂલ્યાંકન કરવામાં કયો પ્રશ્ન શ્રેષ્ઠ મદદ કરશે?",
+          "options_gu": [
+            "Is the headline attention-grabbing?",
+            "Are multiple credible sources cited?",
+            "Does it confirm what I already believe?",
+            "Is it shared by many people on social media?"
+          ]
         },
         {
           "questionId": "441",
@@ -5394,7 +7248,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "તમારી પાસે 7-લિટરનો જગ અને 3-લિટરનો જગ છે. તમે બરાબર 5 લિટર કેવી રીતે માપી શકો?",
+          "options_gu": [
+            "Fill 7L, pour into 3L, empty 3L, pour remaining 4L into 3L, fill 7L again, pour from 7L to fill 3L 5L remains",
+            "Fill 3L twice into 7L jug 6L , add 1L more",
+            "Fill 7L, pour out 2L somehow",
+            "It's impossible with these jugs"
+          ]
         },
         {
           "questionId": "442",
@@ -5408,7 +7269,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "એક ખેડૂતને શિયાળ, મરઘી અને મકાઈની થેલી સાથે નદી પાર કરવી છે. તેની હોડી માત્ર તેને અને એક વસ્તુ લઈ જઈ શકે છે. શિયાળ મરઘીને ખાશે, અને જો એકલા છોડી દેવામાં આવે તો મરઘી મકાઈ ખાશે. તે બધાને કેવી રીતે પાર કરાવે?",
+          "options_gu": [
+            "Take chicken first, return alone, take fox, bring chicken back, take corn, return alone, take chicken",
+            "Take corn first, return alone, take chicken, return with corn, take fox, return alone, take corn",
+            "Take fox first, return with chicken, take corn, return alone, take chicken",
+            "Take everything at once somehow"
+          ]
         },
         {
           "questionId": "443",
@@ -5422,7 +7290,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "તમે 200 લોકો માટે શાળાનો કાર્યક્રમ આયોજિત કરી રહ્યા છો. સ્થળની કિંમત $500 છે, દરેક વ્યક્તિ માટે ખોરાકની કિંમત $8 છે, અને સજાવટની કિંમત $200 છે. જો ટિકિટ $12 દરેક હોય, તો સંતુલન સાધવા માટે કેટલી ટિકિટ વેચવી પડે?",
+          "options_gu": [
+            "125 tickets",
+            "142 tickets",
+            "150 tickets",
+            "175 tickets"
+          ]
         },
         {
           "questionId": "444",
@@ -5436,7 +7311,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "બપોરે ઘડિયાળ સાચો સમય બતાવે છે. જો તે દર કલાકે 2 મિનિટ આગળ ચાલે, તો જ્યારે વાસ્તવિક સમય 6:00PM હોય ત્યારે તે કયો સમય બતાવશે?",
+          "options_gu": [
+            "6:10PM",
+            "6:12PM",
+            "6:14PM",
+            "6:16PM"
+          ]
         },
         {
           "questionId": "445",
@@ -5450,7 +7332,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "તમે 16 ટીમો સાથે ટુર્નામેન્ટ આયોજિત કરી રહ્યા છો. દરેક ટીમ બીજી દરેક ટીમ સામે એક વાર રમે છે. કુલ કેટલી રમતો રમાશે?",
+          "options_gu": [
+            "120 games",
+            "240 games",
+            "16 games",
+            "32 games"
+          ]
         },
         {
           "questionId": "446",
@@ -5464,7 +7353,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "પુસ્તકાલય મુદત વટાવેલા પુસ્તકો માટે દિવસ દીઠ $0.25 લે છે. જો કોઈ વ્યક્તિ પુસ્તક 12 દિવસ મોડું પાછું આપે અને દંડ તરીકે $4.50 ચૂકવે, તો કેટલા પુસ્તકો મુદત વટાવેલા હતા?",
+          "options_gu": [
+            "1 book",
+            "2 books",
+            "1.5 books",
+            "Cannot be determined"
+          ]
         },
         {
           "questionId": "447",
@@ -5478,7 +7374,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "તમારે ફોટો માટે 6 લોકોને એક હારમાં ગોઠવવાના છે. બે ચોક્કસ લોકોએ એકબીજાની બાજુમાં ઊભા રહેવું જ જોઈએ. કેટલી જુદી જુદી ગોઠવણીઓ શક્ય છે?",
+          "options_gu": [
+            "240",
+            "720",
+            "120",
+            "48"
+          ]
         },
         {
           "questionId": "448",
@@ -5492,7 +7395,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "B",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "એક રેસીપી 4 લોકોને પીરસે છે અને 2 કપ લોટ માંગે છે. તમારે 14 લોકોને પીરસવાનું છે. તમને કેટલા લોટની જરૂર છે?",
+          "options_gu": [
+            "6 cups",
+            "7 cups",
+            "8 cups",
+            "5 cups"
+          ]
         },
         {
           "questionId": "449",
@@ -5506,7 +7416,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "C",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "જો તમે કાગળને અડધો 4 વખત ગડી કરો અને પછી તેમાં એક છિદ્ર કાપો, તો જ્યારે તમે ઉઘાડો ત્યારે કેટલા છિદ્રો હશે?",
+          "options_gu": [
+            "4 holes",
+            "8 holes",
+            "16 holes",
+            "1 hole"
+          ]
         },
         {
           "questionId": "450",
@@ -5520,7 +7437,14 @@ const COMPREHENSIVE_500_PACKAGE = {
           ],
           "correctOption": "A",
           "reverseScored": false,
-          "weight": 1
+          "weight": 1,
+          "text_gu": "એક ટ્રેન ન્યૂયોર્કથી 3:00PM વાગ્યે 60 mph ની ઝડપે નીકળે છે. બીજી ટ્રેન બોસ્ટનથી 4:00PM વાગ્યે 80 mph ની ઝડપે ન્યૂયોર્ક તરફ નીકળે છે. જો શહેરો 200 માઈલ દૂર છે, તો ટ્રેનો ક્યારે મળશે?",
+          "options_gu": [
+            "5:00PM",
+            "5:30PM",
+            "6:00PM",
+            "6:30PM"
+          ]
         }
       ]
     },
@@ -5541,7 +7465,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મારી લાગણીઓ જેમ થાય છે તેમ હું તેમના વિશે જાગૃત છું.",
+          "options_gu": []
         },
         {
           "questionId": "452",
@@ -5552,7 +7478,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે હું દુખી હોઉં છું, ત્યારે મને સામાન્ય રીતે ખબર હોય છે કે કેમ.",
+          "options_gu": []
         },
         {
           "questionId": "453",
@@ -5563,7 +7491,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "દિવસ દરમિયાન હું જે જુદી જુદી લાગણીઓ અનુભવું છું તેને ઓળખી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "454",
@@ -5574,7 +7504,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું સમજું છું કે મારી લાગણીઓ મારા વર્તન પર કેવી અસર કરે છે.",
+          "options_gu": []
         },
         {
           "questionId": "455",
@@ -5585,7 +7517,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારી લાગણીઓના પેટર્ન અને કારણો ઓળખું છું.",
+          "options_gu": []
         },
         {
           "questionId": "456",
@@ -5596,7 +7530,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મળતી આવતી લાગણીઓ વચ્ચે તફાવત કરી શકું છું (જેમ કે હતાશા અને ગુસ્સો).",
+          "options_gu": []
         },
         {
           "questionId": "457",
@@ -5607,7 +7543,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જુદી જુદી પરિસ્થિતિઓમાં મારી લાગણીઓ કેવી રીતે બદલાય છે તેના વિશે હું જાગૃત છું.",
+          "options_gu": []
         },
         {
           "questionId": "458",
@@ -5618,7 +7556,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારી ભાવનાત્મક સ્થિતિઓના શારીરિક ચિહ્નોને ધ્યાનમાં લઉં છું.",
+          "options_gu": []
         },
         {
           "questionId": "459",
@@ -5629,7 +7569,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "ચોક્કસ પરિસ્થિતિઓમાં હું કેવો અનુભવ કરી શકું છું તેની હું આગાહી કરી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "460",
@@ -5640,7 +7582,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારા વિચારો અને લાગણીઓ વચ્ચેના જોડાણને સમજું છું.",
+          "options_gu": []
         },
         {
           "questionId": "461",
@@ -5651,7 +7595,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે હું ગુસ્સામાં હોઉં ત્યારે હું મારા ગુસ્સા પર નિયંત્રણ રાખી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "462",
@@ -5662,7 +7608,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે હું ઉત્સાહિત હોઉં ત્યારે પણ હું કાર્ય કરતા પહેલા વિચારું છું.",
+          "options_gu": []
         },
         {
           "questionId": "463",
@@ -5673,7 +7621,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે હું દુખી હોઉં ત્યારે હું મારી જાતને શાંત કરી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "464",
@@ -5684,7 +7634,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું એવા આવેગોનો પ્રતિકાર કરી શકું છું જે હાનિકારક અથવા અયોગ્ય હોઈ શકે.",
+          "options_gu": []
         },
         {
           "questionId": "465",
@@ -5695,7 +7647,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે હું ભાવનાત્મક હોઉં ત્યારે પણ હું ધ્યાન કેન્દ્રિત રાખી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "466",
@@ -5706,7 +7660,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જુદી જુદી પરિસ્થિતિઓ અનુસાર હું મારી લાગણીઓને અનુકૂળ બનાવી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "467",
@@ -5717,7 +7673,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "નિરાશાઓથી હું ઝડપથી પાછો આવી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "468",
@@ -5728,7 +7686,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારા તણાવના સ્તરનું અસરકારક રીતે વ્યવસ્થાપન કરી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "469",
@@ -5739,7 +7699,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "સંઘર્ષ દરમિયાન હું મારી પ્રતિક્રિયાઓને નિયંત્રિત કરી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "470",
@@ -5750,7 +7712,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "દબાણ હેઠળ હું મારી શાંતિ જાળવી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "471",
@@ -5761,7 +7725,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે કાર્યો મુશ્કેલ બને ત્યારે પણ હું મહેનત કરતો રહું છું.",
+          "options_gu": []
         },
         {
           "questionId": "472",
@@ -5772,7 +7738,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારા માટે પડકારજનક લક્ષ્યો નક્કી કરું છું.",
+          "options_gu": []
         },
         {
           "questionId": "473",
@@ -5783,7 +7751,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મારી સફળ થવાની ક્ષમતા વિશે હું આશાવાદી છું.",
+          "options_gu": []
         },
         {
           "questionId": "474",
@@ -5794,7 +7764,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને લાંબા ગાળાના લક્ષ્યો તરફ કામ કરવાનું ગમે છે.",
+          "options_gu": []
         },
         {
           "questionId": "475",
@@ -5805,7 +7777,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જે વસ્તુઓ હું પ્રાપ્ત કરવા માંગુ છું તેના માટે હું મહેનત કરવા તૈયાર છું.",
+          "options_gu": []
         },
         {
           "questionId": "476",
@@ -5816,7 +7790,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે પ્રગતિ ધીમી હોય ત્યારે પણ હું મારો પ્રયાસ જાળવી રાખું છું.",
+          "options_gu": []
         },
         {
           "questionId": "477",
@@ -5827,7 +7803,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારું પ્રદર્શન સુધારવાના રસ્તાઓ શોધું છું.",
+          "options_gu": []
         },
         {
           "questionId": "478",
@@ -5838,7 +7816,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "નવા પ્રોજેક્ટ્સ અથવા પ્રવૃત્તિઓ શરૂ કરવા હું પહેલ કરું છું.",
+          "options_gu": []
         },
         {
           "questionId": "479",
@@ -5849,7 +7829,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું બાહ્ય પુરસ્કારોને બદલે આંતરિક સંતોષથી પ્રેરિત થઉં છું.",
+          "options_gu": []
         },
         {
           "questionId": "480",
@@ -5860,7 +7842,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "અવરોધો સામે પણ હું મારા લક્ષ્યો માટે પ્રતિબદ્ધ રહું છું.",
+          "options_gu": []
         },
         {
           "questionId": "481",
@@ -5871,7 +7855,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "ચહેરાના હાવભાવ પરથી હું કહી શકું છું કે બીજાઓ શું અનુભવી રહ્યા છે.",
+          "options_gu": []
         },
         {
           "questionId": "482",
@@ -5882,7 +7868,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "બીજાઓ વિશે ચુકાદો કરતા પહેલા હું તેમના દૃષ્ટિકોણ સમજવાનો પ્રયાસ કરું છું.",
+          "options_gu": []
         },
         {
           "questionId": "483",
@@ -5893,7 +7881,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે કોઈ દુખી હોય ત્યારે હું ધ્યાનમાં લઉં છું, ભલે તેઓ તેને છુપાવવાનો પ્રયાસ કરે.",
+          "options_gu": []
         },
         {
           "questionId": "484",
@@ -5904,7 +7894,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે હું પ્રવેશ કરું છું ત્યારે હું જૂથ અથવા રૂમના મૂડને પારખી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "485",
@@ -5915,7 +7907,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જ્યારે બીજાઓ પીડા અથવા દુખમાં હોય ત્યારે મને ચિંતા થાય છે.",
+          "options_gu": []
         },
         {
           "questionId": "486",
@@ -5926,7 +7920,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું સમજી શકું છું કે લોકો જે રીતે પ્રતિક્રિયા આપે છે તે કેમ આપે છે.",
+          "options_gu": []
         },
         {
           "questionId": "487",
@@ -5937,7 +7933,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "વાતચીતમાં હું પંક્તિઓ વચ્ચે વાંચવામાં સારો છું.",
+          "options_gu": []
         },
         {
           "questionId": "488",
@@ -5948,7 +7946,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું બીજાની જગ્યાએ મારી જાતને સહેલાઈથી મૂકી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "489",
@@ -5959,7 +7959,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું શારીરિક ભાષા અને અવાજના ઢંગ જેવા બિન-મૌખિક સંકેતો ધ્યાનમાં લઉં છું.",
+          "options_gu": []
         },
         {
           "questionId": "490",
@@ -5970,7 +7972,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું બીજાઓની લાગણીઓ અને ભાવનાઓ પ્રત્યે સંવેદનશીલ છું.",
+          "options_gu": []
         },
         {
           "questionId": "491",
@@ -5981,7 +7985,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "મને લોકો વચ્ચેના સંઘર્ષનું નિરાકરણ લાવવાનું સહેલું લાગે છે.",
+          "options_gu": []
         },
         {
           "questionId": "492",
@@ -5992,7 +7998,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું બીજાઓને સામાન્ય ધ્યેયો તરફ કામ કરવા પ્રભાવિત કરી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "493",
@@ -6003,7 +8011,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "નવા લોકો સાથે સારો સંબંધ બાંધવામાં હું સારો છું.",
+          "options_gu": []
         },
         {
           "questionId": "494",
@@ -6014,7 +8024,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું મારા વિચારો બીજાઓને સ્પષ્ટ રીતે કહી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "495",
@@ -6025,7 +8037,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "ટીમ પરિસ્થિતિઓમાં હું સારી રીતે કામ કરું છું.",
+          "options_gu": []
         },
         {
           "questionId": "496",
@@ -6036,7 +8050,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું એવી રીતે પ્રતિસાદ આપી શકું છું જે બીજાઓ સારી રીતે સ્વીકારે.",
+          "options_gu": []
         },
         {
           "questionId": "497",
@@ -6047,7 +8063,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "નેટવર્કિંગ અને સંબંધો જાળવવામાં હું સારો છું.",
+          "options_gu": []
         },
         {
           "questionId": "498",
@@ -6058,7 +8076,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું જૂથ ચર્ચાઓનું અસરકારક નેતૃત્વ કરી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "499",
@@ -6069,7 +8089,9 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "હું વાટાઘાટ કરી શકું છું અને બધા માટે કામ કરતા સમાધાન શોધી શકું છું.",
+          "options_gu": []
         },
         {
           "questionId": "500",
@@ -6080,11 +8102,13 @@ const COMPREHENSIVE_500_PACKAGE = {
           "reverseScored": false,
           "weight": 1,
           "subscale": "",
-          "notes": ""
+          "notes": "",
+          "text_gu": "જે જૂથોનો હું ભાગ છું તેમાં હું સકારાત્મક વાતાવરણ ઊભું કરવામાં મદદ કરું છું.",
+          "options_gu": []
         }
       ]
     }
   ]
 };
 
-export default COMPREHENSIVE_500_PACKAGE;
+export default PACKAGE;

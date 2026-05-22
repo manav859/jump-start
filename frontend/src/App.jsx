@@ -5,6 +5,7 @@ import MainLayout from "./layout/MainLayout";
 import BlankLayout from "./layout/BlankLayout";
 import AdminLayout from "./layout/AdminLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import PageLoader from "./components/PageLoader";
 
 const Home = lazy(() => import("./pages/Home"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -35,16 +36,8 @@ const Settings = lazy(() => import("./pages/admin/Settings"));
 const ReviewSubmission = lazy(() => import("./pages/admin/ReviewSubmission"));
 const SupportContentPage = lazy(() => import("./pages/SupportContentPage"));
 
-function RouteFallback() {
-  return (
-    <div className="flex min-h-[40vh] items-center justify-center px-6 text-sm font-medium text-slate-500">
-      Loading page...
-    </div>
-  );
-}
-
 function withSuspense(element) {
-  return <Suspense fallback={<RouteFallback />}>{element}</Suspense>;
+  return <Suspense fallback={<PageLoader />}>{element}</Suspense>;
 }
 
 const protectedPage = (element) =>

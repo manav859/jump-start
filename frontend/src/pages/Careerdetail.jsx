@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -15,10 +16,12 @@ import {
 import api from "../api/api";
 import { getCareerDetailContent, matchCareerByTitle } from "../data/careerDetails";
 
+// Outlook keys map to translation labels — `key` is the backend field
+// in detail.outlook; `labelKey` resolves to the localised heading.
 const OUTLOOK_ITEMS = [
-  { key: "marketDemand", label: "Market Demand" },
-  { key: "jobSatisfaction", label: "Job Satisfaction" },
-  { key: "workLifeBalance", label: "Work-Life Balance" },
+  { key: "marketDemand", labelKey: "careerdetail.marketDemand" },
+  { key: "jobSatisfaction", labelKey: "careerdetail.jobSatisfaction" },
+  { key: "workLifeBalance", labelKey: "careerdetail.workLifeBalance" },
 ];
 
 const getStateCareer = (locationState) => {
@@ -29,6 +32,7 @@ const getStateCareer = (locationState) => {
 };
 
 export default function Careerdetail() {
+  const { t } = useTranslation();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const seededCareer = getStateCareer(location.state);
@@ -75,7 +79,7 @@ export default function Careerdetail() {
   if (loading && !selectedCareer) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center bg-[#F7F8FA] px-4">
-        <p className="text-[#65758B]">Loading career details...</p>
+        <p className="text-[#65758B]">{t("careerdetail.loading")}</p>
       </div>
     );
   }
@@ -84,10 +88,10 @@ export default function Careerdetail() {
     return (
       <div className="flex min-h-[70vh] items-center justify-center bg-[#F7F8FA] px-4">
         <div className="surface-card w-full max-w-xl rounded-[28px] p-8 text-center">
-          <h1 className="text-3xl font-bold text-[#0F1729]">Career Detail Unavailable</h1>
+          <h1 className="text-3xl font-bold text-[#0F1729]">{t("careerdetail.unavailableHeading")}</h1>
           <p className="mt-3 text-[#65758B]">{error}</p>
           <Link to="/result" className="primary-btn mt-6">
-            Back to Results
+            {t("careerdetail.backToResults")}
           </Link>
         </div>
       </div>
@@ -98,13 +102,12 @@ export default function Careerdetail() {
     return (
       <div className="flex min-h-[70vh] items-center justify-center bg-[#F7F8FA] px-4">
         <div className="surface-card w-full max-w-2xl rounded-[28px] p-8 text-center">
-          <h1 className="text-3xl font-bold text-[#0F1729]">No Career Detail Yet</h1>
+          <h1 className="text-3xl font-bold text-[#0F1729]">{t("careerdetail.noDetailHeading")}</h1>
           <p className="mt-3 text-[#65758B]">
-            Complete your assessment to unlock detailed career recommendations and
-            explore them here.
+            {t("careerdetail.noDetailBody")}
           </p>
           <Link to="/result" className="primary-btn mt-6">
-            Go to Results
+            {t("careerdetail.goToResults")}
           </Link>
         </div>
       </div>
@@ -119,7 +122,7 @@ export default function Careerdetail() {
           className="inline-flex items-center gap-2 rounded-full border border-[#DFE7EE] bg-white px-4 py-2 text-sm font-semibold text-[#4E5D72] hover:border-[#C3D4DE] hover:bg-[#FBFCFD]"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Results
+          {t("careerdetail.backToResults")}
         </Link>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_340px] lg:items-start">
@@ -132,13 +135,13 @@ export default function Careerdetail() {
                 className="rounded-full bg-[#E2F8F7] px-4 py-2 text-sm font-semibold text-[#188B8B]"
                 title={
                   detail.score != null
-                    ? `Your weighted match score: ${detail.score}/100`
+                    ? t("careerdetail.matchScore", { score: detail.score })
                     : undefined
                 }
               >
-                {detail.score != null
-                  ? `${Math.round(detail.score)}% Match`
-                  : `${detail.matchPercent}% Match`}
+                {t("result.matchPercent", {
+                  value: detail.score != null ? Math.round(detail.score) : detail.matchPercent,
+                })}
               </span>
               {detail.category ? (
                 <span className="rounded-full border border-[#D9E5EC] bg-white px-3 py-1.5 text-xs font-semibold text-[#4E5D72]">
@@ -158,8 +161,7 @@ export default function Careerdetail() {
                   />
                 </div>
                 <p className="mt-1.5 text-xs text-[#7D8CA2]">
-                  Compatibility based on your Holland code, intelligences,
-                  aptitudes, and EQ.
+                  {t("careerdetail.compatibilityBased")}
                 </p>
               </div>
             ) : null}
@@ -179,7 +181,7 @@ export default function Careerdetail() {
               ))}
               {hiddenSkillCount ? (
                 <span className="rounded-full bg-[#EEF4F7] px-3 py-1 text-[11px] font-semibold text-[#4E5D72]">
-                  +{hiddenSkillCount} more
+                  {t("careerdetail.moreSkills", { count: hiddenSkillCount })}
                 </span>
               ) : null}
             </div>
@@ -190,13 +192,13 @@ export default function Careerdetail() {
               <CalendarDays className="h-5 w-5" />
             </div>
             <p className="mt-4 text-center text-sm font-medium text-[#4E5D72]">
-              Ready to explore this career?
+              {t("careerdetail.readyToExplore")}
             </p>
             <Link to="/bookcounselling" className="primary-btn mt-4 flex w-full">
-              Schedule a Call
+              {t("careerdetail.scheduleCall")}
             </Link>
             <p className="mt-3 text-center text-xs text-[#8A94A6]">
-              Talk to a career counselor
+              {t("careerdetail.talkToCounselor")}
             </p>
           </section>
         </div>
@@ -215,11 +217,10 @@ export default function Careerdetail() {
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-[#0F1729]">
-                      Why this matched you
+                      {t("careerdetail.whyMatchedHeading")}
                     </h2>
                     <p className="mt-1 text-sm text-[#7D8CA2]">
-                      Weighted signals from your assessment that lifted this
-                      career to the top.
+                      {t("careerdetail.whyMatchedSubtitle")}
                     </p>
                   </div>
                 </div>
@@ -229,7 +230,7 @@ export default function Careerdetail() {
                       <span className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-[#188B8B]" />
                       <span>
                         <span className="font-semibold text-[#0F1729]">
-                          Interests:
+                          {t("result.matchReasonInterests")}:
                         </span>{" "}
                         {detail.matchReasons.holland}
                       </span>
@@ -240,7 +241,7 @@ export default function Careerdetail() {
                       <span className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-[#188B8B]" />
                       <span>
                         <span className="font-semibold text-[#0F1729]">
-                          Intelligence:
+                          {t("result.matchReasonIntelligence")}:
                         </span>{" "}
                         {detail.matchReasons.intelligence}
                       </span>
@@ -251,7 +252,7 @@ export default function Careerdetail() {
                       <span className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-[#188B8B]" />
                       <span>
                         <span className="font-semibold text-[#0F1729]">
-                          Aptitude:
+                          {t("result.matchReasonAptitude")}:
                         </span>{" "}
                         {detail.matchReasons.aptitude}
                       </span>
@@ -262,7 +263,7 @@ export default function Careerdetail() {
                       <span className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-[#188B8B]" />
                       <span>
                         <span className="font-semibold text-[#0F1729]">
-                          EQ:
+                          {t("result.matchReasonEq")}:
                         </span>{" "}
                         {detail.matchReasons.eq}
                       </span>
@@ -273,18 +274,18 @@ export default function Careerdetail() {
                   <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
                     {[
                       {
-                        label: "Holland",
+                        label: t("careerdetail.breakdownHolland"),
                         value: detail.breakdown.hollandMatch,
                       },
                       {
-                        label: "Intelligence",
+                        label: t("careerdetail.breakdownIntelligence"),
                         value: detail.breakdown.intelligenceMatch,
                       },
                       {
-                        label: "Aptitude",
+                        label: t("careerdetail.breakdownAptitude"),
                         value: detail.breakdown.aptitudeMatch,
                       },
-                      { label: "EQ", value: detail.breakdown.eqMatch },
+                      { label: t("careerdetail.breakdownEq"), value: detail.breakdown.eqMatch },
                     ].map((item) => (
                       <div
                         key={item.label}
@@ -309,7 +310,7 @@ export default function Careerdetail() {
                 <div className="rounded-2xl bg-[#EAFBFB] p-3 text-[#188B8B]">
                   <NotebookText className="h-5 w-5" />
                 </div>
-                <h2 className="text-2xl font-bold text-[#0F1729]">Career Overview</h2>
+                <h2 className="text-2xl font-bold text-[#0F1729]">{t("careerdetail.careerOverview")}</h2>
               </div>
               <p className="mt-4 text-sm leading-8 text-[#65758B]">{detail.overview}</p>
             </section>
@@ -321,10 +322,10 @@ export default function Careerdetail() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-[#0F1729]">
-                    Salary Range in India
+                    {t("careerdetail.salaryRangeIndia")}
                   </h2>
                   <p className="mt-1 text-sm text-[#8A94A6]">
-                    Indicative range based on experience progression.
+                    {t("careerdetail.salaryRangeBody")}
                   </p>
                 </div>
               </div>
@@ -352,7 +353,7 @@ export default function Careerdetail() {
                 <div className="rounded-2xl bg-[#EEF7FF] p-3 text-[#188B8B]">
                   <CheckCircle2 className="h-5 w-5" />
                 </div>
-                <h2 className="text-2xl font-bold text-[#0F1729]">Key Responsibilities</h2>
+                <h2 className="text-2xl font-bold text-[#0F1729]">{t("careerdetail.keyResponsibilitiesHeading")}</h2>
               </div>
 
               <div className="mt-5 space-y-4">
@@ -373,7 +374,7 @@ export default function Careerdetail() {
                   <Sparkles className="h-5 w-5" />
                 </div>
                 <h2 className="text-2xl font-bold text-[#0F1729]">
-                  Required Skills & Technologies
+                  {t("careerdetail.requiredSkillsHeading")}
                 </h2>
               </div>
 
@@ -394,7 +395,7 @@ export default function Careerdetail() {
                 <div className="rounded-2xl bg-[#FFF6DF] p-3 text-[#F59F0A]">
                   <Building2 className="h-5 w-5" />
                 </div>
-                <h2 className="text-2xl font-bold text-[#0F1729]">Top Hiring Companies</h2>
+                <h2 className="text-2xl font-bold text-[#0F1729]">{t("careerdetail.topHiringCompanies")}</h2>
               </div>
 
               <div className="mt-5 flex flex-wrap gap-3">
@@ -416,7 +417,7 @@ export default function Careerdetail() {
                 <div className="rounded-2xl bg-[#EAFBFB] p-3 text-[#188B8B]">
                   <GraduationCap className="h-5 w-5" />
                 </div>
-                <h2 className="text-2xl font-bold text-[#0F1729]">Education</h2>
+                <h2 className="text-2xl font-bold text-[#0F1729]">{t("careerdetail.educationHeading")}</h2>
               </div>
 
               <div className="mt-5 space-y-4">
@@ -434,14 +435,14 @@ export default function Careerdetail() {
                 <div className="rounded-2xl bg-[#EAFBFB] p-3 text-[#188B8B]">
                   <LineChart className="h-5 w-5" />
                 </div>
-                <h2 className="text-2xl font-bold text-[#0F1729]">Career Outlook</h2>
+                <h2 className="text-2xl font-bold text-[#0F1729]">{t("careerdetail.careerOutlookHeading")}</h2>
               </div>
 
               <div className="mt-5 space-y-5">
                 {OUTLOOK_ITEMS.map((item) => (
                   <div key={item.key}>
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold text-[#0F1729]">{item.label}</p>
+                      <p className="text-sm font-semibold text-[#0F1729]">{t(item.labelKey)}</p>
                       <p className="text-sm font-semibold text-[#188B8B]">
                         {detail.outlook[item.key]}%
                       </p>
@@ -458,10 +459,9 @@ export default function Careerdetail() {
             </section>
 
             <section className="surface-card rounded-[26px] border border-[#F4DCA8] bg-[linear-gradient(180deg,#FFF9EA_0%,#FFFFFF_100%)] p-6">
-              <p className="text-2xl font-bold text-[#0F1729]">Need Guidance?</p>
+              <p className="text-2xl font-bold text-[#0F1729]">{t("careerdetail.needGuidance")}</p>
               <p className="mt-3 text-sm leading-7 text-[#65758B]">
-                Schedule a one-on-one session with our career counselors and get help
-                turning this recommendation into a practical next step.
+                {t("careerdetail.needGuidanceBody")}
               </p>
 
               <div className="mt-5 space-y-3">
@@ -476,7 +476,7 @@ export default function Careerdetail() {
               </div>
 
               <Link to="/bookcounselling" className="primary-btn mt-6 flex w-full gap-2">
-                Schedule a Call
+                {t("careerdetail.scheduleCall")}
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
             </section>

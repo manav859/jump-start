@@ -7,7 +7,9 @@ import {
 } from "../configs/career500qDemo.config.js";
 import { matchCareers } from "../careerMatcher.js";
 
-const DEMO_TOP_N = 6;
+// Demo cap — threshold-based filter (score >= 60) inside matchCareers
+// trims the list; this is the absolute ceiling.
+const DEMO_MAX_N = 10;
 const APTITUDE_SECTION_KEY = "aptitude";
 
 // Prompt-5 fix: weighted overall-score formula, mirrored from career500q.js
@@ -151,7 +153,7 @@ export const scoreCareer500QDemoPackage = (answers = {}, sections = []) => {
       aptitudeScores: result.aptitudeScores,
       eqProfile: result.eqProfile,
     },
-    DEMO_TOP_N
+    DEMO_MAX_N
   );
 
   // Step 5: stamp the demo metadata LAST so nothing downstream can

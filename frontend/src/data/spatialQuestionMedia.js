@@ -39,7 +39,7 @@ export const getSpatialStimulusSrc = (questionId) => {
   }
 
   const folder = getSpatialQuestionFolder(questionId);
-  return folder ? `${folder}/stimulus.png?v=2` : null;
+  return folder ? `${folder}/stimulus.webp?v=2` : null;
 };
 
 export const getSpatialOptionSrc = (questionId, optionLetter) => {
@@ -47,5 +47,5 @@ export const getSpatialOptionSrc = (questionId, optionLetter) => {
   const normalizedLetter = String(optionLetter || "").toUpperCase();
   if (!folder || !normalizedLetter) return null;
 
-  return `${folder}/option-${normalizedLetter}.png?v=2`;
+  return `${folder}/option-${normalizedLetter}.webp?v=2`;
 };

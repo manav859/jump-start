@@ -47,16 +47,24 @@ export default function SectionBreakdownCard({
         />
       </button>
 
-      {showContent ? (
-        <div className="border-t border-[#E8EEF3] px-3 py-3 sm:px-5 sm:py-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8A94A6] sm:text-xs sm:tracking-[0.16em]">
-            Subsection Breakdown
-          </p>
-          <div className="mt-3 sm:mt-4">
-            <SubsectionBreakdownList subsections={section.subsections || []} />
-          </div>
+      {/* Always render the content into the DOM, then visually hide it
+          when collapsed. This keeps native browser print (Ctrl+P) able
+          to expose every section even when our `forceOpen` path isn't
+          triggered — the print stylesheet in index.css overrides the
+          `hidden` utility under @media print. */}
+      <div
+        data-state={showContent ? "open" : "closed"}
+        className={`accordion-content border-t border-[#E8EEF3] px-3 py-3 sm:px-5 sm:py-5 ${
+          showContent ? "" : "hidden"
+        }`}
+      >
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8A94A6] sm:text-xs sm:tracking-[0.16em]">
+          Subsection Breakdown
+        </p>
+        <div className="mt-3 sm:mt-4">
+          <SubsectionBreakdownList subsections={section.subsections || []} />
         </div>
-      ) : null}
+      </div>
     </div>
   );
 }

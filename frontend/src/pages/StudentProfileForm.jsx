@@ -1,17 +1,26 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ArrowLeft, GraduationCap, Loader2 } from "lucide-react";
 import api from "../api/api";
 import { AuthContext } from "../context/AuthContext";
 
-const GENDER_OPTIONS = ["Male", "Female", "Other", "Prefer not to say"];
+// Option arrays carry stable english `value` (sent to the backend) +
+// translation `labelKey` (rendered to the user). The form keeps the
+// english string in state so the DB stays consistent across languages.
+const GENDER_OPTIONS = [
+  { value: "Male", labelKey: "studentProfile.genderMaleOption" },
+  { value: "Female", labelKey: "studentProfile.genderFemaleOption" },
+  { value: "Other", labelKey: "studentProfile.genderOtherOption" },
+  { value: "Prefer not to say", labelKey: "studentProfile.genderPreferNotOption" },
+];
 
 const STREAM_OPTIONS = [
-  "Science",
-  "Commerce",
-  "Arts",
-  "Not Applicable",
-  "Other",
+  { value: "Science", labelKey: "studentProfile.streamScience" },
+  { value: "Commerce", labelKey: "studentProfile.streamCommerce" },
+  { value: "Arts", labelKey: "studentProfile.streamArts" },
+  { value: "Not Applicable", labelKey: "studentProfile.streamNA" },
+  { value: "Other", labelKey: "studentProfile.streamOther" },
 ];
 
 // 28 states + 8 union territories (current as of 2026).
@@ -107,6 +116,7 @@ function Field({
 }
 
 export default function StudentProfileForm() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useContext(AuthContext);
@@ -176,10 +186,10 @@ export default function StudentProfileForm() {
     if (missingRequired.length) {
       setErrors(
         Object.fromEntries(
-          missingRequired.map((field) => [field, "This field is required."])
+          missingRequired.map((field) => [field, t("studentProfile.errorRequired")])
         )
       );
-      setTopError("Please complete the required fields highlighted below.");
+      setTopError(t("studentProfile.completeRequiredFields"));
       return;
     }
 
@@ -206,7 +216,7 @@ export default function StudentProfileForm() {
           const msg =
             selectErr?.response?.data?.msg ||
             selectErr?.message ||
-            "Profile saved, but we couldn't open that test. Try again from your dashboard.";
+            t("studentProfile.selectFailedFallback");
           navigate(returnTo, { replace: true, state: { notice: msg } });
           return;
         }
@@ -221,7 +231,7 @@ export default function StudentProfileForm() {
       setTopError(
         err?.response?.data?.msg ||
           err?.message ||
-          "Failed to save your student profile."
+          t("studentProfile.saveFailed")
       );
     } finally {
       setSaving(false);
@@ -232,7 +242,7 @@ export default function StudentProfileForm() {
     return (
       <div className="flex min-h-[70vh] items-center justify-center bg-[#FAFAFA] px-4">
         <p className="text-sm font-medium text-[#65758B]">
-          Loading your profile...
+          {t("studentProfile.loadingNow")}
         </p>
       </div>
     );
@@ -246,7 +256,7 @@ export default function StudentProfileForm() {
           className="inline-flex items-center gap-2 text-sm font-semibold text-[#4E5D72] hover:text-[#188B8B]"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back
+          {t("studentProfile.back")}
         </Link>
 
         <div className="surface-card mt-4 rounded-[28px] p-7 sm:p-9">
@@ -256,12 +266,10 @@ export default function StudentProfileForm() {
             </span>
             <div>
               <h1 className="text-3xl font-bold text-[#0F1729]">
-                Student Profile
+                {t("studentProfile.title")}
               </h1>
               <p className="mt-1.5 max-w-xl text-sm leading-7 text-[#65758B]">
-                We need a few details before you start your first assessment.
-                This information helps tailor your report and is shown to the
-                counsellor reviewing your submission.
+                {t("studentProfile.introBody")}
               </p>
             </div>
           </div>
@@ -275,10 +283,10 @@ export default function StudentProfileForm() {
           <form onSubmit={handleSubmit} className="mt-7 space-y-8" noValidate>
             <section>
               <h2 className="text-lg font-bold text-[#0F1729]">
-                Personal Details
+                {t("studentProfile.personalDetails")}
               </h2>
               <div className="mt-4 grid gap-5 sm:grid-cols-2">
-                <Field id="fullName" label="Full Name">
+                <Field id="fullName" label={t("studentProfile.fullNameLabel")}>
                   <input
                     id="fullName"
                     type="text"
@@ -287,12 +295,12 @@ export default function StudentProfileForm() {
                     className={`${inputClass} cursor-not-allowed bg-[#F4F6F9] text-[#65758B]`}
                   />
                   <p className={helperClass}>
-                    Update your display name from the Profile page.
+                    {t("studentProfile.fullNameHelper")}
                   </p>
                 </Field>
                 <Field
                   id="dateOfBirth"
-                  label="Date of Birth"
+                  label={t("studentProfile.dateOfBirthLabel")}
                   required
                   error={errors.dateOfBirth}
                 >
@@ -309,7 +317,7 @@ export default function StudentProfileForm() {
                 </Field>
                 <Field
                   id="gender"
-                  label="Gender"
+                  label={t("studentProfile.genderLabel")}
                   required
                   error={errors.gender}
                 >
@@ -321,18 +329,18 @@ export default function StudentProfileForm() {
                     aria-invalid={Boolean(errors.gender)}
                     aria-required="true"
                   >
-                    <option value="">Select gender</option>
+                    <option value="">{t("studentProfile.selectGender")}</option>
                     {GENDER_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt}>
-                        {opt}
+                      <option key={opt.value} value={opt.value}>
+                        {t(opt.labelKey)}
                       </option>
                     ))}
                   </select>
                 </Field>
                 <Field
                   id="phone"
-                  label="Phone Number"
-                  helper="Digits only. Used for counselling follow-up."
+                  label={t("studentProfile.phoneNumberLabel")}
+                  helper={t("studentProfile.phoneHelper")}
                   error={errors.phone}
                 >
                   <input
@@ -353,12 +361,12 @@ export default function StudentProfileForm() {
 
             <section>
               <h2 className="text-lg font-bold text-[#0F1729]">
-                Academic Details
+                {t("studentProfile.academicDetails")}
               </h2>
               <div className="mt-4 grid gap-5 sm:grid-cols-2">
                 <Field
                   id="schoolOrCollege"
-                  label="School / College Name"
+                  label={t("studentProfile.schoolCollegeLabel")}
                   required
                   error={errors.schoolOrCollege}
                 >
@@ -377,9 +385,9 @@ export default function StudentProfileForm() {
                 </Field>
                 <Field
                   id="classOrGrade"
-                  label="Class / Grade"
+                  label={t("studentProfile.classOrGradeLabel")}
                   required
-                  helper="e.g. Class 10, Class 12, B.Com 1st Year"
+                  helper={t("studentProfile.classOrGradeHelper")}
                   error={errors.classOrGrade}
                 >
                   <input
@@ -397,7 +405,7 @@ export default function StudentProfileForm() {
                 </Field>
                 <Field
                   id="stream"
-                  label="Stream"
+                  label={t("studentProfile.streamLabel")}
                   error={errors.stream}
                 >
                   <select
@@ -407,18 +415,18 @@ export default function StudentProfileForm() {
                     className={inputClass}
                     aria-invalid={Boolean(errors.stream)}
                   >
-                    <option value="">Select stream</option>
+                    <option value="">{t("studentProfile.selectStream")}</option>
                     {STREAM_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt}>
-                        {opt}
+                      <option key={opt.value} value={opt.value}>
+                        {t(opt.labelKey)}
                       </option>
                     ))}
                   </select>
                 </Field>
                 <Field
                   id="board"
-                  label="Board / University"
-                  helper="e.g. CBSE, ICSE, Rajasthan Board, University of Delhi"
+                  label={t("studentProfile.boardLabel")}
+                  helper={t("studentProfile.boardHelper")}
                   error={errors.board}
                 >
                   <input
@@ -435,9 +443,9 @@ export default function StudentProfileForm() {
             </section>
 
             <section>
-              <h2 className="text-lg font-bold text-[#0F1729]">Location</h2>
+              <h2 className="text-lg font-bold text-[#0F1729]">{t("studentProfile.location")}</h2>
               <div className="mt-4 grid gap-5 sm:grid-cols-2">
-                <Field id="city" label="City" required error={errors.city}>
+                <Field id="city" label={t("studentProfile.cityLabel2")} required error={errors.city}>
                   <input
                     id="city"
                     type="text"
@@ -451,7 +459,7 @@ export default function StudentProfileForm() {
                 </Field>
                 <Field
                   id="state"
-                  label="State / UT"
+                  label={t("studentProfile.stateLabel2")}
                   required
                   error={errors.state}
                 >
@@ -463,7 +471,7 @@ export default function StudentProfileForm() {
                     aria-invalid={Boolean(errors.state)}
                     aria-required="true"
                   >
-                    <option value="">Select state / UT</option>
+                    <option value="">{t("studentProfile.selectState")}</option>
                     {INDIAN_STATES_AND_UTS.map((stateName) => (
                       <option key={stateName} value={stateName}>
                         {stateName}
@@ -476,9 +484,7 @@ export default function StudentProfileForm() {
 
             <div className="flex flex-col gap-3 border-t border-[#E6EEF2] pt-6 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs text-[#7D8CA2]">
-                Fields marked with{" "}
-                <span className="font-semibold text-[#B91C1C]">*</span> are
-                required to unlock the assessment.
+                {t("studentProfile.requiredFieldsNotice")}
               </p>
               <button
                 type="submit"
@@ -488,10 +494,10 @@ export default function StudentProfileForm() {
                 {saving ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Saving...
+                    {t("studentProfile.savingNow")}
                   </>
                 ) : (
-                  "Save & Continue"
+                  t("studentProfile.saveAndContinue")
                 )}
               </button>
             </div>

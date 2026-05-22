@@ -177,11 +177,20 @@ const formatCareerSkills = (career) => {
   return [...new Set(skills)].slice(0, 6);
 };
 
-export const matchCareers = (profile, topN = 10) => {
+// Threshold-based filter rules:
+//   - include every career whose score >= MATCH_THRESHOLD
+//   - always include at least MIN_RESULTS top-scoring careers, even if
+//     they fall below the threshold (so a low-signal profile still
+//     gets actionable recommendations)
+//   - never return more than `maxN` results
+export const MATCH_THRESHOLD = 60;
+export const MIN_RESULTS = 3;
+
+export const matchCareers = (profile, maxN = 15) => {
   const safeProfile = validateProfile(profile);
-  const safeTopN = Math.max(
-    1,
-    Math.min(CAREER_MAPPINGS.length, Number(topN) || 10)
+  const safeMaxN = Math.max(
+    MIN_RESULTS,
+    Math.min(CAREER_MAPPINGS.length, Number(maxN) || 15)
   );
 
   const scored = CAREER_MAPPINGS.map((career) => {
@@ -239,7 +248,15 @@ export const matchCareers = (profile, topN = 10) => {
 
   scored.sort((a, b) => b.score - a.score || a.title.localeCompare(b.title));
 
-  return scored.slice(0, safeTopN);
+  // Apply threshold: keep all >= MATCH_THRESHOLD, but guarantee at
+  // least MIN_RESULTS so we never return an empty (or near-empty) list
+  // for a low-signal profile. Hard cap at safeMaxN.
+  const aboveThreshold = scored.filter((c) => c.score >= MATCH_THRESHOLD);
+  const minBaseline = scored.slice(0, MIN_RESULTS);
+  const merged =
+    aboveThreshold.length >= MIN_RESULTS ? aboveThreshold : minBaseline;
+
+  return merged.slice(0, safeMaxN);
 };
 
 export const CAREER_MATCHER_INFO = Object.freeze({

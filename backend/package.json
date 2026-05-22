@@ -19,9 +19,12 @@
     "seed:admin": "node scripts/seedAdmin.mjs",
     "seed:demo-package": "node scripts/seedDemoPackage.mjs",
     "migrate:jumpstart-ids": "node scripts/assignJumpstartIds.mjs",
-    "patch:work-style-questions": "node scripts/patchWorkStyleQuestions.mjs"
+    "patch:work-style-questions": "node scripts/patchWorkStyleQuestions.mjs",
+    "patch:math-operators": "node scripts/patchMathOperators.mjs",
+    "translate:questions:gu": "node scripts/translateQuestionsToGujarati.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

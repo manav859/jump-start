@@ -10,5 +10,5 @@ export const getAbstractPromptSrc = (questionId) => {
   const numericId = Number(questionId);
   if (!isAbstractQuestionId(numericId)) return null;
 
-  return `/question-media/abstract/q${String(numericId).padStart(3, "0")}/prompt.png`;
+  return `/question-media/abstract/q${String(numericId).padStart(3, "0")}/prompt.webp`;
 };

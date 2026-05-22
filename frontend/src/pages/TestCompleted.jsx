@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ArrowRight,
   BadgeCheck,
@@ -14,6 +15,7 @@ import resultsIllustration from "../assets/results.png";
 import ResultPendingPanel from "../components/ResultPendingPanel";
 
 export default function TestCompleted() {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -42,7 +44,7 @@ export default function TestCompleted() {
           resultsRes.status === "rejected" &&
           packageRes.status === "rejected"
         ) {
-          setError("Unable to load your submission summary right now.");
+          setError(t("testCompletedExtra.loadError"));
         }
       })
       .finally(() => setLoading(false));
@@ -85,7 +87,7 @@ export default function TestCompleted() {
   if (loading) {
     pageContent = (
       <div className="flex min-h-[70vh] items-center justify-center bg-white px-4">
-        <p className="text-[#65758B]">Loading submission summary...</p>
+        <p className="text-[#65758B]">{t("testCompletedExtra.loadingSummary")}</p>
       </div>
     );
   } else if (results?.resultStatus === "pending_approval") {
@@ -99,11 +101,10 @@ export default function TestCompleted() {
               <Clock3 className="h-9 w-9" />
             </div>
             <h1 className="mt-8 text-4xl font-bold text-[#0F1729] sm:text-5xl">
-              Results Are Being Processed
+              {t("testCompletedExtra.processingHeading")}
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-[#65758B]">
-              Your test has been submitted successfully and is being prepared for
-              your dashboard and report view.
+              {t("testCompletedExtra.processingBody")}
             </p>
 
             <div className="surface-card mx-auto mt-8 max-w-2xl rounded-[30px] border border-[#B9E5E5] p-8">
@@ -111,11 +112,10 @@ export default function TestCompleted() {
                 <FileText className="h-7 w-7" />
               </div>
               <h2 className="mt-5 text-3xl font-bold text-[#0F1729]">
-                Your Results Will Be Ready Here
+                {t("testCompletedExtra.readyHereHeading")}
               </h2>
               <p className="mt-4 text-base leading-8 text-[#65758B]">
-                Jumpstart is organizing your section scores and recommendations
-                so they appear clearly once available.
+                {t("testCompletedExtra.readyHereBody")}
               </p>
             </div>
 
@@ -126,10 +126,10 @@ export default function TestCompleted() {
                 to="/dashboard"
                 className="inline-flex items-center justify-center rounded-[14px] bg-[#188B8B] px-6 py-3 text-sm font-semibold text-white hover:bg-[#147979]"
               >
-                Go to Dashboard
+                {t("testCompletedExtra.goToDashboard")}
               </Link>
               <Link to="/test" className="secondary-btn">
-                Browse More Tests
+                {t("testCompletedExtra.browseMoreTests")}
               </Link>
             </div>
           </div>
@@ -141,9 +141,9 @@ export default function TestCompleted() {
       <div className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
           <div>
-            <h1 className="text-4xl font-bold text-[#0F1729]">Test Completed</h1>
+            <h1 className="text-4xl font-bold text-[#0F1729]">{t("testCompletedExtra.completedTitle")}</h1>
             <p className="mt-2 text-base text-[#65758B]">
-              Your answers have been submitted successfully.
+              {t("testCompletedExtra.completedSubtitle")}
             </p>
           </div>
 
@@ -152,27 +152,27 @@ export default function TestCompleted() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h2 className="text-2xl font-semibold text-[#0F1729]">
-                    {pkg?.title || "Assessment"}
+                    {pkg?.title || t("testCompletedExtra.assessmentFallback")}
                   </h2>
                   <p className="mt-2 text-sm text-[#65758B]">
-                    Sections completed: {results.completedTestsCount || results.testResults?.length || 0}
+                    {t("testCompletedExtra.sectionsCompletedLabel", {
+                      count: results.completedTestsCount || results.testResults?.length || 0,
+                    })}
                   </p>
                 </div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-[#E8F9F8] px-3 py-1 text-xs font-semibold text-[#188B8B]">
                   <BadgeCheck className="h-3 w-3" />
-                  Submitted
+                  {t("testCompletedExtra.submittedBadge")}
                 </span>
               </div>
             </div>
 
             <div className="mt-5 rounded-[24px] bg-[#DFF8F7] px-5 py-5">
               <p className="text-sm font-semibold text-[#0F1729]">
-                What happens next?
+                {t("testCompletedExtra.whatHappensNextShort")}
               </p>
               <p className="mt-2 text-sm leading-7 text-[#65758B]">
-                Your dashboard now reflects the submitted assessment, and your
-                result pages are ready for review. You can return any time to
-                explore your strengths and career matches.
+                {t("testCompletedExtra.whatHappensNextBody")}
               </p>
             </div>
           </div>
@@ -180,21 +180,21 @@ export default function TestCompleted() {
           <div className="surface-card mt-6 flex flex-col gap-5 rounded-[30px] p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
             <div>
               <h2 className="text-3xl font-bold text-[#0F1729]">
-                Submission Confirmation
+                {t("testCompletedExtra.submissionConfirmation")}
               </h2>
               <p className="mt-2 text-sm text-[#65758B]">
-                Your final answers are locked in and ready for review.
+                {t("testCompletedExtra.submissionConfirmationBody")}
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:w-auto sm:flex-row">
               <Link to="/dashboard" className="secondary-btn">
-                Go to Dashboard
+                {t("testCompletedExtra.goToDashboard")}
               </Link>
               <Link
                 to="/result"
                 className="inline-flex items-center justify-center rounded-[14px] bg-[#188B8B] px-6 py-3 text-sm font-semibold text-white hover:bg-[#147979]"
               >
-                Open Results Hub
+                {t("testCompletedExtra.openResultsHub")}
               </Link>
             </div>
           </div>
@@ -219,7 +219,7 @@ export default function TestCompleted() {
               type="button"
               onClick={dismissCelebration}
               className="absolute right-4 top-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
-              aria-label="Close celebration popup"
+              aria-label={t("testCompletedExtra.closeCelebration")}
             >
               <X className="h-4 w-4" />
             </button>
@@ -240,7 +240,7 @@ export default function TestCompleted() {
                 <div className="rounded-[24px] border border-white/10 bg-white/8 p-4 backdrop-blur">
                   <img
                     src={resultsIllustration}
-                    alt="Submission success illustration"
+                    alt={t("testCompletedExtra.submissionImageAlt")}
                     className="h-24 w-auto object-contain sm:h-28"
                   />
                 </div>
@@ -250,15 +250,14 @@ export default function TestCompleted() {
             <div className="px-7 pb-7 pt-6 text-center">
               <div className="inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/85">
                 <Sparkles className="h-3.5 w-3.5 text-[#F6C465]" />
-                Submission Received
+                {t("testCompletedExtra.submissionReceived")}
               </div>
 
               <h2 className="mt-4 text-[30px] font-bold leading-tight text-white">
-                Congratulations!
+                {t("testCompletedExtra.congratulations")}
               </h2>
               <p className="mt-3 text-sm leading-7 text-white/85">
-                You are one step closer to Jumpstarting your educational
-                journey. Stay tuned for your Career and Aptitude Report.
+                {t("testCompletedExtra.celebrationBody")}
               </p>
 
               <button
@@ -266,7 +265,7 @@ export default function TestCompleted() {
                 onClick={handleGoToDashboard}
                 className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-[#F59F0A] px-6 py-3 text-sm font-semibold text-[#0F1729] shadow-[0_14px_28px_rgba(245,159,10,0.24)] hover:bg-[#E89206]"
               >
-                Go to Dashboard
+                {t("testCompletedExtra.goToDashboard")}
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>

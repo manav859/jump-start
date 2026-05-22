@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ChevronDown, Download, ExternalLink, Search } from "lucide-react";
 import api from "../../api/api";
 import AdminPageHeader from "../../components/admin/AdminPageHeader";
@@ -7,6 +8,7 @@ import ResultStatusBadge from "../../components/admin/ResultStatusBadge";
 import { TableSkeleton } from "../../components/admin/Skeletons";
 
 export default function PublishedResults() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,8 +57,8 @@ export default function PublishedResults() {
   return (
     <main className="mx-auto max-w-[1440px] px-6 py-8">
       <AdminPageHeader
-        title="Published Result"
-        subtitle="All results that have already passed admin review and are visible on the frontend are tracked here."
+        title={t("publishedResults.heading")}
+        subtitle={t("publishedResults.subtitle")}
       />
 
       <section className="surface-card mt-8 rounded-[28px] p-5 md:p-6">
@@ -65,7 +67,7 @@ export default function PublishedResults() {
             <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8A94A6]" />
             <input
               type="text"
-              placeholder="Search by student name or email..."
+              placeholder={t("publishedResults.searchPlaceholder")}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               className="w-full rounded-[16px] border border-[#E1EAF0] bg-[#FBFCFD] py-3 pl-11 pr-4 text-sm text-[#0F1729] outline-none focus:border-[#9BD9D6]"
@@ -78,7 +80,7 @@ export default function PublishedResults() {
               onChange={(event) => setTestType(event.target.value)}
               className="w-full appearance-none rounded-[16px] border border-[#E1EAF0] bg-[#FBFCFD] px-4 py-3 text-sm text-[#4E5D72] outline-none focus:border-[#9BD9D6]"
             >
-              <option value="">All Tests</option>
+              <option value="">{t("publishedResults.filterAllTests")}</option>
               {availableTests.map((testName) => (
                 <option key={testName} value={testName}>
                   {testName}
@@ -95,22 +97,22 @@ export default function PublishedResults() {
               <thead className="bg-[#F7FBFB]">
                 <tr>
                   <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Student
+                    {t("publishedResults.tableStudent")}
                   </th>
                   <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Test
+                    {t("publishedResults.tableTest")}
                   </th>
                   <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Published
+                    {t("publishedResults.tablePublished")}
                   </th>
                   <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Score
+                    {t("publishedResults.tableScore")}
                   </th>
                   <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Percentile
+                    {t("publishedResults.tablePercentile")}
                   </th>
                   <th className="px-6 py-4 text-right text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Actions
+                    {t("publishedResults.tableActions")}
                   </th>
                 </tr>
               </thead>
@@ -127,7 +129,7 @@ export default function PublishedResults() {
                       colSpan={6}
                       className="px-6 py-12 text-center text-sm text-[#65758B]"
                     >
-                      No published results found.
+                      {t("publishedResults.noResults")}
                     </td>
                   </tr>
                 ) : (
@@ -167,7 +169,7 @@ export default function PublishedResults() {
                             className="inline-flex items-center gap-2 rounded-[12px] border border-[#D7E4EA] bg-white px-3 py-2 text-xs font-semibold text-[#0F1729] hover:bg-[#F8FAFC]"
                           >
                             <ExternalLink className="h-3.5 w-3.5" />
-                            View
+                            {t("publishedResults.view")}
                           </button>
                           <button
                             type="button"
@@ -175,7 +177,7 @@ export default function PublishedResults() {
                             className="inline-flex items-center gap-2 rounded-[12px] border border-[#D7E4EA] bg-white px-3 py-2 text-xs font-semibold text-[#0F1729] hover:bg-[#F8FAFC]"
                           >
                             <Download className="h-3.5 w-3.5" />
-                            Download
+                            {t("publishedResults.download")}
                           </button>
                         </div>
                       </td>

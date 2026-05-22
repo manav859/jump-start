@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -15,6 +16,7 @@ import { emitAdminNotificationsRefresh } from "../../utils/adminNotifications";
 import { TableSkeleton } from "../../components/admin/Skeletons";
 
 export default function TestSubmissions() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,9 +32,10 @@ export default function TestSubmissions() {
       .get("/v1/admin/submissions")
       .then((res) => setRows(res?.data?.data || []))
       .catch((err) =>
-        setActionError(err?.response?.data?.msg || "Failed to load submissions.")
+        setActionError(err?.response?.data?.msg || t("adminPages.loadSubmissionsFailed"))
       )
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Prompt-9 Fix 1: extend client-side filter to match jumpstartId in
@@ -73,7 +76,7 @@ export default function TestSubmissions() {
       );
       emitAdminNotificationsRefresh();
     } catch (err) {
-      setActionError(err?.response?.data?.msg || "Failed to publish this result.");
+      setActionError(err?.response?.data?.msg || t("adminPages.publishFailed"));
     } finally {
       setApprovingId("");
     }
@@ -81,7 +84,7 @@ export default function TestSubmissions() {
 
   const handleDelete = async (row) => {
     const confirmed = window.confirm(
-      "Delete this submitted result from the admin workflow?"
+      t("adminPages.deleteSubmissionConfirm")
     );
     if (!confirmed) return;
 
@@ -92,7 +95,7 @@ export default function TestSubmissions() {
       setRows((prev) => prev.filter((item) => item.id !== row.id));
       emitAdminNotificationsRefresh();
     } catch (err) {
-      setActionError(err?.response?.data?.msg || "Failed to delete this result.");
+      setActionError(err?.response?.data?.msg || t("adminPages.deleteResultFailed"));
     } finally {
       setDeletingId("");
     }
@@ -101,8 +104,8 @@ export default function TestSubmissions() {
   return (
     <main className="mx-auto max-w-[1440px] px-6 py-8">
       <AdminPageHeader
-        title="Test Submission"
-        subtitle="Review submitted student assessments, inspect the detailed score breakdown, and publish results only after an admin review."
+        title={t("adminPages.submissionsHeading")}
+        subtitle={t("adminPages.submissionsHeaderSubtitle")}
       />
 
       <section className="surface-card mt-8 rounded-[28px] p-5 md:p-6">
@@ -111,7 +114,7 @@ export default function TestSubmissions() {
             <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8A94A6]" />
             <input
               type="text"
-              placeholder="Search by name, email or Jumpstart ID..."
+              placeholder={t("adminPages.searchByName")}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               className="w-full rounded-[16px] border border-[#E1EAF0] bg-[#FBFCFD] py-3 pl-11 pr-4 text-sm text-[#0F1729] outline-none focus:border-[#9BD9D6]"
@@ -125,10 +128,10 @@ export default function TestSubmissions() {
                 onChange={(event) => setStatusFilter(event.target.value)}
                 className="w-full appearance-none rounded-[16px] border border-[#E1EAF0] bg-[#FBFCFD] px-4 py-3 text-sm text-[#4E5D72] outline-none focus:border-[#9BD9D6]"
               >
-                <option value="">All Status</option>
-                <option value="Submitted">Submitted</option>
-                <option value="Pending Approval">Pending Approval</option>
-                <option value="Published">Published</option>
+                <option value="">{t("adminPages.allStatus")}</option>
+                <option value="Submitted">{t("adminPages.statusSubmittedLabel")}</option>
+                <option value="Pending Approval">{t("adminPages.statusPendingApprovalLabel")}</option>
+                <option value="Published">{t("adminPages.statusPublishedLabel")}</option>
               </select>
               <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8A94A6]" />
             </div>
@@ -139,7 +142,7 @@ export default function TestSubmissions() {
                 onChange={(event) => setTypeFilter(event.target.value)}
                 className="w-full appearance-none rounded-[16px] border border-[#E1EAF0] bg-[#FBFCFD] px-4 py-3 text-sm text-[#4E5D72] outline-none focus:border-[#9BD9D6]"
               >
-                <option value="">All Tests</option>
+                <option value="">{t("adminPages.allTests")}</option>
                 {availableTests.map((testName) => (
                   <option key={testName} value={testName}>
                     {testName}
@@ -159,22 +162,22 @@ export default function TestSubmissions() {
               <thead className="bg-[#F7FBFB]">
                 <tr>
                   <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Student
+                    {t("adminPages.tableStudent")}
                   </th>
                   <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Test
+                    {t("adminPages.tableTest")}
                   </th>
                   <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Submitted
+                    {t("adminPages.tableSubmitted")}
                   </th>
                   <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Duration
+                    {t("adminPages.tableDuration")}
                   </th>
                   <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Status
+                    {t("adminPages.tableStatus")}
                   </th>
                   <th className="px-6 py-4 text-right text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Actions
+                    {t("adminPages.tableActions")}
                   </th>
                 </tr>
               </thead>
@@ -191,7 +194,7 @@ export default function TestSubmissions() {
                       colSpan={6}
                       className="px-6 py-12 text-center text-sm text-[#65758B]"
                     >
-                      No submitted tests found for the current filters.
+                      {t("adminPages.noSubmittedTests")}
                     </td>
                   </tr>
                 ) : (
@@ -220,7 +223,7 @@ export default function TestSubmissions() {
                           <span>{row.type}</span>
                           {row.isDemo ? (
                             <span className="inline-flex items-center rounded-full border border-[#F4DCA8] bg-[#FFF9EE] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#B86D00]">
-                              Demo
+                              {t("adminPages.demoChip")}
                             </span>
                           ) : null}
                         </div>
@@ -240,7 +243,10 @@ export default function TestSubmissions() {
                               className="inline-flex items-center rounded-full border border-[#D7E4EA] bg-[#F8FBFC] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#4E5D72]"
                               title="Completed sections out of assigned total"
                             >
-                              {row.completedSections}/{row.totalSections} Sections
+                              {t("adminPages.sectionsChip", {
+                                completed: row.completedSections,
+                                total: row.totalSections,
+                              })}
                             </span>
                           ) : null}
                           {row.hasUnreviewedItems ? (
@@ -249,7 +255,7 @@ export default function TestSubmissions() {
                               title="One or more Section 4 questions need manual review before approval"
                             >
                               <AlertTriangle className="h-3 w-3" />
-                              Review Required
+                              {t("adminPages.reviewRequiredChip")}
                             </span>
                           ) : null}
                         </div>
@@ -262,7 +268,7 @@ export default function TestSubmissions() {
                             className="inline-flex items-center gap-2 rounded-[12px] border border-[#D7E4EA] bg-white px-3 py-2 text-xs font-semibold text-[#0F1729] hover:bg-[#F8FAFC]"
                           >
                             <ExternalLink className="h-3.5 w-3.5" />
-                            View / Process
+                            {t("adminPages.viewProcess")}
                           </button>
 
                           {row.canApprove ? (
@@ -274,8 +280,8 @@ export default function TestSubmissions() {
                             >
                               <CheckCircle2 className="h-3.5 w-3.5" />
                               {approvingId === row.id
-                                ? "Publishing..."
-                                : "Approve & Publish"}
+                                ? t("adminPages.publishing")
+                                : t("adminPages.approveAndPublish")}
                             </button>
                           ) : null}
 
@@ -286,7 +292,7 @@ export default function TestSubmissions() {
                             className="inline-flex items-center gap-2 rounded-[12px] border border-[#F3C7C7] bg-[#FFF5F5] px-3 py-2 text-xs font-semibold text-[#B42318] hover:bg-[#FEEBEC] disabled:opacity-60"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
-                            {deletingId === row.id ? "Deleting..." : "Delete"}
+                            {deletingId === row.id ? t("adminPages.deleting") : t("adminPages.delete")}
                           </button>
                         </div>
                       </td>

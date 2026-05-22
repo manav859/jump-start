@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Mail, MapPin, Phone } from "lucide-react";
 import api from "../api/api";
 import {
@@ -8,10 +9,10 @@ import {
 } from "../data/supportPages";
 
 const quickLinks = [
-  { label: "Home", to: "/" },
-  { label: "Test Packages", to: "/test" },
-  { label: "Dashboard", to: "/dashboard" },
-  { label: "Results", to: "/result" },
+  { labelKey: "nav.home", to: "/" },
+  { labelKey: "nav.tests", to: "/test" },
+  { labelKey: "nav.dashboard", to: "/dashboard" },
+  { labelKey: "nav.results", to: "/result" },
 ];
 
 const defaultSupportLinks = [
@@ -25,6 +26,7 @@ const defaultSupportLinks = [
 ];
 
 export default function Footer() {
+  const { t } = useTranslation();
   const [supportPages, setSupportPages] = useState(fallbackSupportPages);
 
   useEffect(() => {
@@ -78,20 +80,19 @@ export default function Footer() {
             <h3 className="text-2xl font-bold">Jumpstart</h3>
           </div>
           <p className="mt-4 max-w-xs text-sm leading-6 text-white/70">
-            Psychologist-designed career aptitude tests to help you discover
-            your ideal career path.
+            {t("footer.tagline")}
           </p>
         </div>
 
         <div>
           <h4 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60">
-            Quick Links
+            {t("footer.company")}
           </h4>
           <ul className="mt-5 space-y-3 text-sm text-white/80">
             {quickLinks.map((link) => (
               <li key={link.to}>
                 <Link to={link.to} className="hover:text-white">
-                  {link.label}
+                  {t(link.labelKey)}
                 </Link>
               </li>
             ))}
@@ -100,7 +101,7 @@ export default function Footer() {
 
         <div>
           <h4 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60">
-            Support
+            {t("footer.support")}
           </h4>
           <ul className="mt-5 space-y-3 text-sm text-white/80">
             {supportLinks.map((link) => (
@@ -115,7 +116,7 @@ export default function Footer() {
 
         <div>
           <h4 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60">
-            Contact Us
+            {t("footer.contact")}
           </h4>
           <ul className="mt-5 space-y-4 text-sm text-white/80">
             <li className="flex items-center gap-3">
@@ -135,7 +136,7 @@ export default function Footer() {
       </div>
 
       <div className="mx-auto max-w-7xl border-t border-white/10 px-4 py-6 text-center text-sm text-white/55 sm:px-6 lg:px-8">
-        (c) 2026. Jumpstart Education. All Rights Reserved.
+        (c) 2026. Jumpstart Education. {t("footer.rights")}
       </div>
     </footer>
   );

@@ -5,6 +5,8 @@ import {
   getPublicPackageSections,
   getPublicSectionQuestions,
   getAdminConfig,
+  getAdminTranslations,
+  putAdminQuestionTranslation,
   putAdminSupportPages,
   postAdminPackage,
   putAdminPackage,
@@ -23,6 +25,9 @@ router.get("/public/packages/:packageId/sections/:sectionId/questions", getPubli
 
 router.use("/admin", protect, adminOnly);
 router.get("/admin/config", getAdminConfig);
+// Translation panel — list + single-question update endpoints.
+router.get("/admin/translations", getAdminTranslations);
+router.put("/admin/questions/:questionId/translate", putAdminQuestionTranslation);
 router.put("/admin/support-pages", putAdminSupportPages);
 router.post("/admin/packages", postAdminPackage);
 router.put("/admin/packages/:packageId", putAdminPackage);

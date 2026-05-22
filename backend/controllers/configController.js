@@ -250,6 +250,11 @@ export const getPublicConfig = async (req, res) => {
     const packages = (cfg.packages || [])
       .filter((p) => p.active !== false && getQuestionCount(p) > 0)
       .sort((a, b) => a.sortOrder - b.sortOrder);
+    // Package list + support pages change only when an admin re-seeds
+    // or edits config. Cache aggressively at the edge / browser; the
+    // shorter `s-maxage` lets us push a config edit and have CDNs pick
+    // it up within ~10 min while clients hold a 1-hour browser copy.
+    res.set("Cache-Control", "public, max-age=3600, s-maxage=600");
     return res.status(200).json({
       success: true,
       data: {
@@ -266,6 +271,9 @@ export const getPublicConfig = async (req, res) => {
 export const getPublicSupportPages = async (req, res) => {
   try {
     const cfg = await getCfg();
+    // Support page content (FAQs, terms, privacy) is admin-edited and
+    // changes rarely. Same cache window as the package list.
+    res.set("Cache-Control", "public, max-age=3600, s-maxage=600");
     return res.status(200).json({
       success: true,
       data: {
@@ -287,6 +295,7 @@ export const getPublicPackageSections = async (req, res) => {
     const pkg = findPackage(cfg, req.params.packageId);
     if (!pkg) return res.status(404).json({ success: false, msg: "Package not found" });
     const sections = (pkg.sections || []).filter((s) => s.enabled !== false).sort((a, b) => a.sectionId - b.sectionId);
+    res.set("Cache-Control", "public, max-age=3600, s-maxage=600");
     return res.status(200).json({ success: true, data: { package: toPublicPackage(pkg), sections: sections.map(toPublicSection) } });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message || "Failed to load package sections" });
@@ -306,9 +315,19 @@ export const getPublicSectionQuestions = async (req, res) => {
       index,
       questionId: q.questionId || `${index + 1}`,
       text: q.text,
+      // Gujarati translations surface only when an admin has filled
+      // them in via the Translations panel. The frontend falls back to
+      // `text` / `options[i]` when the translation is empty, so it's
+      // safe to ship these fields with empty defaults.
+      text_gu: q.text_gu || "",
       type: q.type,
       options: q.options || [],
+      options_gu: Array.isArray(q.options_gu) ? q.options_gu : [],
     }));
+    // Section questions only change on admin re-seed. Cache for an
+    // hour at the browser; CDN entries refresh within 10 min so a
+    // content patch + reseed propagates quickly.
+    res.set("Cache-Control", "public, max-age=3600, s-maxage=600");
     return res.status(200).json({ success: true, data: { section: toPublicSection(section), questions } });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message || "Failed to load questions" });
@@ -428,6 +447,147 @@ export const putAdminPackageSections = async (req, res) => {
     return res.status(200).json({ success: true, data: { sections: pkg.sections } });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message || "Failed to update sections" });
+  }
+};
+
+// GET /api/v1/admin/translations
+// Returns every question across active packages with translation
+// status, optionally filtered by ?packageId= and ?status=. Used by
+// the admin Translations panel to render its list.
+export const getAdminTranslations = async (req, res) => {
+  try {
+    const cfg = await getCfg();
+    const requestedPackageId = String(req.query?.packageId || "").trim();
+    const statusFilter = String(req.query?.status || "all").toLowerCase();
+
+    const packages = (cfg.packages || [])
+      .filter((p) => p.active !== false)
+      .filter((p) => !requestedPackageId || p.id === requestedPackageId)
+      .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0));
+
+    const rows = [];
+    let translated = 0;
+    let total = 0;
+
+    for (const pkg of packages) {
+      for (const section of pkg.sections || []) {
+        for (const question of section.questions || []) {
+          total += 1;
+          const hasTranslation = Boolean(
+            String(question.text_gu || "").trim()
+          );
+          if (hasTranslation) translated += 1;
+          if (statusFilter === "translated" && !hasTranslation) continue;
+          if (statusFilter === "untranslated" && hasTranslation) continue;
+          rows.push({
+            packageId: pkg.id,
+            packageTitle: pkg.title,
+            sectionId: section.sectionId,
+            sectionTitle: section.title,
+            questionId: String(question.questionId || ""),
+            text: question.text || "",
+            text_gu: question.text_gu || "",
+            options: Array.isArray(question.options) ? question.options : [],
+            options_gu: Array.isArray(question.options_gu)
+              ? question.options_gu
+              : [],
+            translated: hasTranslation,
+          });
+        }
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        summary: { total, translated, untranslated: total - translated },
+        rows,
+      },
+    });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ success: false, msg: err.message || "Failed to load translations" });
+  }
+};
+
+// PUT /api/v1/admin/questions/:questionId/translate
+// Body: { language: "gu", text: "...", options: ["...", "..."] }
+//
+// Sets text_gu / options_gu on the matching question across every
+// active package. Matches by questionId (the canonical ID from the
+// 500-question bank), so a translation entered once propagates to
+// both the full test and the demo curation if they reference the
+// same question. Pass null/"" for `text` to clear a translation;
+// pass an empty array for `options` to leave option translations
+// unchanged.
+export const putAdminQuestionTranslation = async (req, res) => {
+  try {
+    const { questionId } = req.params;
+    const { language, text, options } = req.body || {};
+
+    const lang = String(language || "").trim().toLowerCase();
+    if (lang !== "gu") {
+      // Only Gujarati is supported in this phase. Future languages
+      // will gate on a SUPPORTED_TRANSLATION_LANGUAGES set.
+      return res
+        .status(400)
+        .json({ success: false, msg: "Unsupported language" });
+    }
+
+    const cfg = await getCfg();
+    const targetId = String(questionId || "").trim();
+    if (!targetId) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "questionId is required" });
+    }
+
+    let matched = 0;
+    for (const pkg of cfg.packages || []) {
+      for (const section of pkg.sections || []) {
+        for (const question of section.questions || []) {
+          if (String(question.questionId || "") !== targetId) continue;
+          if (text !== undefined) {
+            question.text_gu = String(text || "").trim();
+          }
+          if (Array.isArray(options)) {
+            // Pad / trim to match `options` length so the indexes
+            // stay aligned. Missing entries become empty strings
+            // (silent fallback to English in the UI).
+            const englishLength = Array.isArray(question.options)
+              ? question.options.length
+              : 0;
+            const padded = Array.from({ length: englishLength }, (_, i) =>
+              String(options[i] || "").trim()
+            );
+            question.options_gu = padded;
+          }
+          matched += 1;
+        }
+      }
+    }
+
+    if (matched === 0) {
+      return res
+        .status(404)
+        .json({ success: false, msg: `No question with id ${targetId}` });
+    }
+
+    // Tell Mongoose the nested array changed — without this the
+    // sub-document edits inside packages[].sections[].questions[]
+    // don't always trigger a save.
+    cfg.markModified("packages");
+    await cfg.save();
+
+    return res.status(200).json({
+      success: true,
+      data: { questionId: targetId, matched, language: lang },
+    });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ success: false, msg: err.message || "Failed to save translation" });
   }
 };
 

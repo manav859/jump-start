@@ -1,8 +1,10 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { BookmarkCheck, Clock3, LayoutDashboard, PlayCircle } from "lucide-react";
 
 export default function TestPaused() {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state || {};
@@ -21,7 +23,7 @@ export default function TestPaused() {
   if (!isValidPauseState) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#FAFAFA] px-4">
-        <p className="text-[#65758B]">Redirecting...</p>
+        <p className="text-[#65758B]">{t("sectionBreak.redirecting")}</p>
       </div>
     );
   }
@@ -40,32 +42,31 @@ export default function TestPaused() {
           </div>
 
           <h1 className="mt-6 text-4xl font-bold text-[#0F1729]">
-            Test Paused
+            {t("testPaused.title")}
           </h1>
           <p className="mt-3 text-base leading-8 text-[#65758B]">
-            Your progress has been saved successfully. You can return later and
-            continue from exactly where you left off.
+            {t("testPaused.body")}
           </p>
 
           <div className="mt-8 rounded-[24px] border border-[#D9E5EC] bg-[#F8FAFC] p-6 text-left">
             <h2 className="text-2xl font-bold text-[#0F1729]">
-              Saved Progress
+              {t("sectionBreak.yourProgress")}
             </h2>
             <div className="mt-5 space-y-4">
               <div className="flex items-center justify-between gap-4 border-b border-[#E1E7EF] pb-4">
-                <span className="text-sm text-[#65758B]">Current Section</span>
+                <span className="text-sm text-[#65758B]">{t("livetest.sectionN", { number: "" }).trim()}</span>
                 <span className="text-sm font-semibold text-[#0F1729]">
-                  Section {state.sectionId}: {state.sectionTitle}
+                  {t("livetest.sectionN", { number: state.sectionId })}: {state.sectionTitle}
                 </span>
               </div>
               <div className="flex items-center justify-between gap-4 border-b border-[#E1E7EF] pb-4">
-                <span className="text-sm text-[#65758B]">Answered</span>
+                <span className="text-sm text-[#65758B]">{t("sectionBreak.questionsAnswered")}</span>
                 <span className="text-sm font-semibold text-[#0F1729]">
-                  {state.answeredCount || 0} of {state.totalQuestions || 0}
+                  {state.answeredCount || 0} {t("common.of")} {state.totalQuestions || 0}
                 </span>
               </div>
               <div className="flex items-center justify-between gap-4">
-                <span className="text-sm text-[#65758B]">Time Remaining</span>
+                <span className="text-sm text-[#65758B]">{t("sectionBreak.timeElapsed")}</span>
                 <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#0F1729]">
                   <Clock3 className="h-4 w-4 text-[#188B8B]" />
                   {timeLabel}
@@ -81,7 +82,7 @@ export default function TestPaused() {
               className="inline-flex items-center justify-center gap-2 rounded-[14px] bg-[#188B8B] px-6 py-3 text-sm font-semibold text-white hover:bg-[#147979]"
             >
               <LayoutDashboard className="h-4 w-4" />
-              Go to Dashboard
+              {t("testPaused.returnToDashboard")}
             </button>
             <button
               type="button"
@@ -89,7 +90,7 @@ export default function TestPaused() {
               className="inline-flex items-center justify-center gap-2 rounded-[14px] border-2 border-[#188B8B] px-6 py-3 text-sm font-semibold text-[#188B8B] hover:bg-[#F6FDFC]"
             >
               <PlayCircle className="h-4 w-4" />
-              Resume Test
+              {t("dashboard.continueTestCta")}
             </button>
           </div>
         </div>

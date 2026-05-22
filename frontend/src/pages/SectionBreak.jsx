@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { CheckCircle2, Coffee, Save, TimerReset } from "lucide-react";
 import api from "../api/api";
 
 export default function SectionBreak() {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state || {};
@@ -46,7 +48,7 @@ export default function SectionBreak() {
   if (!isValidState) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#FAFAFA] px-4">
-        <p className="text-[#65758B]">Redirecting...</p>
+        <p className="text-[#65758B]">{t("sectionBreak.redirecting")}</p>
       </div>
     );
   }
@@ -55,7 +57,7 @@ export default function SectionBreak() {
     <div className="min-h-screen bg-[#FAFAFA]">
       <div className="border-b border-[#E1E7EF] bg-white">
         <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 lg:px-8">
-          <h1 className="text-xl font-bold text-[#0F1729]">Section Break</h1>
+          <h1 className="text-xl font-bold text-[#0F1729]">{t("sectionBreak.title")}</h1>
         </div>
       </div>
 
@@ -66,37 +68,37 @@ export default function SectionBreak() {
           </div>
 
           <h2 className="mt-6 text-4xl font-bold text-[#0F1729]">
-            Section {completedSection} Complete!
+            {t("sectionBreak.sectionComplete", { number: completedSection })}
           </h2>
           <p className="mt-2 text-base text-[#65758B]">
-            Great progress! Take a short break before continuing.
+            {t("sectionBreak.tagline")}
           </p>
 
           <div className="mt-8 rounded-[24px] border border-[#D9E5EC] bg-white p-6 text-left shadow-sm sm:p-8">
-            <h3 className="text-2xl font-bold text-[#0F1729]">Your Progress</h3>
+            <h3 className="text-2xl font-bold text-[#0F1729]">{t("sectionBreak.yourProgress")}</h3>
             <div className="mt-6 space-y-4">
               <div className="flex items-center justify-between gap-4 border-b border-[#E1E7EF] pb-4">
-                <span className="text-sm text-[#65758B]">Completed Sections</span>
+                <span className="text-sm text-[#65758B]">{t("sectionBreak.completedSections")}</span>
                 <span className="text-sm font-semibold text-[#0F1729]">
-                  {completedSectionsCount} of {totalSections}
+                  {completedSectionsCount} {t("common.of")} {totalSections}
                 </span>
               </div>
               <div className="flex items-center justify-between gap-4 border-b border-[#E1E7EF] pb-4">
-                <span className="text-sm text-[#65758B]">Questions Answered</span>
+                <span className="text-sm text-[#65758B]">{t("sectionBreak.questionsAnswered")}</span>
                 <span className="text-sm font-semibold text-[#0F1729]">
-                  {questionsSoFar} of {totalQuestions}
+                  {questionsSoFar} {t("common.of")} {totalQuestions}
                 </span>
               </div>
               <div className="flex items-center justify-between gap-4 border-b border-[#E1E7EF] pb-4">
-                <span className="text-sm text-[#65758B]">Time Elapsed</span>
+                <span className="text-sm text-[#65758B]">{t("sectionBreak.timeElapsed")}</span>
                 <span className="text-sm font-semibold text-[#0F1729]">
-                  {timeElapsedMinutes} minutes
+                  {timeElapsedMinutes} {t("sectionBreak.minutes")}
                 </span>
               </div>
               <div className="flex items-start justify-between gap-4">
-                <span className="text-sm text-[#65758B]">Remaining Sections</span>
+                <span className="text-sm text-[#65758B]">{t("sectionBreak.remainingSections")}</span>
                 <span className="max-w-[60%] text-right text-sm font-semibold text-[#0F1729]">
-                  {remainingTitles.length ? remainingTitles.join(", ") : "None"}
+                  {remainingTitles.length ? remainingTitles.join(", ") : t("sectionBreak.none")}
                 </span>
               </div>
             </div>
@@ -109,11 +111,10 @@ export default function SectionBreak() {
               </div>
               <div>
                 <h4 className="text-base font-semibold text-[#0F1729]">
-                  Take a Break
+                  {t("sectionBreak.takeBreakTitle")}
                 </h4>
                 <p className="mt-2 text-sm leading-7 text-[#65758B]">
-                  You can take a short 5-minute break. Your progress is saved.
-                  When you are ready, click continue to start the next section.
+                  {t("sectionBreak.takeBreakBody")}
                 </p>
               </div>
             </div>
@@ -124,16 +125,16 @@ export default function SectionBreak() {
             onClick={() => navigate(`/livetest/${nextSectionId}`, { replace: true })}
             className="mt-6 inline-flex w-full cursor-pointer items-center justify-center rounded-[14px] bg-[#F59F0A] px-6 py-3.5 text-sm font-semibold text-[#0F1729] shadow-[0_14px_28px_rgba(245,159,10,0.18)] transition hover:bg-[#E89206]"
           >
-            Continue to Next Section
+            {t("sectionBreak.continueCta")}
           </button>
 
           <div className="mt-4 flex items-center justify-center gap-2 text-sm text-[#65758B]">
             <TimerReset className="h-4 w-4 text-[#188B8B]" />
-            <span>Estimated time for next section: {estimatedNextMinutes} minutes</span>
+            <span>{t("sectionBreak.estimatedNext", { minutes: estimatedNextMinutes })}</span>
           </div>
 
           <p className="mt-4 text-sm text-[#98A2B3]">
-            Next up: {remainingTitles[0] || completedSectionTitle}
+            {t("sectionBreak.nextUp", { title: remainingTitles[0] || completedSectionTitle })}
           </p>
 
           {/* Prompt-9 Fix 3: secondary "Save & Return to Dashboard"
@@ -168,11 +169,12 @@ export default function SectionBreak() {
             className="mt-6 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] border-2 border-[#188B8B] bg-white px-6 py-3.5 text-sm font-semibold text-[#188B8B] transition hover:bg-[#F6FDFC] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Save className="h-4 w-4" />
-            {savingReturn ? "Saving…" : "Save & Return to Dashboard"}
+            {savingReturn
+              ? t("sectionBreak.saveAndReturnSaving")
+              : t("sectionBreak.saveAndReturn")}
           </button>
           <p className="mt-3 text-xs leading-5 text-[#98A2B3]">
-            Your progress is saved. You can continue this test anytime from your
-            dashboard.
+            {t("sectionBreak.savedHelper")}
           </p>
         </div>
       </div>
