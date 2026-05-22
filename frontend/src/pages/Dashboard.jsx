@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 import api from "../api/api";
+import { localisedPackageField } from "../utils/packageLabel";
 
 const DEMO_PACKAGE_ID = "demo-aptitude-50q";
 
@@ -447,7 +448,12 @@ export default function Dashboard() {
                 </div>
                 <h2 className="mt-4 text-2xl font-bold text-[#0F1729] sm:text-3xl">
                   {t("dashboardExtra.continueYourAssessment", {
-                    title: stats.test_in_progress.packageTitle || t("dashboardExtra.assessmentFallback"),
+                    title: localisedPackageField(
+                      t,
+                      stats.test_in_progress.packageId,
+                      "title",
+                      stats.test_in_progress.packageTitle
+                    ) || t("dashboardExtra.assessmentFallback"),
                   })}
                 </h2>
                 <p className="mt-2 text-sm leading-7 text-[#65758B] sm:text-base sm:leading-8">
@@ -569,7 +575,7 @@ export default function Dashboard() {
                       <div className="flex flex-wrap items-start justify-between gap-4">
                         <div>
                           <h3 className="text-2xl font-semibold text-[#0F1729]">
-                            {pkg.title}
+                            {localisedPackageField(t, pkg.packageId || pkg.id, "title", pkg.title)}
                           </h3>
                           <div className="mt-3 flex flex-wrap gap-5 text-sm text-[#65758B]">
                             <span>{t("dashboardExtra.sectionsCount2", { count: pkg.totalSections ?? 0 })}</span>

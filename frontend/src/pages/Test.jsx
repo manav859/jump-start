@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { BadgeCheck, Check, LayoutDashboard, ShieldCheck, Sparkles } from "lucide-react";
 import api from "../api/api";
 import { AuthContext } from "../context/AuthContext";
+import { localisedPackageField } from "../utils/packageLabel";
 
 const accentStyles = [
   {
@@ -86,19 +87,6 @@ const getPlanActionMeta = (plan, t) => {
     actionLabel: t("testCatalog.actionBuy"),
     mode: "purchase",
   };
-};
-
-// Look up a localised package field (title/badge/description/durationText/features)
-// for one of the three seeded packages. Falls back to the API value when the
-// locale has no entry, which is what keeps unknown / future package ids working.
-const localisedPackageField = (t, packageId, field, fallback) => {
-  if (!packageId) return fallback;
-  const key = `testCatalog.packages.${packageId}.${field}`;
-  const value = t(key, { defaultValue: "", returnObjects: field === "features" });
-  if (field === "features") {
-    return Array.isArray(value) && value.length ? value : fallback;
-  }
-  return value || fallback;
 };
 
 export default function Test() {

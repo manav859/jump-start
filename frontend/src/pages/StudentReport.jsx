@@ -11,6 +11,7 @@ import {
   Target,
 } from "lucide-react";
 import api from "../api/api";
+import { localisedPackageField } from "../utils/packageLabel";
 import ResultPendingPanel from "../components/ResultPendingPanel";
 import SectionBreakdownCard from "../components/admin/SectionBreakdownCard";
 import StatusPill from "../components/results/StatusPill";
@@ -135,7 +136,8 @@ export default function StudentReport() {
 
             <div className="mt-5 flex flex-wrap items-center gap-2.5 sm:gap-3">
               <h1 className="text-[28px] font-bold leading-9 text-[#0F1729] sm:text-4xl">
-                {report?.packageTitle || "Assessment Report"}
+                {localisedPackageField(t, report?.packageId, "title", report?.packageTitle) ||
+                  t("report.assessmentReport")}
               </h1>
               <StatusPill label={statusMeta.label} className={statusMeta.className} />
             </div>
