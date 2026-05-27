@@ -1,4 +1,4 @@
-import { Trash2, CheckCircle2, ArrowLeft } from "lucide-react";
+import { Trash2, CheckCircle2, ArrowLeft, ExternalLink } from "lucide-react";
 import ResultStatusBadge from "./ResultStatusBadge";
 
 export default function ReviewActionBar({
@@ -10,6 +10,10 @@ export default function ReviewActionBar({
   onApprove,
   onDelete,
   onBack,
+  // Opens the student-facing report in a new tab using the admin-only
+  // ungated endpoint. Falsy => the button is hidden (e.g. while the
+  // submission detail is still loading and we don't have a report id).
+  onViewStudentReport,
 }) {
   return (
     <section className="surface-card rounded-[28px] p-6">
@@ -37,6 +41,17 @@ export default function ReviewActionBar({
             <ArrowLeft className="h-4 w-4" />
             Back to Submission List
           </button>
+
+          {onViewStudentReport ? (
+            <button
+              type="button"
+              onClick={onViewStudentReport}
+              className="inline-flex items-center justify-center gap-2 rounded-[14px] border border-[#9BD9D6] bg-white px-5 py-3 text-sm font-semibold text-[#188B8B] hover:bg-[#F0FBFB]"
+            >
+              <ExternalLink className="h-4 w-4" />
+              View Student Report
+            </button>
+          ) : null}
 
           {canDelete ? (
             <button

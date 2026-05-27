@@ -21,6 +21,20 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     { icon: <Settings size={20} />, label: "Settings", path: "/admin/settings" },
   ];
 
+  // Auto-close on link click is a mobile-only behaviour — on mobile the
+  // sidebar slides over the content (with a dimmed overlay), so we want
+  // it to dismiss once the admin picks a destination. On desktop (lg+)
+  // the rail is persistent, and closing it on every nav click was a bug
+  // — admins would land on a page with no nav visible. We gate the close
+  // behind a viewport-width check that matches the Tailwind `lg`
+  // breakpoint (1024px) so the two paths stay in sync.
+  const handleNavClick = () => {
+    if (typeof window === "undefined" || !onClose) return;
+    if (window.matchMedia("(max-width: 1023px)").matches) {
+      onClose();
+    }
+  };
+
   return (
     <>
       {/* ── Mobile overlay ── clicking outside closes the sidebar */}
@@ -50,7 +64,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                 key={item.path}
                 to={item.path}
                 title={item.label}
-                onClick={onClose}
+                onClick={handleNavClick}
                 className={({ isActive }) =>
                   `group relative p-2 rounded-lg transition-colors flex items-center justify-center
                 ${

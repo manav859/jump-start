@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import api from "../../api/api";
 import { SettingsSkeleton } from "../../components/admin/Skeletons";
 import TranslationsPanel from "../../components/admin/TranslationsPanel";
+import CouponsPanel from "../../components/admin/CouponsPanel";
 
 const blankPackage = {
   id: "",
@@ -394,11 +395,15 @@ export default function Settings() {
   // only block on the assessment-manager skeleton when that tab is
   // active. This means switching to Translations works even if the
   // initial /admin/config payload is still in flight.
+  // Skeleton only applies to the assessment tab — the other two tabs
+  // (Translations, Coupons) load their own data and render their own
+  // states, so we don't want to gate them behind the config fetch.
   if (loading && activeTab === "assessment") return <SettingsSkeleton />;
 
   const tabs = [
     { value: "assessment", label: t("adminPages.tabAssessment") },
     { value: "translations", label: t("adminPages.tabTranslations") },
+    { value: "coupons", label: "Coupons" },
   ];
 
   return (
@@ -408,12 +413,16 @@ export default function Settings() {
           <h1 className="text-3xl font-bold text-gray-900">
             {activeTab === "translations"
               ? t("adminPages.tabTranslations")
-              : t("adminPages.tabAssessment")}
+              : activeTab === "coupons"
+                ? "Coupons"
+                : t("adminPages.tabAssessment")}
           </h1>
           <p className="text-gray-500 mt-1">
             {activeTab === "translations"
               ? t("adminPages.translationsSubtitle")
-              : t("adminPages.assessmentSubtitle")}
+              : activeTab === "coupons"
+                ? "Create and manage promotional codes used at checkout."
+                : t("adminPages.assessmentSubtitle")}
           </p>
         </div>
       </div>
@@ -437,6 +446,8 @@ export default function Settings() {
 
       {activeTab === "translations" ? (
         <TranslationsPanel />
+      ) : activeTab === "coupons" ? (
+        <CouponsPanel />
       ) : (
         <>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}

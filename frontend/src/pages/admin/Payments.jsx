@@ -131,7 +131,10 @@ const Payments = () => {
                 <th className="px-6 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest">{t("payments.tableOrderId")}</th>
                 <th className="px-6 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest">{t("payments.tableStudent")}</th>
                 <th className="px-6 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">{t("payments.tablePackage")}</th>
-                <th className="px-6 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">{t("payments.tableAmount")}</th>
+                <th className="px-6 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">Coupon Used</th>
+                <th className="px-6 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">Original Price</th>
+                <th className="px-6 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">Discount Applied</th>
+                <th className="px-6 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">Final Paid</th>
                 <th className="px-6 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">{t("payments.tableMethod")}</th>
                 <th className="px-6 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">{t("payments.tableDate")}</th>
                 <th className="px-6 py-5 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">{t("payments.tableStatus")}</th>
@@ -140,7 +143,7 @@ const Payments = () => {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {loading ? (
-                <tr><td colSpan={8} className="p-0 border-none"><TableSkeleton rows={5} cols={8} /></td></tr>
+                <tr><td colSpan={11} className="p-0 border-none"><TableSkeleton rows={5} cols={11} /></td></tr>
               ) : filteredPayments.length > 0 ? (
                 filteredPayments.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
@@ -152,7 +155,28 @@ const Payments = () => {
                       </div>
                     </td>
                     <td className="px-6 py-5 text-center text-sm">{item.package}</td>
-                    <td className="px-6 py-5 text-center text-sm font-bold text-gray-900">{item.amountLabel}</td>
+                    <td className="px-6 py-5 text-center text-xs">
+                      {item.couponCode ? (
+                        <span className="inline-flex items-center rounded-full border border-[#9BD9D6] bg-[#F0FBFB] px-2.5 py-0.5 font-mono font-semibold text-[#188B8B]">
+                          {item.couponCode}
+                        </span>
+                      ) : (
+                        <span className="text-gray-300">None</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-5 text-center text-sm text-gray-700 whitespace-nowrap">
+                      {item.originalAmountLabel || item.amountLabel}
+                    </td>
+                    <td className="px-6 py-5 text-center text-sm whitespace-nowrap">
+                      {item.discountAmount > 0 ? (
+                        <span className="font-semibold text-emerald-700">
+                          − {item.discountAmountLabel}
+                        </span>
+                      ) : (
+                        <span className="text-gray-300">—</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-5 text-center text-sm font-bold text-gray-900 whitespace-nowrap">{item.amountLabel}</td>
                     <td className="px-6 py-5">
                       <div className="flex items-center justify-center gap-2 text-gray-600">
                         {item.method === "Card" ? <CreditCard size={14} /> : <Smartphone size={14} />}
@@ -167,7 +191,7 @@ const Payments = () => {
                   </tr>
                 ))
               ) : (
-                <tr><td colSpan={8} className="px-6 py-12 text-center text-gray-400 italic">{t("payments.noTransactions")}</td></tr>
+                <tr><td colSpan={11} className="px-6 py-12 text-center text-gray-400 italic">{t("payments.noTransactions")}</td></tr>
               )}
             </tbody>
           </table>

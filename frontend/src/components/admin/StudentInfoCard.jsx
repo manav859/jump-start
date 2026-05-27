@@ -1,47 +1,73 @@
-import { Mail, Phone, FileBadge2, GraduationCap, CalendarDays, Hash } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  FileBadge2,
+  GraduationCap,
+  CalendarDays,
+  Hash,
+  Timer,
+} from "lucide-react";
 import { formatAdminDate } from "../../data/adminReview";
 import ResultStatusBadge from "./ResultStatusBadge";
 
-const infoItems = (student = {}) => [
-  {
-    key: "referenceId",
-    label: "Reference ID",
-    value: student.referenceId || "-",
-    icon: Hash,
-  },
-  {
-    key: "email",
-    label: "Email",
-    value: student.email || "-",
-    icon: Mail,
-  },
-  {
-    key: "phone",
-    label: "Phone",
-    value: student.phone || "-",
-    icon: Phone,
-  },
-  {
-    key: "testName",
-    label: "Test Name",
-    value: student.testName || "-",
-    icon: GraduationCap,
-  },
-  {
-    key: "submittedAt",
-    label: "Submitted",
-    value: formatAdminDate(student.submittedAt),
-    icon: CalendarDays,
-  },
-  {
-    key: "attemptLabel",
-    label: "Attempt",
-    value: student.attemptLabel || "-",
-    icon: FileBadge2,
-  },
-];
+const infoItems = (student = {}, { totalDurationMinutes } = {}) => {
+  const items = [
+    {
+      key: "referenceId",
+      label: "Reference ID",
+      value: student.referenceId || "-",
+      icon: Hash,
+    },
+    {
+      key: "email",
+      label: "Email",
+      value: student.email || "-",
+      icon: Mail,
+    },
+    {
+      key: "phone",
+      label: "Phone",
+      value: student.phone || "-",
+      icon: Phone,
+    },
+    {
+      key: "testName",
+      label: "Test Name",
+      value: student.testName || "-",
+      icon: GraduationCap,
+    },
+    {
+      key: "submittedAt",
+      label: "Submitted",
+      value: formatAdminDate(student.submittedAt),
+      icon: CalendarDays,
+    },
+    {
+      key: "attemptLabel",
+      label: "Attempt",
+      value: student.attemptLabel || "-",
+      icon: FileBadge2,
+    },
+  ];
+  // Duration is only rendered when the backend actually captured it.
+  // Legacy reports written before duration tracking landed get nothing
+  // here instead of a misleading "0 min" placeholder.
+  if (totalDurationMinutes != null) {
+    items.push({
+      key: "totalDuration",
+      label: "Total Duration",
+      value: `${totalDurationMinutes} min`,
+      icon: Timer,
+    });
+  }
+  return items;
+};
 
-export default function StudentInfoCard({ student, statusLabel }) {
+export default function StudentInfoCard({
+  student,
+  statusLabel,
+  totalDurationMinutes = null,
+}) {
   const reviewContext = student?.testName || student?.testType || "Assessment";
 
   return (
@@ -62,7 +88,7 @@ export default function StudentInfoCard({ student, statusLabel }) {
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        {infoItems(student).map((item) => {
+        {infoItems(student, { totalDurationMinutes }).map((item) => {
           const Icon = item.icon;
           return (
             <div

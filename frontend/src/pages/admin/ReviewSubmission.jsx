@@ -346,6 +346,7 @@ export default function ReviewSubmission() {
         <StudentInfoCard
           student={detail?.student}
           statusLabel={detail?.statusLabel}
+          totalDurationMinutes={detail?.totalDurationMinutes ?? null}
         />
         <OverallScoreSummaryCard
           summary={{
@@ -562,24 +563,94 @@ export default function ReviewSubmission() {
                 </p>
                 <div className="mt-3 space-y-3">
                   {(detail?.analysis?.careers || []).length ? (
-                    detail.analysis.careers.slice(0, 3).map((career) => (
-                      <div
-                        key={career.title}
-                        className="rounded-[20px] border border-[#E5EEF2] bg-[#FBFCFD] px-4 py-4"
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="text-sm font-semibold text-[#0F1729]">
-                            {career.title}
-                          </p>
-                          <span className="rounded-full bg-[#EAFBFB] px-3 py-1 text-xs font-semibold text-[#188B8B]">
-                            {t("reviewSubmission.matchPercent", { value: career.matchPercent ?? 0 })}
-                          </span>
+                    // Admin sees the full career list (was capped at 3
+                    // pre-go-live). Layout mirrors the student-facing
+                    // /result page: title + category chip + match %
+                    // pill + progress bar + the four "why it matched"
+                    // reason lines — so counsellors review the same
+                    // surface the student will see post-approval.
+                    detail.analysis.careers.map((career, index) => {
+                      const matchValue =
+                        career.score != null
+                          ? career.score
+                          : career.matchPercent != null
+                            ? career.matchPercent
+                            : 0;
+                      const reasons = career.matchReasons || {};
+                      const hasReasons =
+                        reasons.holland ||
+                        reasons.intelligence ||
+                        reasons.aptitude ||
+                        reasons.eq;
+                      return (
+                        <div
+                          key={`${career.title}-${index}`}
+                          className="rounded-[18px] border border-[#E1E7EF] bg-white px-4 py-4"
+                        >
+                          <div className="flex flex-wrap items-center gap-2.5">
+                            <h3 className="text-sm font-semibold text-[#0F1729]">
+                              {career.title}
+                            </h3>
+                            <span className="rounded-full bg-[#E2F8F7] px-2.5 py-0.5 text-[10px] font-semibold text-[#188B8B]">
+                              {Math.round(matchValue)}% Match
+                            </span>
+                            {career.category ? (
+                              <span className="rounded-full border border-[#D9E5EC] px-2.5 py-0.5 text-[10px] font-semibold text-[#4E5D72]">
+                                {career.category}
+                              </span>
+                            ) : null}
+                          </div>
+                          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#E6EEF2]">
+                            <div
+                              className="h-1.5 rounded-full bg-[#188B8B]"
+                              style={{
+                                width: `${Math.min(100, Math.max(0, matchValue))}%`,
+                              }}
+                            />
+                          </div>
+                          {hasReasons ? (
+                            <ul className="mt-3 space-y-1.5 text-[12px] leading-5 text-[#4E5D72]">
+                              {reasons.holland ? (
+                                <li>
+                                  <span className="font-semibold text-[#0F1729]">
+                                    {t("result.matchReasonInterests")}:
+                                  </span>{" "}
+                                  {reasons.holland}
+                                </li>
+                              ) : null}
+                              {reasons.intelligence ? (
+                                <li>
+                                  <span className="font-semibold text-[#0F1729]">
+                                    {t("result.matchReasonIntelligence")}:
+                                  </span>{" "}
+                                  {reasons.intelligence}
+                                </li>
+                              ) : null}
+                              {reasons.aptitude ? (
+                                <li>
+                                  <span className="font-semibold text-[#0F1729]">
+                                    {t("result.matchReasonAptitude")}:
+                                  </span>{" "}
+                                  {reasons.aptitude}
+                                </li>
+                              ) : null}
+                              {reasons.eq ? (
+                                <li>
+                                  <span className="font-semibold text-[#0F1729]">
+                                    {t("result.matchReasonEq")}:
+                                  </span>{" "}
+                                  {reasons.eq}
+                                </li>
+                              ) : null}
+                            </ul>
+                          ) : career.description ? (
+                            <p className="mt-2 text-sm leading-6 text-[#65758B]">
+                              {career.description}
+                            </p>
+                          ) : null}
                         </div>
-                        <p className="mt-2 text-sm leading-6 text-[#65758B]">
-                          {career.description}
-                        </p>
-                      </div>
-                    ))
+                      );
+                    })
                   ) : (
                     <span className="text-sm text-[#65758B]">
                       {t("reviewSubmission.noCareerRecommendationsLabel")}
@@ -611,6 +682,18 @@ export default function ReviewSubmission() {
           onApprove={handleApprove}
           onDelete={handleDelete}
           onBack={() => navigate("/admin/testsubmissions")}
+          // `userId` route param is the per-attempt assessmentReport _id
+          // (the admin route is keyed by it, despite the legacy name).
+          // The adminView flag routes StudentReport.jsx to the ungated
+          // /v1/admin/results/:reportId/student-view endpoint so admin
+          // sees the same payload the student will receive, regardless
+          // of approval state.
+          onViewStudentReport={
+            userId
+              ? () =>
+                  window.open(`/result/${userId}?adminView=1`, "_blank", "noopener")
+              : undefined
+          }
         />
       </div>
     </main>
