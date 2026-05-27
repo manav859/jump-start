@@ -18,10 +18,12 @@
     "seed:assessment": "node scripts/seedAssessmentFromJson.mjs",
     "seed:admin": "node scripts/seedAdmin.mjs",
     "seed:demo-package": "node scripts/seedDemoPackage.mjs",
+    "seed:gujarati-package": "node scripts/seedGujaratiPackage.mjs",
     "migrate:jumpstart-ids": "node scripts/assignJumpstartIds.mjs",
     "patch:work-style-questions": "node scripts/patchWorkStyleQuestions.mjs",
     "patch:math-operators": "node scripts/patchMathOperators.mjs",
-    "translate:questions:gu": "node scripts/translateQuestionsToGujarati.mjs"
+    "translate:questions:gu": "node scripts/translateQuestionsToGujarati.mjs",
+    "export:answer-key": "node scripts/exportSection4AnswerKey.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",

@@ -1,15 +1,14 @@
 // Frontend i18n bootstrap.
 //
-// Phase 1 scope (groundwork only): English (en) is the default;
-// Gujarati (gu) is registered as the first regional locale so the
-// nav-bar language toggle has somewhere to switch to. Page-level
-// content is NOT translated yet — only the navigation strings live
-// in the `common` namespace. New strings should land in
-// `locales/<lang>/common.json` until we shard into per-page
-// namespaces.
+// Current scope: site UI is English-only. The Gujarati locale resources
+// and the SUPPORTED_LANGUAGES list are kept in place so the language
+// toggle can be reinstated without re-instrumenting the pages — but the
+// active language is hard-locked to `en` here, and `setLanguage()` is
+// a no-op. The header toggle has been removed.
 //
-// Persistence: the chosen language is stored in localStorage under
-// `jumpstart.lang` so a refresh keeps the student's preference.
+// Gujarati assessment content (the 500-question bank) is delivered as
+// a separate test package whose `text` / `options` fields already carry
+// the Gujarati strings — it does NOT depend on i18n locale switching.
 
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
@@ -19,24 +18,13 @@ import guCommon from "./locales/gu/common.json";
 
 export const SUPPORTED_LANGUAGES = ["en", "gu"];
 export const DEFAULT_LANGUAGE = "en";
+// Storage key retained so a prior `gu` preference doesn't keep
+// resurfacing — we clear it on bootstrap below.
 const STORAGE_KEY = "jumpstart.lang";
 
-const readStoredLanguage = () => {
-  if (typeof window === "undefined") return DEFAULT_LANGUAGE;
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored && SUPPORTED_LANGUAGES.includes(stored)) return stored;
-  } catch {
-    // localStorage may be unavailable (SSR / private mode). Fall back
-    // to the default — non-fatal.
-  }
-  return DEFAULT_LANGUAGE;
-};
-
 // Reflect the active language on the <html> element so CSS selectors
-// like `:lang(gu)` and screen readers pick up the change. The init
-// call below sets it on first load; setLanguage() keeps it in sync
-// when the user toggles via the nav.
+// like `:lang(en)` and screen readers pick up the locale. Locked to
+// English now that the toggle is gone.
 const syncHtmlLang = (lang) => {
   if (typeof document === "undefined") return;
   try {
@@ -46,14 +34,23 @@ const syncHtmlLang = (lang) => {
   }
 };
 
-const initialLanguage = readStoredLanguage();
+// Clear any persisted preference from when the toggle existed — keeps
+// returning users from being stuck in a locale the UI can no longer
+// surface.
+try {
+  if (typeof window !== "undefined" && window.localStorage) {
+    window.localStorage.removeItem(STORAGE_KEY);
+  }
+} catch {
+  // Storage may be unavailable; non-fatal.
+}
 
 i18n.use(initReactI18next).init({
   resources: {
     en: { common: enCommon },
     gu: { common: guCommon },
   },
-  lng: initialLanguage,
+  lng: DEFAULT_LANGUAGE,
   fallbackLng: DEFAULT_LANGUAGE,
   defaultNS: "common",
   supportedLngs: SUPPORTED_LANGUAGES,
@@ -63,19 +60,14 @@ i18n.use(initReactI18next).init({
   },
 });
 
-syncHtmlLang(initialLanguage);
+syncHtmlLang(DEFAULT_LANGUAGE);
 
-export const setLanguage = (lang) => {
-  if (!SUPPORTED_LANGUAGES.includes(lang)) return;
-  i18n.changeLanguage(lang);
-  syncHtmlLang(lang);
-  try {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(STORAGE_KEY, lang);
-    }
-  } catch {
-    // Storage failure is non-fatal; the in-memory change still applies.
-  }
+// Kept exported so future code that imports it doesn't break, but the
+// function is a no-op while the site is English-only. If you want to
+// re-enable the toggle, restore the original body and wire the header
+// language switcher back on.
+export const setLanguage = (_lang) => {
+  // intentional no-op
 };
 
 export default i18n;

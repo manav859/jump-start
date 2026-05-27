@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { ensureRequiredEnv } from "../config/env.js";
 import AssessmentConfig from "../models/AssessmentConfig.js";
 import COMPREHENSIVE_500_PACKAGE from "../config/comprehensive500Package.generated.js";
+import GUJARATI_PACKAGE from "../config/gujaratiPackage.generated.js";
 import { buildDemoPackageDoc } from "../utils/scoring/configs/career500qDemo.config.js";
 
 const DUMMY_TEST_PACKAGE = {
@@ -102,6 +103,13 @@ async function run() {
       ...JSON.parse(JSON.stringify(COMPREHENSIVE_500_PACKAGE)),
       active: true,
       sortOrder: 1,
+    },
+    {
+      // Gujarati edition — derived from the English bank with text_gu /
+      // options_gu swapped into the primary text / options fields.
+      ...JSON.parse(JSON.stringify(GUJARATI_PACKAGE)),
+      active: true,
+      sortOrder: 2,
     },
     {
       ...buildDemoPackageDoc(COMPREHENSIVE_500_PACKAGE),
