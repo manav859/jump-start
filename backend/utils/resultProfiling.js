@@ -1280,9 +1280,9 @@ export const buildReviewSummary = ({
     strengths[0]?.name
       ? `Strongest signal area: ${strengths[0].name} at ${strengths[0].value}%.`
       : "",
-    careerRecommendations[0]?.title
-      ? `Top recommended pathway: ${careerRecommendations[0].title} with ${careerRecommendations[0].matchPercent}% match.`
-      : "",
+    // "Top recommended pathway: ..." intentionally removed — career
+    // recommendations must only surface in the dedicated section at
+    // the end of the report, not be previewed in Key Observations.
     sectionBreakdown.some((section) => section.status === "incomplete")
       ? "Some sections appear incomplete and should be reviewed before publication."
       : "All available sections were completed and are ready for admin review.",

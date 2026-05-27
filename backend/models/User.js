@@ -312,7 +312,15 @@ const purchaseHistorySchema = new mongoose.Schema(
   {
     packageId: { type: String, default: "" },
     packageTitle: { type: String, default: "" },
+    // `amount` is the final amount actually charged (after any discount).
+    // Existing reads of `amount` keep working — they just see the
+    // post-discount value, which is what the user paid.
     amount: { type: Number, default: null },
+    // Coupon trail. All three default to null so historical purchase
+    // records without coupons remain untouched.
+    couponCode: { type: String, default: null },
+    discountAmount: { type: Number, default: null },
+    originalAmount: { type: Number, default: null },
     purchasedAt: { type: Date, default: null },
     paymentMethod: { type: String, default: "Online" },
   },
@@ -403,6 +411,18 @@ const manualReviewItemSchema = new mongoose.Schema(
   { _id: false }
 );
 
+// Per-section duration captured from testProgress.sectionTimings at
+// submit time. Mirrored from `sections[i].title` so the admin UI can
+// label rows without re-resolving the package config.
+const sectionDurationSchema = new mongoose.Schema(
+  {
+    sectionId: { type: String, default: "" },
+    sectionTitle: { type: String, default: "" },
+    durationMinutes: { type: Number, default: null },
+  },
+  { _id: false }
+);
+
 const assessmentReportSchema = new mongoose.Schema({
   packageId: { type: String, default: "" },
   packageTitle: { type: String, default: "" },
@@ -416,6 +436,13 @@ const assessmentReportSchema = new mongoose.Schema({
   manualReviewItems: { type: [manualReviewItemSchema], default: [] },
   hasUnreviewedItems: { type: Boolean, default: false },
   manualReviewCompletedAt: { type: Date, default: null },
+  // Wall-clock duration of the attempt. `totalDurationMinutes` is the
+  // delta between the test's `startedAt` and the submission timestamp;
+  // `sectionDurations` is the per-section breakdown. Both stay null on
+  // reports written before this field landed — the UI treats null as
+  // "not tracked" and hides the line.
+  totalDurationMinutes: { type: Number, default: null },
+  sectionDurations: { type: [sectionDurationSchema], default: [] },
   createdAt: { type: Date, default: null },
   updatedAt: { type: Date, default: null },
 });
@@ -516,6 +543,29 @@ const userSchema = new mongoose.Schema(
       completedSectionIds: { type: [Number], default: [] },
       timeRemainingSeconds: { type: Number, default: null },
       updatedAt: { type: Date, default: null },
+      // Wall-clock test start — captured once on the first progress
+      // ping (which is when the student lands on Q1 of section 1). Used
+      // by postTestSubmit to compute `totalDurationMinutes` on the
+      // resulting report.
+      startedAt: { type: Date, default: null },
+      // Per-section timings. Each entry is appended when the section
+      // first becomes active (`startedAt`) and again when the section
+      // is marked complete (`completedAt`). Submit reads completedAt -
+      // startedAt for `sectionDurations`. Sparse by design — sections
+      // the student never reached simply don't appear.
+      sectionTimings: {
+        type: [
+          new mongoose.Schema(
+            {
+              sectionId: { type: Number, required: true },
+              startedAt: { type: Date, default: null },
+              completedAt: { type: Date, default: null },
+            },
+            { _id: false }
+          ),
+        ],
+        default: [],
+      },
     },
   },
   { timestamps: true }
