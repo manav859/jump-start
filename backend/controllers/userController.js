@@ -2,6 +2,7 @@ import User, {
   STUDENT_PROFILE_REQUIRED_FIELDS,
 } from "../models/User.js";
 import AssessmentConfig from "../models/AssessmentConfig.js";
+import Coupon from "../models/Coupon.js";
 import { computeAssessmentResult } from "../utils/scoring/index.js";
 import { DEMO_PACKAGE_ID } from "../utils/scoring/configs/career500qDemo.config.js";
 import {
@@ -183,7 +184,7 @@ const getOwnedPackages = (cfg, user) => {
   return getActivePackages(cfg).filter((pkg) => ownedIds.has(pkg.id));
 };
 
-const getPackageLookup = (cfg) =>
+export const getPackageLookup = (cfg) =>
   new Map((cfg?.packages || []).map((pkg) => [String(pkg.id), pkg]));
 
 const findPackageById = (cfg, packageId) =>
@@ -381,7 +382,7 @@ const buildFallbackSectionBreakdown = (profile = {}) =>
 const countCompletedSections = (sectionBreakdown = []) =>
   sectionBreakdown.filter((section) => section.status !== "incomplete").length;
 
-const buildStudentReportDetail = (report, user, packageLookup) => {
+export const buildStudentReportDetail = (report, user, packageLookup) => {
   const profile = report?.profile || {};
   const packageId = String(report?.packageId || "");
   const pkg = packageLookup.get(packageId);
@@ -440,6 +441,21 @@ const buildStudentReportDetail = (report, user, packageLookup) => {
       id: String(user?._id || ""),
       name: user?.name || "Student",
       email: user?.email || "",
+      // Surface jumpstartId + studentProfile so the report's first page
+      // can show the student's identity block (name, JS-ID, school,
+      // class, city, etc.). The frontend treats missing fields as "—".
+      jumpstartId: user?.jumpstartId || "",
+      profile: {
+        dateOfBirth: user?.studentProfile?.dateOfBirth || null,
+        gender: user?.studentProfile?.gender || "",
+        phone: user?.studentProfile?.phone || user?.mobile || "",
+        schoolOrCollege: user?.studentProfile?.schoolOrCollege || "",
+        classOrGrade: user?.studentProfile?.classOrGrade || "",
+        stream: user?.studentProfile?.stream || "",
+        board: user?.studentProfile?.board || "",
+        city: user?.studentProfile?.city || user?.city || "",
+        state: user?.studentProfile?.state || "",
+      },
     },
     summary: {
       overallScore: profile.overallScore ?? null,
@@ -459,6 +475,17 @@ const buildStudentReportDetail = (report, user, packageLookup) => {
     sectionBreakdown,
     personalityType: profile.personalityType || null,
     reviewSummary: profile.reviewSummary || {},
+    // Surface the captured durations so the student report (page 1
+    // header + per-section breakdown) and the admin Review page can
+    // display them. Null on legacy reports — UI hides the line then.
+    totalDurationMinutes: report?.totalDurationMinutes ?? null,
+    sectionDurations: Array.isArray(report?.sectionDurations)
+      ? report.sectionDurations.map((row) => ({
+          sectionId: String(row?.sectionId || ""),
+          sectionTitle: String(row?.sectionTitle || ""),
+          durationMinutes: row?.durationMinutes ?? null,
+        }))
+      : [],
     careerRecommendations: Array.isArray(profile.careerRecommendations)
       ? profile.careerRecommendations
       : [],
@@ -680,7 +707,7 @@ export const selectPackage = async (req, res) => {
 // POST /api/v1/user/package/purchase
 export const purchasePackage = async (req, res) => {
   try {
-    const { packageId } = req.body || {};
+    const { packageId, couponCode } = req.body || {};
     if (!packageId) return res.status(400).json({ success: false, msg: "packageId is required" });
     const [cfg, user] = await Promise.all([AssessmentConfig.getOrCreateDefault(), User.findById(req.user.id)]);
     if (!user) return res.status(404).json({ success: false, msg: "User not found" });
@@ -694,6 +721,43 @@ export const purchasePackage = async (req, res) => {
       });
     }
 
+    const originalAmount = Number(pkg.amount || 0);
+    let finalAmount = originalAmount;
+    let appliedCouponCode = null;
+    let discountAmount = null;
+
+    // Optional coupon. Re-validate server-side (never trust the client's
+    // computed price) and increment usedCount atomically only when the
+    // claim is < maxUses, so concurrent purchases can't both squeeze
+    // past a hard cap.
+    const trimmedCoupon = String(couponCode || "").trim().toUpperCase();
+    if (trimmedCoupon) {
+      const coupon = await Coupon.findOne({ code: trimmedCoupon });
+      if (!coupon) {
+        return res.status(400).json({ success: false, msg: "Coupon code not found." });
+      }
+      const redeemable = coupon.isRedeemable();
+      if (!redeemable.ok) {
+        return res.status(400).json({ success: false, msg: redeemable.reason });
+      }
+      const { discount, finalPrice } = coupon.applyToAmount(originalAmount);
+      // Atomic increment guarded by the maxUses ceiling — falls through
+      // to a 409 if some other concurrent request took the last slot.
+      const filter = { _id: coupon._id, isActive: true };
+      if (coupon.maxUses != null) {
+        filter.usedCount = { $lt: coupon.maxUses };
+      }
+      const inc = await Coupon.updateOne(filter, { $inc: { usedCount: 1 } });
+      if (inc.modifiedCount !== 1) {
+        return res
+          .status(409)
+          .json({ success: false, msg: "Coupon usage limit reached" });
+      }
+      appliedCouponCode = coupon.code;
+      discountAmount = discount;
+      finalAmount = finalPrice;
+    }
+
     user.selectedPackageId = pkg.id;
     user.purchasedPackages = [...new Set([...(user.purchasedPackages || []), pkg.id])];
     user.purchaseHistory = [
@@ -701,7 +765,13 @@ export const purchasePackage = async (req, res) => {
       {
         packageId: pkg.id,
         packageTitle: pkg.title,
-        amount: Number(pkg.amount || 0),
+        // `amount` is the post-discount value (what the user actually
+        // paid); originalAmount preserves the pre-discount sticker for
+        // the admin Payments table.
+        amount: finalAmount,
+        couponCode: appliedCouponCode,
+        discountAmount,
+        originalAmount,
         purchasedAt: new Date(),
         paymentMethod: "Online",
       },
@@ -709,9 +779,70 @@ export const purchasePackage = async (req, res) => {
     user.testsInProgress = 0;
     user.testProgress = createEmptyTestProgress();
     await user.save();
-    return res.status(200).json({ success: true, data: { packageId: pkg.id } });
+    return res.status(200).json({
+      success: true,
+      data: {
+        packageId: pkg.id,
+        originalAmount,
+        discountAmount,
+        finalAmount,
+        couponCode: appliedCouponCode,
+      },
+    });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message || "Failed to purchase package" });
+  }
+};
+
+// POST /api/v1/user/coupon/validate
+// Body: { code, packageId }
+// Returns { valid, discountType, discountValue, finalPrice, ... } or
+// { valid: false, msg }. This is a read-only sanity check — no DB
+// writes, no usage counter increment. The actual claim happens at
+// purchasePackage time, which re-runs all checks atomically.
+export const validateCoupon = async (req, res) => {
+  try {
+    const { code, packageId } = req.body || {};
+    const trimmed = String(code || "").trim().toUpperCase();
+    if (!trimmed) {
+      return res.status(400).json({ success: false, msg: "Code is required" });
+    }
+    if (!packageId) {
+      return res.status(400).json({ success: false, msg: "packageId is required" });
+    }
+    const [cfg, coupon] = await Promise.all([
+      AssessmentConfig.getOrCreateDefault(),
+      Coupon.findOne({ code: trimmed }),
+    ]);
+    if (!coupon) {
+      return res.status(404).json({ success: false, msg: "Coupon code not found." });
+    }
+    const redeemable = coupon.isRedeemable();
+    if (!redeemable.ok) {
+      return res.status(400).json({ success: false, msg: redeemable.reason });
+    }
+    const pkg = getActivePackages(cfg).find((p) => p.id === packageId);
+    if (!pkg) {
+      return res.status(404).json({ success: false, msg: "Package not found or inactive" });
+    }
+    const originalAmount = Number(pkg.amount || 0);
+    const { discount, finalPrice } = coupon.applyToAmount(originalAmount);
+    return res.status(200).json({
+      success: true,
+      data: {
+        valid: true,
+        code: coupon.code,
+        discountType: coupon.discountType,
+        discountValue: coupon.discountValue,
+        originalAmount,
+        discountAmount: discount,
+        finalPrice,
+      },
+    });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ success: false, msg: err.message || "Failed to validate coupon" });
   }
 };
 
@@ -1214,7 +1345,7 @@ export const getResultDetail = async (req, res) => {
     const [user, cfg] = await Promise.all([
       User.findById(req.user.id)
         .select(
-          "_id name email selectedPackageId resultProfile resultPublication assessmentReports testsCompleted updatedAt createdAt"
+          "_id name email jumpstartId mobile city studentProfile selectedPackageId resultProfile resultPublication assessmentReports testsCompleted updatedAt createdAt"
         )
         .lean(),
       AssessmentConfig.getOrCreateDefault(),
@@ -1343,22 +1474,85 @@ export const getTestProgress = async (req, res) => {
 export const patchTestProgress = async (req, res) => {
   try {
     const { sectionId, questionIndex, answers, completedSectionIds, timeRemainingSeconds } = req.body;
-    const update = { "testProgress.updatedAt": new Date() };
-    if (sectionId !== undefined) update["testProgress.sectionId"] = sectionId;
-    if (questionIndex !== undefined) update["testProgress.questionIndex"] = questionIndex;
-    if (answers !== undefined) update["testProgress.answers"] = answers;
-    if (Array.isArray(completedSectionIds)) {
-      update["testProgress.completedSectionIds"] = [...new Set(completedSectionIds.map((n) => Number(n)).filter(Boolean))];
+    const now = new Date();
+
+    // Duration tracking needs read-modify-write semantics (set startedAt
+    // exactly once, append a section-timing row exactly once per
+    // section), so we fetch the user first instead of using a blind
+    // $set. The hot path (typing an answer, ticking a timer) still
+    // resolves in a single round-trip.
+    const user = await User.findById(req.user.id).select("testProgress testsInProgress");
+    if (!user) {
+      return res.status(404).json({ success: false, msg: "User not found" });
     }
-    if (timeRemainingSeconds !== undefined) update["testProgress.timeRemainingSeconds"] = timeRemainingSeconds;
+
+    if (sectionId !== undefined) user.testProgress.sectionId = sectionId;
+    if (questionIndex !== undefined) user.testProgress.questionIndex = questionIndex;
+    if (answers !== undefined) user.testProgress.answers = answers;
+    if (timeRemainingSeconds !== undefined) {
+      user.testProgress.timeRemainingSeconds = timeRemainingSeconds;
+    }
+
+    const previouslyCompleted = new Set(
+      (user.testProgress.completedSectionIds || []).map((n) => Number(n))
+    );
+    let nextCompleted = previouslyCompleted;
+    if (Array.isArray(completedSectionIds)) {
+      nextCompleted = new Set(
+        completedSectionIds.map((n) => Number(n)).filter(Boolean)
+      );
+      user.testProgress.completedSectionIds = [...nextCompleted];
+    }
+
+    // Stamp startedAt on the very first progress ping — this is when
+    // the student lands on Q1 of section 1, before they've answered
+    // anything or completed any section. Subsequent pings leave it
+    // alone so resuming a paused test doesn't reset the clock.
+    if (!user.testProgress.startedAt) {
+      user.testProgress.startedAt = now;
+    }
+
+    // Maintain sectionTimings:
+    //   - Mark startedAt for the active section the first time we see
+    //     it surface in the progress (or fall back to the test start).
+    //   - Stamp completedAt the first time the section appears in
+    //     completedSectionIds.
+    const timings = Array.isArray(user.testProgress.sectionTimings)
+      ? user.testProgress.sectionTimings
+      : [];
+    const findOrAdd = (id) => {
+      let row = timings.find((t) => Number(t.sectionId) === Number(id));
+      if (!row) {
+        row = { sectionId: Number(id), startedAt: null, completedAt: null };
+        timings.push(row);
+      }
+      return row;
+    };
+
+    if (sectionId !== undefined) {
+      const row = findOrAdd(sectionId);
+      if (!row.startedAt) {
+        row.startedAt = now;
+      }
+    }
+
+    [...nextCompleted].forEach((id) => {
+      if (previouslyCompleted.has(id)) return; // already tracked
+      const row = findOrAdd(id);
+      if (!row.startedAt) row.startedAt = user.testProgress.startedAt || now;
+      if (!row.completedAt) row.completedAt = now;
+    });
+
+    user.testProgress.sectionTimings = timings;
+    user.testProgress.updatedAt = now;
+
     const hasStarted =
       (answers && Object.keys(answers).length > 0) ||
       Number(questionIndex || 0) > 0 ||
-      (Array.isArray(completedSectionIds) && completedSectionIds.length > 0);
-    if (hasStarted) {
-      update.testsInProgress = 1;
-    }
-    await User.findByIdAndUpdate(req.user.id, { $set: update });
+      nextCompleted.size > 0;
+    if (hasStarted) user.testsInProgress = 1;
+
+    await user.save();
     return res.status(200).json({ success: true, data: { ok: true } });
   } catch (err) {
     res.status(500).json({ success: false, msg: err.message || "Failed to save progress" });
@@ -1410,6 +1604,60 @@ export const postTestSubmit = async (req, res) => {
       approvedAt: null,
       approvedByName: "",
     };
+
+    // Duration capture. Total = submitted - testProgress.startedAt
+    // (null when startedAt was never set — i.e. pre-existing user state
+    // from before duration tracking was added; we leave it null then so
+    // the UI can hide the line gracefully). Per-section pulls from
+    // testProgress.sectionTimings; falls back to deriving from the
+    // section's configured durationMinutes minus timeRemainingSeconds
+    // for the section that was active when submit fired, if needed.
+    const minutesBetween = (start, end) => {
+      if (!start || !end) return null;
+      const diff = (new Date(end).getTime() - new Date(start).getTime()) / 60000;
+      if (!Number.isFinite(diff) || diff < 0) return null;
+      return Math.max(1, Math.round(diff));
+    };
+
+    const totalDurationMinutes = minutesBetween(
+      user.testProgress?.startedAt,
+      submittedAt
+    );
+
+    const timings = Array.isArray(user.testProgress?.sectionTimings)
+      ? user.testProgress.sectionTimings
+      : [];
+    const sectionDurations = sections.map((section) => {
+      const row = timings.find(
+        (t) => Number(t.sectionId) === Number(section.sectionId)
+      );
+      let durationMinutes = null;
+      if (row) {
+        const end = row.completedAt || submittedAt;
+        durationMinutes = minutesBetween(row.startedAt, end);
+      } else if (
+        Number(user.testProgress?.sectionId) === Number(section.sectionId) &&
+        Number.isFinite(Number(user.testProgress?.timeRemainingSeconds)) &&
+        Number(section.durationMinutes) > 0
+      ) {
+        // Fallback for the section that was active at submit time but
+        // never got a sectionTimings row (e.g. a one-shot submit without
+        // intermediate progress pings): derive from the configured
+        // section budget minus the time remaining when submit fired.
+        const elapsedMin =
+          Number(section.durationMinutes) -
+          Number(user.testProgress.timeRemainingSeconds) / 60;
+        if (Number.isFinite(elapsedMin) && elapsedMin > 0) {
+          durationMinutes = Math.max(1, Math.round(elapsedMin));
+        }
+      }
+      return {
+        sectionId: String(section.sectionId),
+        sectionTitle: section.title || "",
+        durationMinutes,
+      };
+    });
+
     const nextReport = createAssessmentReportEntry({
       user,
       packageId: pkg.id,
@@ -1421,6 +1669,9 @@ export const postTestSubmit = async (req, res) => {
         ? profile.manualReviewItems
         : [],
     });
+    nextReport.totalDurationMinutes = totalDurationMinutes;
+    nextReport.sectionDurations = sectionDurations;
+
     user.assessmentReports = Array.isArray(user.assessmentReports)
       ? [...user.assessmentReports, nextReport]
       : [nextReport];
@@ -1430,7 +1681,16 @@ export const postTestSubmit = async (req, res) => {
       9999
     );
     user.testsInProgress = 0;
-    user.testProgress = { sectionId: 1, questionIndex: 0, answers: {}, completedSectionIds: [], timeRemainingSeconds: null, updatedAt: null };
+    user.testProgress = {
+      sectionId: 1,
+      questionIndex: 0,
+      answers: {},
+      completedSectionIds: [],
+      timeRemainingSeconds: null,
+      updatedAt: null,
+      startedAt: null,
+      sectionTimings: [],
+    };
     syncLegacyStateFromReports(user);
     await user.save();
     return res.status(200).json({

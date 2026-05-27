@@ -10,12 +10,17 @@ import {
   getAdminSubmissions,
   getAdminSubmissionDetail,
   getAdminResults,
+  getAdminStudentReportView,
   getAdminAnalytics,
   approveAdminResult,
   deleteAdminResult,
   getManualReviewItems,
   submitManualDecision,
   finalizeManualReview,
+  listCoupons,
+  createCoupon,
+  toggleCoupon,
+  deleteCoupon,
 } from "../controllers/adminController.js";
 
 const router = express.Router();
@@ -31,6 +36,13 @@ router.get("/payments", getAdminPayments);
 router.get("/submissions", getAdminSubmissions);
 router.get("/submissions/:userId", getAdminSubmissionDetail);
 router.get("/results", getAdminResults);
+// Admin-only "view the student-facing report" — bypasses the
+// publication-status gate that hides un-approved reports from the
+// student's own /v1/user/results/:reportId endpoint. Used by the
+// "View Student Report" button on the Review Submission page so
+// counsellors can see exactly what the student will receive once
+// the report is approved.
+router.get("/results/:reportId/student-view", getAdminStudentReportView);
 router.patch("/results/:userId/approve", approveAdminResult);
 router.delete("/results/:userId", deleteAdminResult);
 // Manual review queue for Section 4 image/diagram items. :reportId here is
@@ -46,5 +58,14 @@ router.post(
   finalizeManualReview
 );
 router.get("/analytics", getAdminAnalytics);
+
+// Coupons — admin-only CRUD. POST creates a new code, PATCH toggles
+// active/inactive, DELETE removes (only safe before redemptions; deleting
+// a redeemed coupon still preserves the trail on purchaseHistory because
+// couponCode is stored as a snapshot string, not a foreign key).
+router.get("/coupons", listCoupons);
+router.post("/coupons", createCoupon);
+router.patch("/coupons/:id", toggleCoupon);
+router.delete("/coupons/:id", deleteCoupon);
 
 export default router;

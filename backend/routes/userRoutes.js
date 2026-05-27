@@ -15,6 +15,7 @@ import {
   updateProfile,
   getStudentProfile,
   updateStudentProfile,
+  validateCoupon,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -33,5 +34,9 @@ router.patch("/results", protect, updateResults);
 router.get("/test-progress", protect, getTestProgress);
 router.patch("/test-progress", protect, patchTestProgress);
 router.post("/test-submit", protect, postTestSubmit);
+// Read-only coupon validation — student checks a code at checkout without
+// committing it. The actual redemption happens inside purchasePackage,
+// which re-validates and atomically increments the usage counter.
+router.post("/coupon/validate", protect, validateCoupon);
 
 export default router;

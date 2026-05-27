@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import AssessmentConfig from "../models/AssessmentConfig.js";
+import Coupon from "../models/Coupon.js";
 import {
   getResultPublicationState,
   RESULT_PUBLICATION_STATUS,
@@ -12,6 +13,10 @@ import {
 } from "../utils/assessmentReports.js";
 import { matchCareers } from "../utils/scoring/careerMatcher.js";
 import { DEMO_APTITUDE_BANDS } from "../utils/scoring/configs/career500qDemo.config.js";
+import {
+  buildStudentReportDetail,
+  getPackageLookup,
+} from "./userController.js";
 
 const fmtCurrency = (n) =>
   new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(
@@ -78,6 +83,19 @@ const getUserPurchaseEntries = (user, packageMap) => {
       const amount = Number(
         purchase.amount != null ? purchase.amount : pkg?.amount || 0
       );
+      // Reconstruct original price + discount from the purchase trail
+      // for the admin Payments table. Older purchases that predate the
+      // coupon system have no trail and fall back to `amount` for both,
+      // which renders as "₹X / None / ₹0 / ₹X" in the admin UI.
+      const originalAmount =
+        purchase.originalAmount != null
+          ? Number(purchase.originalAmount)
+          : amount;
+      const discountAmount =
+        purchase.discountAmount != null
+          ? Number(purchase.discountAmount)
+          : Math.max(0, originalAmount - amount);
+      const couponCode = purchase.couponCode || null;
       const purchasedAt =
         purchase.purchasedAt || user.updatedAt || user.createdAt || null;
 
@@ -92,6 +110,12 @@ const getUserPurchaseEntries = (user, packageMap) => {
         packageId: purchase.packageId || "",
         amount,
         amountLabel: fmtCurrency(amount),
+        // Coupon trail surfaced for the admin Payments table.
+        couponCode,
+        originalAmount,
+        originalAmountLabel: fmtCurrency(originalAmount),
+        discountAmount,
+        discountAmountLabel: fmtCurrency(discountAmount),
         method: purchase.paymentMethod || "Online",
         date: purchasedAt,
         fallback: false,
@@ -381,6 +405,21 @@ const buildAdminReviewPayload = (user, cfg, reportOverride = null) => {
     packageId: report.packageId || user.selectedPackageId || "",
     status: publication.status,
     statusLabel: getPublicationStatusLabel(publication.status),
+    // Duration snapshot surfaced for the Review Snapshot card. Null on
+    // reports written before duration tracking landed — the UI hides
+    // the line in that case.
+    totalDurationMinutes:
+      report.totalDurationMinutes != null
+        ? Number(report.totalDurationMinutes)
+        : null,
+    sectionDurations: Array.isArray(report.sectionDurations)
+      ? report.sectionDurations.map((row) => ({
+          sectionId: String(row?.sectionId || ""),
+          sectionTitle: String(row?.sectionTitle || ""),
+          durationMinutes:
+            row?.durationMinutes != null ? Number(row.durationMinutes) : null,
+        }))
+      : [],
     student: {
       name: user.name || "Unknown",
       referenceId: `JS-${String(user._id).slice(-8).toUpperCase()}`,
@@ -912,7 +951,14 @@ export const getAdminSubmissions = async (req, res) => {
               report.updatedAt ||
               user.updatedAt ||
               user.createdAt,
-            duration: "N/A",
+            duration:
+              report.totalDurationMinutes != null
+                ? `${report.totalDurationMinutes} min`
+                : "N/A",
+            totalDurationMinutes:
+              report.totalDurationMinutes != null
+                ? Number(report.totalDurationMinutes)
+                : null,
             status: getPublicationStatusLabel(report.publication.status),
             canApprove:
               report.publication.status ===
@@ -1570,5 +1616,253 @@ export const getAdminAnalytics = async (req, res) => {
     });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message || "Failed to load analytics" });
+  }
+};
+
+// GET /api/v1/admin/results/:reportId/student-view
+// Admin-only fetch of the student-facing report payload for ANY report id,
+// regardless of publication status. Used by the "View Student Report"
+// button on the admin Review Submission page so counsellors see exactly
+// what the student receives — including for reports still in
+// PENDING_APPROVAL that would otherwise be hidden by the student endpoint's
+// hasAccess gate.
+//
+// Returns the same shape as GET /api/v1/user/results/:reportId, but with
+// `hasAccess` forced to `true` so the frontend StudentReport.jsx renders
+// the report body immediately rather than the "under review" panel.
+export const getAdminStudentReportView = async (req, res) => {
+  try {
+    const { reportId } = req.params;
+    if (!reportId) {
+      return res.status(400).json({ success: false, msg: "reportId is required" });
+    }
+
+    const cfg = await AssessmentConfig.getOrCreateDefault();
+    const packageLookup = getPackageLookup(cfg);
+
+    // The report id is the per-attempt assessmentReports sub-document _id.
+    // Mongo can find the parent User by querying for it, which is faster
+    // and more correct than scanning every user.
+    const user = await User.findOne({ "assessmentReports._id": reportId })
+      .select(
+        "_id name email jumpstartId mobile city studentProfile selectedPackageId resultProfile resultPublication assessmentReports testsCompleted updatedAt createdAt"
+      )
+      .lean();
+
+    if (!user) {
+      return res.status(404).json({ success: false, msg: "Result report not found" });
+    }
+
+    const storedReports = getStoredAssessmentReports(user, packageLookup);
+    const report = storedReports.find(
+      (item) => String(item._id) === String(reportId)
+    );
+
+    if (!report) {
+      return res.status(404).json({ success: false, msg: "Result report not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        // Force the gate open — admin always sees the report body.
+        hasAccess: true,
+        resultStatus: report.publication.status,
+        submittedAt: report.publication.submittedAt,
+        approvedAt: report.publication.approvedAt,
+        estimatedReadyHours: null,
+        // Annotate the payload so the frontend can render an "admin
+        // preview" banner if it wants to make the bypass obvious to
+        // the counsellor.
+        adminPreview: true,
+        report: buildStudentReportDetail(report, user, packageLookup),
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Failed to load student report",
+    });
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Coupon management — admin-side CRUD.
+// ---------------------------------------------------------------------------
+// Coupons live in their own collection (see backend/models/Coupon.js).
+// The shape returned to the admin UI matches what Settings.jsx renders:
+// code / discount / used-vs-max / expiry / status chip.
+
+const serializeCoupon = (doc) => ({
+  id: String(doc._id),
+  code: doc.code,
+  discountType: doc.discountType,
+  discountValue: doc.discountValue,
+  maxUses: doc.maxUses,
+  usedCount: doc.usedCount || 0,
+  expiresAt: doc.expiresAt,
+  isActive: Boolean(doc.isActive),
+  createdAt: doc.createdAt,
+  createdBy: doc.createdBy ? String(doc.createdBy) : null,
+});
+
+// GET /api/v1/admin/coupons
+export const listCoupons = async (_req, res) => {
+  try {
+    const coupons = await Coupon.find({}).sort({ createdAt: -1 }).lean();
+    return res.status(200).json({
+      success: true,
+      data: { coupons: coupons.map(serializeCoupon) },
+    });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ success: false, msg: err.message || "Failed to load coupons" });
+  }
+};
+
+// POST /api/v1/admin/coupons
+// Body: { code, discountType, discountValue, maxUses?, expiresAt? }
+// Validation rules:
+//   - code is required, 3-32 chars, alphanumeric+dash, uppercased on save
+//   - discountType is "percent" | "flat"
+//   - discountValue: 1-100 if percent; >=1 if flat
+//   - maxUses (optional): positive integer
+//   - expiresAt (optional): ISO date in the future
+export const createCoupon = async (req, res) => {
+  try {
+    const {
+      code,
+      discountType,
+      discountValue,
+      maxUses,
+      expiresAt,
+    } = req.body || {};
+
+    const trimmedCode = String(code || "").trim().toUpperCase();
+    if (!/^[A-Z0-9\-_]{3,32}$/.test(trimmedCode)) {
+      return res.status(400).json({
+        success: false,
+        msg: "Code must be 3-32 alphanumeric characters (letters, digits, '-' or '_').",
+      });
+    }
+    if (!["percent", "flat"].includes(discountType)) {
+      return res.status(400).json({
+        success: false,
+        msg: "discountType must be either 'percent' or 'flat'.",
+      });
+    }
+    const numericValue = Number(discountValue);
+    if (!Number.isFinite(numericValue) || numericValue <= 0) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "discountValue must be a positive number." });
+    }
+    if (discountType === "percent" && numericValue > 100) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Percent discount cannot exceed 100." });
+    }
+
+    const parsedMaxUses =
+      maxUses === null || maxUses === undefined || maxUses === ""
+        ? null
+        : Number(maxUses);
+    if (parsedMaxUses != null && (!Number.isInteger(parsedMaxUses) || parsedMaxUses <= 0)) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "maxUses must be a positive integer or omitted." });
+    }
+
+    let parsedExpiry = null;
+    if (expiresAt) {
+      const dt = new Date(expiresAt);
+      if (Number.isNaN(dt.getTime())) {
+        return res
+          .status(400)
+          .json({ success: false, msg: "expiresAt is not a valid date." });
+      }
+      parsedExpiry = dt;
+    }
+
+    const existing = await Coupon.findOne({ code: trimmedCode }).lean();
+    if (existing) {
+      return res
+        .status(409)
+        .json({ success: false, msg: `Coupon "${trimmedCode}" already exists.` });
+    }
+
+    const created = await Coupon.create({
+      code: trimmedCode,
+      discountType,
+      discountValue: numericValue,
+      maxUses: parsedMaxUses,
+      expiresAt: parsedExpiry,
+      isActive: true,
+      createdBy: req.user?.id || null,
+    });
+
+    return res
+      .status(201)
+      .json({ success: true, data: { coupon: serializeCoupon(created) } });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ success: false, msg: err.message || "Failed to create coupon" });
+  }
+};
+
+// PATCH /api/v1/admin/coupons/:id
+// Body: { isActive?: boolean }
+// Used for activate / deactivate from the admin Coupons tab. Other
+// fields are intentionally immutable post-creation — admins should
+// delete + recreate if a code's terms need to change, so the audit
+// trail (and existing redemptions) stay coherent.
+export const toggleCoupon = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ success: false, msg: "Coupon id is required" });
+    }
+    const { isActive } = req.body || {};
+    if (typeof isActive !== "boolean") {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Body must include { isActive: boolean }" });
+    }
+    const updated = await Coupon.findByIdAndUpdate(
+      id,
+      { isActive },
+      { new: true }
+    );
+    if (!updated) {
+      return res.status(404).json({ success: false, msg: "Coupon not found" });
+    }
+    return res
+      .status(200)
+      .json({ success: true, data: { coupon: serializeCoupon(updated) } });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ success: false, msg: err.message || "Failed to update coupon" });
+  }
+};
+
+// DELETE /api/v1/admin/coupons/:id
+export const deleteCoupon = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ success: false, msg: "Coupon id is required" });
+    }
+    const deleted = await Coupon.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, msg: "Coupon not found" });
+    }
+    return res.status(200).json({ success: true, data: { id } });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ success: false, msg: err.message || "Failed to delete coupon" });
   }
 };
