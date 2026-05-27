@@ -1,5 +1,6 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { apiUnavailableMessage, getApiV1Url } from "../config/env";
+import { clearApiCache } from "../utils/apiCache";
 
 export const AuthContext = createContext();
 
@@ -121,6 +122,9 @@ export const AuthProvider = ({ children }) => {
 
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+    // Drop any cached API responses so the next user landing on this
+    // tab can't see the previous user's data.
+    clearApiCache();
   }, []);
 
   const updateUser = useCallback((nextUser) => {

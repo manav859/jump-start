@@ -2,12 +2,14 @@ import { Outlet } from "react-router-dom";
 import { useState } from "react";
 import AdminHeader from "../pages/admin/AdminHeader";
 import AdminSidebar from "../pages/admin/AdminSidebar";
+import NavigationProgress from "../components/NavigationProgress";
 
 export default function AdminLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   return (
     <div className="min-h-screen bg-[#f9fafb]">
+      <NavigationProgress />
       {/* FIXED SIDEBAR */}
       <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
