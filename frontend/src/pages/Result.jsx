@@ -19,6 +19,13 @@ import api from "../api/api";
 import { AuthContext } from "../context/AuthContext";
 import StatusPill from "../components/results/StatusPill";
 import usePrintableDocument from "../hooks/usePrintableDocument";
+import { ResultPageSkeleton } from "../components/Skeletons";
+import {
+  readApiCache,
+  writeApiCache,
+  cacheUserKey,
+  CACHE_TTL,
+} from "../utils/apiCache";
 import {
   formatStudentDate,
   getPrimaryActionLabel,
@@ -97,16 +104,31 @@ export default function Result() {
   const { printDocument } = usePrintableDocument();
 
   useEffect(() => {
+    const userId = cacheUserKey(user);
+    const cached = readApiCache("userResults", {
+      userId,
+      ttlMs: CACHE_TTL.USER_RESULTS_MS,
+    });
+    if (cached) {
+      setData(normalizeStudentResultsPayload(cached));
+      setLoading(false);
+      return;
+    }
+
     api
       .get("/v1/user/results")
       .then((res) => {
-        setData(normalizeStudentResultsPayload(res?.data?.data || {}));
+        const payload = res?.data?.data || {};
+        writeApiCache("userResults", payload, { userId });
+        setData(normalizeStudentResultsPayload(payload));
       })
       .catch((err) => {
         setError(err?.response?.data?.msg || "Failed to load your results.");
       })
       .finally(() => setLoading(false));
-  }, []);
+    // user identity drives the cache key; refetch when the active user changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?._id || user?.id || user?.email]);
 
   const summaryCards = useMemo(
     () => [
@@ -248,11 +270,7 @@ export default function Result() {
   };
 
   if (loading) {
-    return (
-      <div className="flex min-h-[70vh] items-center justify-center bg-[#FAFAFA] px-4">
-        <p className="text-[#6E7F97]">{t("result.loadingResults")}</p>
-      </div>
-    );
+    return <ResultPageSkeleton />;
   }
 
   if (error && !data.tests.length) {

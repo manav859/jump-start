@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   ArrowLeft,
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import api from "../api/api";
 import { localisedPackageField } from "../utils/packageLabel";
+import { StudentReportSkeleton } from "../components/Skeletons";
 import ResultPendingPanel from "../components/ResultPendingPanel";
 import SectionBreakdownCard from "../components/admin/SectionBreakdownCard";
 import StatusPill from "../components/results/StatusPill";
@@ -34,6 +35,12 @@ const fallbackStrengths = [
 export default function StudentReport() {
   const { t } = useTranslation();
   const { reportId } = useParams();
+  // Admin counsellor mode: ?adminView=1 routes the request through the
+  // admin-only endpoint so an unapproved report still renders. The
+  // student-facing flow leaves the query string empty and hits the
+  // gated /v1/user/results/:reportId endpoint as before.
+  const [searchParams] = useSearchParams();
+  const adminView = searchParams.get("adminView") === "1";
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [payload, setPayload] = useState(() =>
@@ -49,8 +56,11 @@ export default function StudentReport() {
     }
 
     setLoading(true);
+    const endpoint = adminView
+      ? `/v1/admin/results/${reportId}/student-view`
+      : `/v1/user/results/${reportId}`;
     api
-      .get(`/v1/user/results/${reportId}`)
+      .get(endpoint)
       .then((res) => {
         setPayload(normalizeStudentReportPayload(res?.data?.data || {}));
       })
@@ -58,13 +68,31 @@ export default function StudentReport() {
         setError(err?.response?.data?.msg || "Failed to load this report.");
       })
       .finally(() => setLoading(false));
-  }, [reportId]);
+  }, [reportId, adminView]);
 
   const report = payload.report;
   const statusMeta = getResultMeta("result", payload.resultStatus);
-  const sectionBreakdown = Array.isArray(report?.sectionBreakdown)
-    ? report.sectionBreakdown
-    : [];
+  // Merge per-section duration (captured at submit time) onto the
+  // breakdown rows so SectionBreakdownCard can show "Completed in X min"
+  // beside each section title without a second lookup.
+  const sectionBreakdown = useMemo(() => {
+    const raw = Array.isArray(report?.sectionBreakdown)
+      ? report.sectionBreakdown
+      : [];
+    const durations = Array.isArray(report?.sectionDurations)
+      ? report.sectionDurations
+      : [];
+    if (!durations.length) return raw;
+    const byId = new Map(
+      durations.map((row) => [String(row.sectionId), row.durationMinutes])
+    );
+    return raw.map((section) => {
+      const dur = byId.get(String(section.sectionId));
+      return dur != null
+        ? { ...section, durationMinutes: dur }
+        : section;
+    });
+  }, [report?.sectionBreakdown, report?.sectionDurations]);
   const strengths = useMemo(() => {
     if (Array.isArray(report?.strengths) && report.strengths.length) {
       return report.strengths;
@@ -72,12 +100,22 @@ export default function StudentReport() {
     return fallbackStrengths;
   }, [report?.strengths]);
 
-  if (loading) {
-    return (
-      <div className="flex min-h-[70vh] items-center justify-center bg-[#F7F8FA] px-4">
-        <p className="text-[#65758B]">{t("loading.report")}</p>
-      </div>
+  // Filter legacy "Top recommended pathway: ..." rows out of Key
+  // Observations. Career recommendations must only surface in their
+  // dedicated section at the end of the report. The backend no longer
+  // emits this row in newly-generated reports, but old reports stored
+  // in MongoDB still carry it — this client-side filter strips them
+  // out at render time so the legacy row never appears on screen.
+  const visibleObservations = useMemo(() => {
+    const raw = report?.reviewSummary?.observations;
+    if (!Array.isArray(raw)) return [];
+    return raw.filter(
+      (item) => !/^\s*top\s+recommended\s+pathway\b/i.test(String(item || ""))
     );
+  }, [report?.reviewSummary?.observations]);
+
+  if (loading) {
+    return <StudentReportSkeleton />;
   }
 
   if (error) {
@@ -142,21 +180,6 @@ export default function StudentReport() {
               <StatusPill label={statusMeta.label} className={statusMeta.className} />
             </div>
 
-            <p className="mt-3 max-w-3xl text-[15px] leading-7 text-[#65758B] sm:text-base sm:leading-8">
-              Detailed score report for {report?.student?.name || "your assessment"}.
-              Review your overall performance, strengths, and section-wise breakdown.
-            </p>
-
-            <div className="mt-4 flex flex-wrap gap-4 text-[13px] text-[#65758B] sm:gap-5 sm:text-sm">
-              <span className="inline-flex items-center gap-2">
-                <CalendarDays className="h-4 w-4 text-[#188B8B]" />
-                {t("report.submittedOn", { date: formatStudentDate(report?.submittedAt) })}
-              </span>
-              <span className="inline-flex items-center gap-2">
-                <BadgeCheck className="h-4 w-4 text-[#188B8B]" />
-                {t("report.attempt", { number: report?.attemptNumber || 1 })}
-              </span>
-            </div>
           </div>
 
           <button
@@ -169,7 +192,83 @@ export default function StudentReport() {
           </button>
         </div>
 
-        <section className="surface-card report-print-card mt-8 rounded-[22px] p-4 sm:rounded-[30px] sm:p-6">
+        {/* Student information card — first thing on screen and on
+            page 1 of the printed PDF. Identity (name + Jumpstart ID),
+            attempt context (submitted date, attempt number), and the
+            student profile snapshot live here so counsellors / parents
+            see who the report is for before any findings. Findings begin
+            on page 2 via the page-break-before on the next section. */}
+        <section className="surface-card report-print-card mt-8 rounded-[22px] p-5 sm:rounded-[30px] sm:p-7">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#188B8B]">
+                Student Information
+              </p>
+              <h2 className="mt-2 text-[22px] font-bold leading-8 text-[#0F1729] sm:text-2xl">
+                {report?.student?.name || "—"}
+              </h2>
+              {report?.student?.email ? (
+                <p className="mt-1 text-[13px] text-[#65758B]">{report.student.email}</p>
+              ) : null}
+            </div>
+            {report?.student?.jumpstartId ? (
+              <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[#9BD9D6] bg-[#F0FBFB] px-3.5 py-1.5 text-[12px] font-semibold text-[#188B8B]">
+                <BadgeCheck className="h-4 w-4" />
+                Jumpstart ID: {report.student.jumpstartId}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-4 text-[13px] text-[#65758B] sm:gap-5 sm:text-sm">
+            <span className="inline-flex items-center gap-2">
+              <CalendarDays className="h-4 w-4 text-[#188B8B]" />
+              {t("report.submittedOn", { date: formatStudentDate(report?.submittedAt) })}
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <BadgeCheck className="h-4 w-4 text-[#188B8B]" />
+              {t("report.attempt", { number: report?.attemptNumber || 1 })}
+            </span>
+            {/* Total wall-clock duration of the attempt. Only rendered
+                when the backend captured it (legacy reports without
+                tracking will hide this entirely rather than show a
+                misleading "0 min"). */}
+            {report?.totalDurationMinutes != null ? (
+              <span className="inline-flex items-center gap-2">
+                <CalendarDays className="h-4 w-4 text-[#188B8B]" />
+                Total Duration: {report.totalDurationMinutes} min
+              </span>
+            ) : null}
+          </div>
+
+          {report?.student?.profile ? (
+            <div className="mt-5 grid gap-3 rounded-[18px] bg-[#FBFCFD] p-4 sm:mt-6 sm:grid-cols-2 sm:gap-4 sm:p-5 lg:grid-cols-3">
+              {[
+                ["Date of Birth", formatStudentDate(report.student.profile.dateOfBirth)],
+                ["Gender", report.student.profile.gender],
+                ["Phone", report.student.profile.phone],
+                ["School / College", report.student.profile.schoolOrCollege],
+                ["Class / Grade", report.student.profile.classOrGrade],
+                ["Stream", report.student.profile.stream],
+                ["Board", report.student.profile.board],
+                ["City", report.student.profile.city],
+                ["State", report.student.profile.state],
+              ]
+                .filter(([, value]) => value && String(value).trim() && String(value) !== "—")
+                .map(([label, value]) => (
+                  <div key={label}>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8A94A6]">
+                      {label}
+                    </p>
+                    <p className="mt-1 text-[13px] font-semibold text-[#0F1729] sm:text-sm">
+                      {value}
+                    </p>
+                  </div>
+                ))}
+            </div>
+          ) : null}
+        </section>
+
+        <section className="surface-card report-print-card report-print-page-break-before mt-8 rounded-[22px] p-4 sm:rounded-[30px] sm:p-6">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-[18px] bg-[#F1FCF5] px-4 py-4 sm:rounded-[22px] sm:px-5 sm:py-5">
               <p className="text-[13px] font-semibold text-[#65758B] sm:text-sm">Completed Sections</p>
@@ -281,6 +380,56 @@ export default function StudentReport() {
             </section>
           </div>
         </div>
+
+        <section className="surface-card report-print-card report-print-page-break-before mt-6 rounded-[22px] p-5 sm:rounded-[30px] sm:p-7">
+          <h2 className="text-[20px] font-bold leading-8 text-[#0F1729] sm:text-2xl">
+            {t("result.keyObservations")}
+          </h2>
+          <div className="mt-4 space-y-2.5 sm:mt-5 sm:space-y-3">
+            {visibleObservations.length ? (
+              visibleObservations.map((item) => (
+                <div
+                  key={item}
+                  className="rounded-[16px] bg-[#F8FAFC] px-4 py-3.5 text-[13px] leading-6 text-[#4E5D72] sm:rounded-2xl sm:py-4 sm:text-sm sm:leading-7"
+                >
+                  {item}
+                </div>
+              ))
+            ) : (
+              <div className="rounded-[16px] bg-[#F8FAFC] px-4 py-4 text-[13px] text-[#65758B] sm:rounded-2xl sm:text-sm">
+                {t("result.noObservations")}
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className="surface-card report-print-card report-print-page-break-before mt-8 rounded-[24px] p-5 sm:rounded-[30px] sm:p-7">
+          <div>
+            <h2 className="text-[20px] font-bold leading-8 text-[#0F1729] sm:text-2xl">
+              {t("result.sectionBreakdownTitle")}
+            </h2>
+            <p className="mt-2 text-sm leading-7 text-[#65758B]">
+              {t("result.sectionBreakdownSubtitle")}
+            </p>
+          </div>
+
+          <div className="mt-6 space-y-4">
+            {sectionBreakdown.length ? (
+              sectionBreakdown.map((section, index) => (
+                <SectionBreakdownCard
+                  key={section.sectionId || section.title}
+                  section={section}
+                  defaultOpen={index === 0}
+                  forceOpen={isPreparingPrint}
+                />
+              ))
+            ) : (
+              <div className="rounded-[22px] border border-dashed border-[#D8E6EC] bg-[#FBFCFD] px-5 py-8 text-center text-sm text-[#65758B]">
+                {t("result.noBreakdown")}
+              </div>
+            )}
+          </div>
+        </section>
 
         <section className="surface-card report-print-card report-print-page-break-before mt-6 rounded-[22px] p-5 sm:rounded-[30px] sm:p-7">
           <div className="flex items-start justify-between gap-3">
@@ -596,55 +745,6 @@ export default function StudentReport() {
           </section>
         ) : null}
 
-        <section className="surface-card report-print-card report-print-page-break-before mt-6 rounded-[22px] p-5 sm:rounded-[30px] sm:p-7">
-          <h2 className="text-[20px] font-bold leading-8 text-[#0F1729] sm:text-2xl">
-            {t("result.keyObservations")}
-          </h2>
-          <div className="mt-4 space-y-2.5 sm:mt-5 sm:space-y-3">
-            {(report?.reviewSummary?.observations || []).length ? (
-              report.reviewSummary.observations.map((item) => (
-                <div
-                  key={item}
-                  className="rounded-[16px] bg-[#F8FAFC] px-4 py-3.5 text-[13px] leading-6 text-[#4E5D72] sm:rounded-2xl sm:py-4 sm:text-sm sm:leading-7"
-                >
-                  {item}
-                </div>
-              ))
-            ) : (
-              <div className="rounded-[16px] bg-[#F8FAFC] px-4 py-4 text-[13px] text-[#65758B] sm:rounded-2xl sm:text-sm">
-                {t("result.noObservations")}
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section className="surface-card report-print-card report-print-page-break-before mt-8 rounded-[24px] p-5 sm:rounded-[30px] sm:p-7">
-          <div>
-            <h2 className="text-[20px] font-bold leading-8 text-[#0F1729] sm:text-2xl">
-              {t("result.sectionBreakdownTitle")}
-            </h2>
-            <p className="mt-2 text-sm leading-7 text-[#65758B]">
-              {t("result.sectionBreakdownSubtitle")}
-            </p>
-          </div>
-
-          <div className="mt-6 space-y-4">
-            {sectionBreakdown.length ? (
-              sectionBreakdown.map((section, index) => (
-                <SectionBreakdownCard
-                  key={section.sectionId || section.title}
-                  section={section}
-                  defaultOpen={index === 0}
-                  forceOpen={isPreparingPrint}
-                />
-              ))
-            ) : (
-              <div className="rounded-[22px] border border-dashed border-[#D8E6EC] bg-[#FBFCFD] px-5 py-8 text-center text-sm text-[#65758B]">
-                {t("result.noBreakdown")}
-              </div>
-            )}
-          </div>
-        </section>
       </div>
     </div>
   );

@@ -3,17 +3,31 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LogOut, Menu, UserRound, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { AuthContext } from "../context/AuthContext";
-import { setLanguage, SUPPORTED_LANGUAGES } from "../i18n/i18n";
 import ConfirmDialog from "./ConfirmDialog";
 
 // Nav items live by translation key now. The `to` path is preserved;
 // `labelKey` looks up the localized string under the `common.nav`
 // namespace at render time.
+// `prefetch` is invoked on hover / focus to start downloading the next
+// page's lazy chunk before the user clicks — see PrefetchLink for the
+// long-form explanation. Each thunk is fired at most once per session
+// by the browser's HTTP cache.
+const fired = new Set();
+const prefetch = (key, importer) => {
+  if (fired.has(key)) return;
+  fired.add(key);
+  try {
+    importer().catch(() => fired.delete(key));
+  } catch (_err) {
+    fired.delete(key);
+  }
+};
+
 const defaultNavItems = [
-  { labelKey: "nav.home", to: "/" },
-  { labelKey: "nav.tests", to: "/test" },
-  { labelKey: "nav.dashboard", to: "/dashboard" },
-  { labelKey: "nav.results", to: "/result" },
+  { labelKey: "nav.home", to: "/", prefetch: () => prefetch("/", () => import("../pages/Home")) },
+  { labelKey: "nav.tests", to: "/test", prefetch: () => prefetch("/test", () => import("../pages/Test")) },
+  { labelKey: "nav.dashboard", to: "/dashboard", prefetch: () => prefetch("/dashboard", () => import("../pages/Dashboard")) },
+  { labelKey: "nav.results", to: "/result", prefetch: () => prefetch("/result", () => import("../pages/Result")) },
 ];
 
 const getLinkClassName = ({ isActive }) =>
@@ -32,13 +46,10 @@ export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useContext(AuthContext);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const isAdmin = user?.role === "admin";
-  const currentLanguage = SUPPORTED_LANGUAGES.includes(i18n.language)
-    ? i18n.language
-    : "en";
 
   const firstName = useMemo(() => {
     const name = String(user?.name || "").trim();
@@ -96,6 +107,8 @@ export default function Header() {
           key={item.to}
           to={item.to}
           onClick={() => setMobileOpen(false)}
+          onMouseEnter={item.prefetch}
+          onFocus={item.prefetch}
           className={getLinkClassName}
         >
           {t(item.labelKey)}
@@ -111,42 +124,14 @@ export default function Header() {
           key={`mobile-${item.to}`}
           to={item.to}
           onClick={() => setMobileOpen(false)}
+          onMouseEnter={item.prefetch}
+          onFocus={item.prefetch}
           className={getMobileLinkClassName}
         >
           {t(item.labelKey)}
         </NavLink>
       ))}
     </>
-  );
-
-  // Compact EN / ગુજ toggle. Phase 1: only the nav labels respond.
-  // Page-level content stays in English until per-page i18n lands.
-  const renderLanguageToggle = (extraClass = "") => (
-    <div
-      role="group"
-      aria-label={t("language.label", "Language")}
-      className={`inline-flex items-center gap-1 rounded-full border border-[#D9E5EC] bg-white p-0.5 ${extraClass}`}
-    >
-      {SUPPORTED_LANGUAGES.map((lang) => {
-        const isActive = currentLanguage === lang;
-        const label = lang === "gu" ? "ગુજ" : "EN";
-        return (
-          <button
-            key={lang}
-            type="button"
-            onClick={() => setLanguage(lang)}
-            aria-pressed={isActive}
-            className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${
-              isActive
-                ? "bg-[#188B8B] text-white"
-                : "text-[#0F1729] hover:bg-[#F0FBFB]"
-            }`}
-          >
-            {label}
-          </button>
-        );
-      })}
-    </div>
   );
 
   return (
@@ -165,7 +150,6 @@ export default function Header() {
           </div>
 
           <div className="hidden items-center gap-3 lg:flex">
-            {renderLanguageToggle()}
             {user ? (
               <>
                 <Link
@@ -247,8 +231,6 @@ export default function Header() {
           </div>
 
           <nav className="mt-8 flex flex-col gap-2">{mobileNavLinks}</nav>
-
-          <div className="mt-6 flex justify-center">{renderLanguageToggle()}</div>
 
           <div className="mt-auto flex flex-col gap-3 pt-8">
             {user ? (

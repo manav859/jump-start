@@ -5,6 +5,29 @@ import { BadgeCheck, Check, LayoutDashboard, ShieldCheck, Sparkles } from "lucid
 import api from "../api/api";
 import { AuthContext } from "../context/AuthContext";
 import { localisedPackageField } from "../utils/packageLabel";
+import { PackageCardsSkeleton } from "../components/Skeletons";
+import {
+  readApiCache,
+  writeApiCache,
+  invalidateApiCache,
+  cacheUserKey,
+  CACHE_TTL,
+} from "../utils/apiCache";
+
+// Action buttons land on /pretest/sections in every flow except the
+// dummy test (which goes to /pretest). Warm both chunks on hover so the
+// chunk is already in cache when the click handler fires `navigate(...)`.
+let pretestChunksRequested = false;
+const prefetchPretestChunks = () => {
+  if (pretestChunksRequested) return;
+  pretestChunksRequested = true;
+  Promise.all([
+    import("./Pretest"),
+    import("./PretestSections"),
+  ]).catch(() => {
+    pretestChunksRequested = false;
+  });
+};
 
 const accentStyles = [
   {
@@ -123,8 +146,50 @@ export default function Test() {
     : "mt-12 grid gap-6 lg:grid-cols-3";
 
   useEffect(() => {
-    const configRequest = api.get("/v1/public/config");
-    const initRequest = token ? api.get("/v1/user/init") : Promise.resolve(null);
+    const userId = cacheUserKey(user);
+
+    // Build plans from public packages + (optional) purchased packages.
+    const composePlans = (publicPackages, purchasedPackages) => {
+      const purchasedMap = new Map(
+        (purchasedPackages || []).map((pkg) => [pkg.id, pkg])
+      );
+      return (publicPackages || []).map((plan) => {
+        const ownedPackage = purchasedMap.get(plan.id);
+        return {
+          ...plan,
+          owned: Boolean(ownedPackage),
+          ownershipStatus: ownedPackage?.status || "available",
+          publicationStatus: ownedPackage?.publicationStatus || "not_submitted",
+        };
+      });
+    };
+
+    // Try the sessionStorage cache first. Public config is essentially
+    // immutable session-to-session, and user init only needs to be fresh
+    // to ~60s for the "purchased" chip to flip correctly after a buy.
+    const cachedConfig = readApiCache("publicConfig", {
+      userId: "anon",
+      ttlMs: CACHE_TTL.PUBLIC_CONFIG_MS,
+    });
+    const cachedInit = token
+      ? readApiCache("userInit", { userId, ttlMs: CACHE_TTL.USER_INIT_MS })
+      : null;
+
+    if (cachedConfig) {
+      setPlans(composePlans(cachedConfig.packages, cachedInit?.purchased_packages));
+      setLoading(false);
+      // If we already have everything fresh, skip the network entirely.
+      if (!token || cachedInit) return;
+    }
+
+    const configRequest = cachedConfig
+      ? Promise.resolve({ data: { data: cachedConfig } })
+      : api.get("/v1/public/config");
+    const initRequest = !token
+      ? Promise.resolve(null)
+      : cachedInit
+        ? Promise.resolve({ data: { data: cachedInit } })
+        : api.get("/v1/user/init");
 
     Promise.allSettled([configRequest, initRequest])
       .then(([configRes, initRes]) => {
@@ -134,32 +199,22 @@ export default function Test() {
               configRes.reason?.message ||
               t("testCatalog.loadFailedDefault")
             : "";
-        const publicPackages =
-          configRes.status === "fulfilled"
-            ? configRes.value?.data?.data?.packages || []
-            : [];
-        const purchasedPackages =
-          initRes.status === "fulfilled"
-            ? initRes.value?.data?.data?.purchased_packages || []
-            : [];
-        const purchasedMap = new Map(
-          purchasedPackages.map((pkg) => [pkg.id, pkg])
-        );
+        const configData =
+          configRes.status === "fulfilled" ? configRes.value?.data?.data : null;
+        const initData =
+          initRes.status === "fulfilled" && initRes.value
+            ? initRes.value?.data?.data
+            : null;
+
+        if (configData && !cachedConfig) {
+          writeApiCache("publicConfig", configData, { userId: "anon" });
+        }
+        if (initData && token && !cachedInit) {
+          writeApiCache("userInit", initData, { userId });
+        }
 
         setLoadError(configError);
-
-        setPlans(
-          publicPackages.map((plan) => {
-            const ownedPackage = purchasedMap.get(plan.id);
-            return {
-              ...plan,
-              owned: Boolean(ownedPackage),
-              ownershipStatus: ownedPackage?.status || "available",
-              publicationStatus:
-                ownedPackage?.publicationStatus || "not_submitted",
-            };
-          })
-        );
+        setPlans(composePlans(configData?.packages || [], initData?.purchased_packages || []));
       })
       .catch((err) => {
         console.error("Failed to load packages", err);
@@ -200,6 +255,9 @@ export default function Test() {
       if (user) {
         updateUser({ ...user, selectedPackageId: plan.id });
       }
+      // Cached /v1/user/init no longer reflects the new purchase /
+      // selection — drop it so the next Dashboard / Test mount refetches.
+      invalidateApiCache("userInit");
       navigate("/pretest/sections", { replace: true });
     } catch (err) {
       console.error("Failed to open package", err);
@@ -212,11 +270,7 @@ export default function Test() {
   };
 
   if (loading) {
-    return (
-      <div className="flex min-h-[70vh] items-center justify-center bg-[#FAFAFA] px-4">
-        <p className="text-[#65758B]">{t("testCatalog.loading")}</p>
-      </div>
-    );
+    return <PackageCardsSkeleton />;
   }
 
   return (
@@ -308,6 +362,8 @@ export default function Test() {
                   <button
                     type="button"
                     onClick={() => handlePlanAction(plan)}
+                    onMouseEnter={prefetchPretestChunks}
+                    onFocus={prefetchPretestChunks}
                     className={`mt-8 w-full rounded-2xl px-5 py-3 text-sm font-semibold ${buttonClass}`}
                   >
                     {openingPlanId === plan.id ? t("testCatalog.actionOpening") : action.actionLabel}

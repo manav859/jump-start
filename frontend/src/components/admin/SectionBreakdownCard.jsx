@@ -37,6 +37,11 @@ export default function SectionBreakdownCard({
           </h3>
           <p className="mt-1 text-[13px] font-medium leading-5 text-[#4E5D72] sm:mt-1.5 sm:text-sm sm:leading-6">
             {getSectionScoreLine(section)}
+            {section.durationMinutes != null ? (
+              <span className="ml-2 text-[#188B8B]">
+                · Completed in {section.durationMinutes} min
+              </span>
+            ) : null}
           </p>
         </div>
 

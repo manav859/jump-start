@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -14,7 +14,15 @@ import {
   Sparkles,
 } from "lucide-react";
 import api from "../api/api";
+import { AuthContext } from "../context/AuthContext";
 import { getCareerDetailContent, matchCareerByTitle } from "../data/careerDetails";
+import { CareerdetailSkeleton } from "../components/Skeletons";
+import {
+  readApiCache,
+  writeApiCache,
+  cacheUserKey,
+  CACHE_TTL,
+} from "../utils/apiCache";
 
 // Outlook keys map to translation labels — `key` is the backend field
 // in detail.outlook; `labelKey` resolves to the localised heading.
@@ -34,6 +42,7 @@ const getStateCareer = (locationState) => {
 export default function Careerdetail() {
   const { t } = useTranslation();
   const location = useLocation();
+  const { user } = useContext(AuthContext);
   const [searchParams] = useSearchParams();
   const seededCareer = getStateCareer(location.state);
   const [loading, setLoading] = useState(true);
@@ -44,16 +53,33 @@ export default function Careerdetail() {
   });
 
   useEffect(() => {
+    const userId = cacheUserKey(user);
+    // Reuse the same `userResults` cache key as Result.jsx — if the
+    // student just came from /result the payload is already warm and
+    // this page renders without a network round-trip.
+    const cached = readApiCache("userResults", {
+      userId,
+      ttlMs: CACHE_TTL.USER_RESULTS_MS,
+    });
+    if (cached) {
+      setData(cached);
+      setLoading(false);
+      return;
+    }
+
     api
       .get("/v1/user/results")
       .then((res) => {
-        setData(res?.data?.data || {});
+        const payload = res?.data?.data || {};
+        writeApiCache("userResults", payload, { userId });
+        setData(payload);
       })
       .catch((err) => {
         setError(err?.response?.data?.msg || "Failed to load career details.");
       })
       .finally(() => setLoading(false));
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?._id || user?.id || user?.email]);
 
   const requestedCareerTitle = searchParams.get("career") || seededCareer?.title || "";
   const selectedCareer = useMemo(() => {
@@ -77,11 +103,7 @@ export default function Careerdetail() {
   const showBlockingError = Boolean(error) && !selectedCareer;
 
   if (loading && !selectedCareer) {
-    return (
-      <div className="flex min-h-[70vh] items-center justify-center bg-[#F7F8FA] px-4">
-        <p className="text-[#65758B]">{t("careerdetail.loading")}</p>
-      </div>
-    );
+    return <CareerdetailSkeleton />;
   }
 
   if (showBlockingError) {
@@ -315,38 +337,11 @@ export default function Careerdetail() {
               <p className="mt-4 text-sm leading-8 text-[#65758B]">{detail.overview}</p>
             </section>
 
-            <section className="surface-card rounded-[26px] p-6">
-              <div className="flex items-center gap-3">
-                <div className="rounded-2xl bg-[#FFF6DF] p-3 text-[#F59F0A]">
-                  <BriefcaseBusiness className="h-5 w-5" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-[#0F1729]">
-                    {t("careerdetail.salaryRangeIndia")}
-                  </h2>
-                  <p className="mt-1 text-sm text-[#8A94A6]">
-                    {t("careerdetail.salaryRangeBody")}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-5 grid gap-4 md:grid-cols-3">
-                {detail.salaryBands.map((band) => (
-                  <div
-                    key={`${band.label}-${band.range}`}
-                    className="rounded-[22px] border border-[#D5EDEF] bg-[#ECFCFC] px-5 py-5 text-center"
-                  >
-                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#7F8A9C]">
-                      {band.label}
-                    </p>
-                    <p className="mt-3 text-2xl font-bold text-[#0F1729]">{band.range}</p>
-                    <p className="mt-2 text-xs font-medium text-[#8A94A6]">
-                      {band.experience}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
+            {/* Salary Range section hidden — current placeholder data
+                wasn't sufficiently differentiated per career (client
+                feedback). detail.salaryBands is preserved in
+                careerDetails.js so this block can be re-enabled once
+                accurate India-wage data is available. */}
 
             <section className="surface-card rounded-[26px] p-6">
               <div className="flex items-center gap-3">

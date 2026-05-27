@@ -17,6 +17,14 @@ import {
 import { AuthContext } from "../context/AuthContext";
 import api from "../api/api";
 import { localisedPackageField } from "../utils/packageLabel";
+import { DashboardSkeleton } from "../components/Skeletons";
+import PrefetchLink from "../components/PrefetchLink";
+import {
+  readApiCache,
+  writeApiCache,
+  cacheUserKey,
+  CACHE_TTL,
+} from "../utils/apiCache";
 
 const DEMO_PACKAGE_ID = "demo-aptitude-50q";
 
@@ -146,29 +154,47 @@ export default function Dashboard() {
       return;
     }
 
+    const userId = cacheUserKey(user);
+    const applyData = (data) => {
+      setStats({
+        tests_completed: data.tests_completed ?? 0,
+        tests_in_progress: data.tests_in_progress ?? 0,
+        reports_ready: data.reports_ready ?? 0,
+        counselling_sessions: data.counselling_sessions ?? 0,
+        user: data.user || user || null,
+        selected_package_id: data.user?.selectedPackageId || user?.selectedPackageId || "",
+        purchased_packages: data.purchased_packages || [],
+        top_careers: data.top_careers || [],
+        result_status: data.result_status || "not_submitted",
+        demo_test: data.demo_test || null,
+        student_profile_complete: Boolean(
+          data.student_profile_complete ??
+            data.user?.studentProfile?.isComplete
+        ),
+        test_in_progress: data.test_in_progress || null,
+      });
+    };
+
+    // Serve the cached payload synchronously when fresh (<60s) so the
+    // dashboard renders without a network round-trip on repeat visits
+    // within the same session.
+    const cached = readApiCache("userInit", {
+      userId,
+      ttlMs: CACHE_TTL.USER_INIT_MS,
+    });
+    if (cached) {
+      applyData(cached);
+      setLoading(false);
+      return;
+    }
+
     api
       .get("/v1/user/init")
       .then((res) => {
         const data = res?.data?.data;
         if (!data) return;
-
-        setStats({
-          tests_completed: data.tests_completed ?? 0,
-          tests_in_progress: data.tests_in_progress ?? 0,
-          reports_ready: data.reports_ready ?? 0,
-          counselling_sessions: data.counselling_sessions ?? 0,
-          user: data.user || user || null,
-          selected_package_id: data.user?.selectedPackageId || user?.selectedPackageId || "",
-          purchased_packages: data.purchased_packages || [],
-          top_careers: data.top_careers || [],
-          result_status: data.result_status || "not_submitted",
-          demo_test: data.demo_test || null,
-          student_profile_complete: Boolean(
-            data.student_profile_complete ??
-              data.user?.studentProfile?.isComplete
-          ),
-          test_in_progress: data.test_in_progress || null,
-        });
+        writeApiCache("userInit", data, { userId });
+        applyData(data);
       })
       .catch((err) => {
         console.error("Failed to load dashboard", err);
@@ -353,11 +379,7 @@ export default function Dashboard() {
   };
 
   if (loading) {
-    return (
-      <div className="flex min-h-[70vh] items-center justify-center bg-[#FAFAFA] px-4">
-        <p className="text-[#65758B]">{t("dashboardExtra.loading")}</p>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   const displayName = stats.user?.name || user?.name || t("dashboardExtra.userFallback");
@@ -486,7 +508,26 @@ export default function Dashboard() {
           </section>
         ) : null}
 
-        {stats.demo_test ? (
+        {/*
+          Demo Test card visibility rule:
+          - Show when the user has no purchased packages yet — the demo
+            is the primary CTA for evaluating the platform.
+          - Hide entirely once any package is purchased (even if the
+            demo hasn't been attempted) — the user's main CTA from then
+            on is their actual purchased test, not the demo.
+          Excludes the auto-bundled "dummy-test" / free demo entries
+          themselves from the purchase check so they don't suppress
+          the demo card just because they're listed.
+        */}
+        {stats.demo_test &&
+        !(stats.purchased_packages || []).some(
+          (pkg) =>
+            pkg.id !== "demo-aptitude-50q" &&
+            pkg.id !== "dummy-test" &&
+            (pkg.purchaseState === "purchased" ||
+              pkg.amount > 0 ||
+              pkg.status === "purchased")
+        ) ? (
           <section className="mt-8 overflow-hidden rounded-[26px] border border-[#F5D9A6] bg-[linear-gradient(135deg,#FFF6E0_0%,#FFFFFF_55%,#F6FDFC_100%)] p-6 shadow-[0_18px_36px_rgba(245,159,10,0.12)] sm:p-7">
             <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
               <div className="max-w-2xl">
@@ -583,6 +624,22 @@ export default function Dashboard() {
                             <span>
                               {t("dashboardExtra.totalDurationCount", { count: pkg.totalDurationMinutes ?? 0 })}
                             </span>
+                            {/* Expiry line: rendered only when the
+                                backend surfaces `expiresAt` on the
+                                purchased package. The data model
+                                doesn't track expiry today, so this
+                                stays hidden until that field lands —
+                                avoiding fake / placeholder dates. */}
+                            {pkg.expiresAt ? (
+                              <span className="font-medium text-[#B86D00]">
+                                Expires{" "}
+                                {new Date(pkg.expiresAt).toLocaleDateString("en-IN", {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                })}
+                              </span>
+                            ) : null}
                           </div>
                           {publicationMeta ? (
                             <p
@@ -637,12 +694,13 @@ export default function Dashboard() {
               <p className="mt-4 text-sm text-red-600">{packageError}</p>
             ) : null}
 
-            <Link
+            <PrefetchLink
               to="/test"
+              prefetch={() => import("./Test")}
               className="mt-6 inline-flex w-full items-center justify-center rounded-2xl border-2 border-[#188B8B] px-5 py-3 text-sm font-semibold text-[#188B8B] hover:bg-[#F6FDFC]"
             >
               {t("dashboardExtra.browseMoreTests")}
-            </Link>
+            </PrefetchLink>
           </section>
 
           <div className="space-y-6">

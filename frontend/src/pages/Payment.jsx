@@ -16,6 +16,14 @@ const Payment = () => {
   const [method, setMethod] = useState("upi");
   const [agree, setAgree] = useState(false);
 
+  // Coupon checkout state. `appliedCoupon` is the validated payload from
+  // /v1/user/coupon/validate — null until the student successfully applies
+  // a code. Once set, the order summary recalculates pre-GST.
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState(null); // { code, discountAmount, finalPrice }
+  const [couponError, setCouponError] = useState("");
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
+
   const plan = location.state?.plan;
 
   useEffect(() => {
@@ -26,19 +34,73 @@ const Payment = () => {
 
   const formatPrice = (n) => `₹${Number(n).toLocaleString("en-IN")}`;
   const subtotal = plan?.amount ?? 0;
-  const gstAmount = Math.round(subtotal * GST_RATE);
-  const total = subtotal + gstAmount;
+  // Discount applies pre-GST so the GST is computed on the actual
+  // collected base. Backend's purchasePackage applies the discount to
+  // pkg.amount directly — the two agree on `finalAmount`.
+  const discount = appliedCoupon?.discountAmount || 0;
+  const subtotalAfterDiscount = Math.max(0, subtotal - discount);
+  const gstAmount = Math.round(subtotalAfterDiscount * GST_RATE);
+  const total = subtotalAfterDiscount + gstAmount;
+
+  const handleApplyCoupon = async () => {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) {
+      setCouponError("Enter a code to apply.");
+      return;
+    }
+    setCouponError("");
+    setValidatingCoupon(true);
+    try {
+      const res = await api.post("/v1/user/coupon/validate", {
+        code,
+        packageId: plan.id,
+      });
+      const data = res?.data?.data;
+      if (!data?.valid) {
+        setCouponError(res?.data?.msg || "Coupon is not valid for this package.");
+        setAppliedCoupon(null);
+        return;
+      }
+      setAppliedCoupon({
+        code: data.code,
+        discountAmount: Number(data.discountAmount || 0),
+        finalPrice: Number(data.finalPrice || 0),
+        discountType: data.discountType,
+        discountValue: data.discountValue,
+      });
+    } catch (err) {
+      setCouponError(
+        err?.response?.data?.msg || "Could not apply coupon — please try again."
+      );
+      setAppliedCoupon(null);
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponError("");
+    setCouponInput("");
+  };
 
   const handleCompletePayment = () => {
     if (!plan?.id) return;
+    // Pass the validated coupon code (if any) — backend re-validates and
+    // atomically increments usedCount, so we never trust the client's
+    // computed price.
+    const payload = { packageId: plan.id };
+    if (appliedCoupon?.code) payload.couponCode = appliedCoupon.code;
     api
-      .post("/v1/user/package/purchase", { packageId: plan.id })
+      .post("/v1/user/package/purchase", payload)
       .then(() =>
         navigate("/payment-confirmation", {
           replace: true,
           state: {
             plan,
             subtotal,
+            discount,
+            couponCode: appliedCoupon?.code || null,
             gstAmount,
             total,
             method,
@@ -227,6 +289,12 @@ const Payment = () => {
                 <span className="text-[#0F1729] font-medium">{plan.title}</span>
                 <span className="text-[#0F1729] text-base font-semibold">{formatPrice(subtotal)}</span>
               </div>
+              {appliedCoupon ? (
+                <div className="flex justify-between text-emerald-700">
+                  <span className="font-medium">Coupon ({appliedCoupon.code})</span>
+                  <span className="font-semibold">− {formatPrice(discount)}</span>
+                </div>
+              ) : null}
               <div className="flex justify-between text-slate-500">
                 <span className="text-[#65758B]">GST (18%)</span>
                 <span>{formatPrice(gstAmount)}</span>
@@ -251,15 +319,56 @@ const Payment = () => {
               <label className="block text-sm font-medium text-[#0F1729] mb-2">
                 Discount Code
               </label>
-              <div className="flex gap-2">
-                <input
-                  className="w-[100%] h-[42px] rounded-[14px] border border-[#E1E7EF] bg-[#FAFAFA] px-4 text-sm outline-none"
-                  placeholder="Enter code"
-                />
-                <button type="button" className="h-[42px] px-5 rounded-[14px] border-2 border-[#188B8B] text-[#188B8B] text-sm font-medium">
-                  Apply
-                </button>
-              </div>
+              {appliedCoupon ? (
+                <div className="flex items-center justify-between gap-2 rounded-[14px] border border-emerald-200 bg-emerald-50 px-4 py-2.5">
+                  <div className="text-sm">
+                    <span className="font-semibold text-emerald-800">
+                      {appliedCoupon.code}
+                    </span>
+                    <span className="ml-2 text-emerald-700">
+                      Coupon applied — {formatPrice(discount)} off
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    className="text-xs font-semibold text-emerald-800 underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex gap-2">
+                    <input
+                      value={couponInput}
+                      onChange={(event) => {
+                        setCouponInput(event.target.value);
+                        if (couponError) setCouponError("");
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          event.preventDefault();
+                          handleApplyCoupon();
+                        }
+                      }}
+                      className="w-[100%] h-[42px] rounded-[14px] border border-[#E1E7EF] bg-[#FAFAFA] px-4 text-sm uppercase outline-none"
+                      placeholder="Enter code"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={validatingCoupon || !couponInput.trim()}
+                      className="h-[42px] px-5 rounded-[14px] border-2 border-[#188B8B] text-[#188B8B] text-sm font-medium disabled:opacity-60"
+                    >
+                      {validatingCoupon ? "Applying..." : "Apply"}
+                    </button>
+                  </div>
+                  {couponError ? (
+                    <p className="mt-2 text-xs font-medium text-red-600">{couponError}</p>
+                  ) : null}
+                </>
+              )}
             </div>
 
             <div className="border-t border-[#E1E7EF] my-6" />
