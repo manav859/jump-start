@@ -555,6 +555,7 @@ assessmentConfigSchema.statics.getOrCreateDefault = async function getOrCreateDe
     cfg.packages = packageSeeds;
     changed = true;
   } else {
+    const seededIds = new Set(packageSeeds.map((seed) => seed.id));
     const nextPackages = packageSeeds.map((seed) => {
       const existing = (cfg.packages || []).find((pkg) => pkg.id === seed.id);
 
@@ -575,14 +576,26 @@ assessmentConfigSchema.statics.getOrCreateDefault = async function getOrCreateDe
       return existing;
     });
 
-    if (
-      (cfg.packages || []).length !== nextPackages.length ||
-      nextPackages.some((pkg, index) => cfg.packages[index]?.id !== pkg.id)
-    ) {
-      cfg.packages = nextPackages;
+    // Preserve packages that aren't part of the default seed set — e.g.
+    // the separately-seeded Gujarati edition (complete-aptitude-500q-
+    // gujarati). Without this, every getOrCreateDefault call would
+    // rebuild `packages` from the 3 default seeds and silently strip any
+    // extra package, so the Gujarati card would vanish from /test the
+    // moment any config read ran.
+    const extraPackages = (cfg.packages || []).filter(
+      (pkg) => !seededIds.has(pkg.id)
+    );
+    const merged = [...nextPackages, ...extraPackages];
+
+    const sameLength = (cfg.packages || []).length === merged.length;
+    const sameOrder =
+      sameLength &&
+      merged.every((pkg, index) => cfg.packages[index]?.id === pkg.id);
+    if (!sameLength || !sameOrder) {
+      cfg.packages = merged;
       changed = true;
     } else {
-      cfg.packages = nextPackages;
+      cfg.packages = merged;
     }
   }
 

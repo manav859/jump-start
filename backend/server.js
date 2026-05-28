@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import { ensureRequiredEnv } from "./config/env.js";
 import { ensureAdminAccount } from "./utils/adminBootstrap.js";
+import { seedGujaratiPackage } from "./scripts/seedGujaratiPackage.mjs";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import configRoutes from "./routes/configRoutes.js";
@@ -90,6 +91,24 @@ const startServer = async () => {
       adminStatus.created ? " (created)" : ""
     }`
   );
+
+  // Auto-seed the Gujarati test package on boot so it's guaranteed to
+  // exist in production without a manual seed step. Idempotent + insert-
+  // only — after the first boot it's just a cheap presence check. Wrapped
+  // so a seed hiccup logs but never blocks the API from coming up.
+  try {
+    const guStatus = await seedGujaratiPackage();
+    console.log(
+      guStatus.created
+        ? "Gujarati package seeded (inserted)"
+        : "Gujarati package already present"
+    );
+  } catch (seedError) {
+    console.error(
+      "Gujarati package auto-seed failed (continuing boot):",
+      seedError.message
+    );
+  }
 
   const server = app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
