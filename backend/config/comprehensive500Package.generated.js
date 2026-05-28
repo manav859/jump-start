@@ -1,6 +1,6 @@
 // AUTO-GENERATED — comprehensive 500-question package with Gujarati translations.
 // Regenerate via:  npm run translate:questions:gu  OR  node scripts/applyGujaratiTranslations.mjs
-// Last updated: 2026-05-22T12:56:10.444Z
+// Last updated: 2026-05-28T05:40:40.241Z
 
 const PACKAGE = {
   "id": "complete-aptitude-500q",
@@ -5522,7 +5522,7 @@ const PACKAGE = {
             "◐",
             "◑"
           ],
-          "correctOption": "B",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 1,
           "text_gu": "પૂર્ણ કરો: ○●○●○●?",
@@ -5648,7 +5648,7 @@ const PACKAGE = {
             "EG",
             "GE"
           ],
-          "correctOption": "B",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 1,
           "text_gu": "પેટર્ન પૂર્ણ કરો: AB, BA, CD, DC, ?",
@@ -7288,7 +7288,7 @@ const PACKAGE = {
             "150 tickets",
             "175 tickets"
           ],
-          "correctOption": "B",
+          "correctOption": "D",
           "reverseScored": false,
           "weight": 1,
           "text_gu": "તમે 200 લોકો માટે શાળાનો કાર્યક્રમ આયોજિત કરી રહ્યા છો. સ્થળની કિંમત $500 છે, દરેક વ્યક્તિ માટે ખોરાકની કિંમત $8 છે, અને સજાવટની કિંમત $200 છે. જો ટિકિટ $12 દરેક હોય, તો સંતુલન સાધવા માટે કેટલી ટિકિટ વેચવી પડે?",

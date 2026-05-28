@@ -23,7 +23,8 @@
     "patch:work-style-questions": "node scripts/patchWorkStyleQuestions.mjs",
     "patch:math-operators": "node scripts/patchMathOperators.mjs",
     "translate:questions:gu": "node scripts/translateQuestionsToGujarati.mjs",
-    "export:answer-key": "node scripts/exportSection4AnswerKey.mjs"
+    "export:answer-key": "node scripts/exportSection4AnswerKey.mjs",
+    "export:answer-keys": "node scripts/exportFullAnswerKey.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
