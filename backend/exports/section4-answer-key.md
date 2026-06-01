@@ -616,7 +616,7 @@ _Generated 2026-05-28 from `comprehensive500Package.generated.js` — 160 questi
    C. ◐
    D. ◑
 
-      Correct Answer: **B** — ●
+      Correct Answer: **A** — ○
 
 **Q358.** In 3, 6, 12, 24, what comes next?
 
@@ -670,7 +670,7 @@ _Generated 2026-05-28 from `comprehensive500Package.generated.js` — 160 questi
    C. EG
    D. GE
 
-      Correct Answer: **B** — FE
+      Correct Answer: **A** — EF
 
 **Q364.** Which is different: 7, 14, 21, 29, 35?
 
@@ -1390,7 +1390,7 @@ _Generated 2026-05-28 from `comprehensive500Package.generated.js` — 160 questi
    C. 150 tickets
    D. 175 tickets
 
-      Correct Answer: **B** — 142 tickets
+      Correct Answer: **D** — 175 tickets
 
 **Q444.** A clock shows the correct time at noon. If it runs fast by 2 minutes every hour, what time will it show when the actual time is 6:00PM?
 

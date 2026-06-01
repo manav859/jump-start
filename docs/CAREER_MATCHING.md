@@ -160,6 +160,59 @@ To add a career, append an object to `CAREER_MAPPINGS` with these fields:
 
 After adding a career, no other code changes are required — the matcher reads `CAREER_MAPPINGS` directly. To add a `careerDetails` entry for the detail page, update [frontend/src/data/careerDetails.js](../frontend/src/data/careerDetails.js) too.
 
+### Question-to-career-dimension mapping
+
+The four buckets the matcher consumes (`hollandProfile`, `multipleIntelligences`, `aptitudeScores`, `eqProfile`) are populated upstream by the section scorers from these question ranges:
+
+**Holland Codes (weight 0.35)** — from Section 3 Interest Assessment (Q201–Q236, 6 questions per code, Likert 1–5 averaged then converted to 0–100).
+
+| Code | Questions | Theme |
+|---|---|---|
+| R — Realistic | Q201–Q206 | Hands-on, build/fix/operate |
+| I — Investigative | Q207–Q212 | Research, analyse, "why does this work?" |
+| A — Artistic | Q213–Q218 | Express, create, design |
+| S — Social | Q219–Q224 | Help, support, develop people |
+| E — Enterprising | Q225–Q230 | Influence, persuade, lead |
+| C — Conventional | Q231–Q236 | Structure, precision, systems |
+
+**Multiple Intelligences (weight 0.25)** — from Section 2 (Q121–Q200, 10 questions per intelligence, Likert averaged and normalised to 0–100).
+
+| Intelligence | Questions |
+|---|---|
+| Logical-Mathematical | Q121–Q130 |
+| Linguistic-Verbal | Q131–Q140 |
+| Spatial-Visual | Q141–Q150 |
+| Musical-Rhythmic | Q151–Q160 |
+| Bodily-Kinesthetic | Q161–Q170 |
+| Interpersonal | Q171–Q180 |
+| Intrapersonal | Q181–Q190 |
+| Naturalistic | Q191–Q200 |
+
+**Aptitude Scores (weight 0.25)** — from Section 4 (Q291–Q450). Each subsection is graded objectively: `score = (correctCount / scorableCount) × 100`. Subsection ranges:
+
+| Aptitude | Questions |
+|---|---|
+| Verbal Reasoning | Q291–Q315 |
+| Numerical Ability | Q316–Q340 |
+| Abstract Reasoning | Q341–Q365 |
+| Spatial Relations | Q366–Q390 |
+| Mechanical Reasoning | Q391–Q410 |
+| Clerical Speed & Accuracy | Q411–Q430 |
+| Critical Thinking | Q431–Q440 |
+| Problem Solving | Q441–Q450 |
+
+**EQ Competencies (weight 0.15)** — from Section 5 Emotional Intelligence Assessment (Q451–Q500, 10 questions per competency, Likert averaged and normalised to 0–100).
+
+| Competency | Questions |
+|---|---|
+| Self-Awareness | Q451–Q460 |
+| Self-Regulation | Q461–Q470 |
+| Motivation | Q471–Q480 |
+| Empathy | Q481–Q490 |
+| Social Skills | Q491–Q500 |
+
+Section 1 (Personality) does **not** feed the career matcher directly — its OCEAN + EQ-derived MBTI type is presented in the report as self-understanding context. The matcher works off the four objective + behavioural buckets above. See [PERSONALITY_ASSESSMENT.md — Personality × career matching](PERSONALITY_ASSESSMENT.md#personality--career-matching--current-state) for the design rationale.
+
 ### `matchCareers(profile, topN = 10)` — input/output contract
 
 [backend/utils/scoring/careerMatcher.js](../backend/utils/scoring/careerMatcher.js)
@@ -245,6 +298,65 @@ export const CAREER_MATCH_WEIGHTS = Object.freeze({
 ```
 
 Sum = 1.0. If you change a weight, change `careerScore`'s expected range too (currently the implementation clamps to 0-100 after combining).
+
+### Worked example — Software Engineer
+
+Given a student profile:
+
+```
+hollandProfile:        I = 85,  R = 72,  A = 38,  S = 45,  E = 55,  C = 60
+multipleIntelligences: Logical-Math = 90,  Spatial-Visual = 75,  ...
+aptitudeScores:        Numerical = 88,  Abstract = 80,  Problem Solving = 78
+eqProfile:             Self-Regulation = 70,  Motivation = 75,  ...
+```
+
+And the career fingerprint for **Software Engineer**:
+
+```
+hollandCodes:      ["I", "R"]                          // I = primary, R = secondary
+intelligenceTypes: ["Logical-Math", "Spatial-Visual"]
+aptitudeStrengths: ["Numerical", "Abstract"]
+eqCompetencies:    ["Self-Regulation", "Motivation"]
+```
+
+**Holland match** — primary at 1.0×, secondary at 0.6×, averaged:
+
+```
+weighted = [ 85 × 1.0,  72 × 0.6 ]  =  [ 85, 43.2 ]
+hollandMatch = (85 + 43.2) / 2  =  64.1
+```
+
+**Intelligence / Aptitude / EQ matches** — plain averages over the names the career lists:
+
+```
+intelligenceMatch = (90 + 75) / 2   =  82.5
+aptitudeMatch     = (88 + 80) / 2   =  84.0
+eqMatch           = (70 + 75) / 2   =  72.5
+```
+
+**Final compatibility:**
+
+```
+careerScore = 64.1 × 0.35 + 82.5 × 0.25 + 84.0 × 0.25 + 72.5 × 0.15
+            = 22.435 + 20.625 + 21.000 + 10.875
+            = 74.9 %      // clamped 0–100, rounded to one decimal
+```
+
+The displayed match badge shows **75% Match** (`matchPercent = Math.round(score)`). The student's expandable "Why this matched you" lines surface the source signals: dominant interest code I, strong Logical-Math + Spatial intelligences, strong Numerical + Abstract aptitudes, high Self-Regulation + Motivation.
+
+### Display rules
+
+The matcher's full top-N is clamped at output time by these rules, applied in [career500q.js](../backend/utils/scoring/packageScoring/career500q.js) and [career500qDemo.js](../backend/utils/scoring/packageScoring/career500qDemo.js):
+
+| Rule | Value | Notes |
+|---|---|---|
+| **Minimum match threshold** | 60 | Careers below 60% drop off the recommendations list — except in the floor case below. |
+| **Minimum careers shown** | 3 | Even if every career scores < 60, the top 3 by score are always included so a low-signal profile still gets an actionable result. |
+| **Maximum careers shown — full test** | 15 | `matchCareers(profile, 15)` cap. |
+| **Maximum careers shown — demo** | 10 | Demo wrapper passes `topN = 6` to the matcher but displays up to 10 on the result page. |
+| **Sort order** | Highest match % first | Ties broken alphabetically by `title`. |
+
+Threshold and floor are captured in `MATCH_THRESHOLD` and `MIN_RESULTS` in [careerMatcher.js](../backend/utils/scoring/careerMatcher.js); the caps are passed through the `topN` argument from each scorer.
 
 ### Holland-match: primary vs secondary
 

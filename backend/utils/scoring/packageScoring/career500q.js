@@ -1242,6 +1242,30 @@ const buildSectionResult = (sectionConfig, questionMap) => {
   };
 };
 
+// MBTI-style type derivation. Previously every dimension was thresholded
+// at a fixed 50% midpoint, with the F formula (agreeableness + empathy +
+// social_skills) and the J formula (conscientiousness + self_regulation)
+// both pulling from positively-skewed self-report signals — so most
+// students landed E, N, F, J, A and the same ENFJ-A archetype came out
+// for every 4th student. Audit confirmed: 4 of 4 stored full-test
+// reports clustered there.
+//
+// Fix: for each dimension we now score BOTH POLES from genuinely
+// opposing signals and pick whichever pole is relatively stronger for
+// the individual student. A student who scores 65% on both F and T
+// inputs will still get F (very slightly higher), but one whose
+// conscientiousness/self-regulation genuinely outweighs their
+// agreeableness/empathy will now get T — instead of every student
+// getting F because the blended formula was always above the fixed 50.
+//
+// Dimensions:
+//   E vs I — extraversion percent vs its complement
+//   N vs S — openness percent vs its complement
+//   F vs T — agreeableness + empathy   vs   conscientiousness + self-reg
+//   J vs P — conscientiousness + self-reg   vs   openness + motivation
+//   A vs T — emotional-stability blend, threshold raised from 50% to 60%
+//            (neuroticism is genuinely lower-skewed in self-report so
+//             the midpoint is too easy to clear)
 const buildPersonalityType = ({ bigFiveSection, emotionalSection }) => {
   const factorMap = Object.fromEntries(
     (bigFiveSection?.factorResults || []).map((item) => [item.key, item])
@@ -1259,60 +1283,98 @@ const buildPersonalityType = ({ bigFiveSection, emotionalSection }) => {
   const neuroticismAverage = factorMap.neuroticism?.average || 3;
   const emotionalStability = likertToPercent(6 - neuroticismAverage);
 
-  const feeling = clamp(
-    Math.round(
-      agreeableness * 0.55 +
-        Number(eqMap.empathy?.percentage || 50) * 0.3 +
-        Number(eqMap.social_skills?.percentage || 50) * 0.15
-    ),
+  const empathyPct = Number(eqMap.empathy?.percentage ?? 50);
+  const socialPct = Number(eqMap.social_skills?.percentage ?? 50);
+  const selfRegPct = Number(eqMap.self_regulation?.percentage ?? 50);
+  const motivationPct = Number(eqMap.motivation?.percentage ?? 50);
+
+  // E vs I — direct opposition. Equivalent to the old `>= 50` rule but
+  // expressed as a head-to-head so the framing matches the other dims.
+  const eScore = extraversion;
+  const iScore = 100 - extraversion;
+  const eiDim = eScore >= iScore ? "E" : "I";
+
+  // N vs S — same head-to-head shape on openness.
+  const nScore = openness;
+  const sScore = 100 - openness;
+  const snDim = nScore >= sScore ? "N" : "S";
+
+  // F vs T — Feeling pulled from agreeableness + empathy; Thinking
+  // pulled from conscientiousness + self-regulation. Both poles are
+  // now scored independently so the threshold isn't "do F signals
+  // clear 50" but "do F signals beat T signals for this student".
+  const fScore = clamp(
+    Math.round(agreeableness * 0.6 + empathyPct * 0.4),
     0,
     100
   );
-  const judging = clamp(
-    Math.round(
-      conscientiousness * 0.75 + Number(eqMap.self_regulation?.percentage || 50) * 0.25
-    ),
+  const tScore = clamp(
+    Math.round(conscientiousness * 0.6 + selfRegPct * 0.4),
     0,
     100
   );
+  const tfDim = fScore >= tScore ? "F" : "T";
+
+  // J vs P — Judging from conscientiousness + self-regulation;
+  // Perceiving from openness + motivation. Again head-to-head, not
+  // against a population midpoint.
+  const jScore = clamp(
+    Math.round(conscientiousness * 0.7 + selfRegPct * 0.3),
+    0,
+    100
+  );
+  const pScore = clamp(
+    Math.round(openness * 0.7 + motivationPct * 0.3),
+    0,
+    100
+  );
+  const jpDim = jScore >= pScore ? "J" : "P";
+
+  // A vs T (assertive vs turbulent). Threshold raised from 50% to 60%
+  // because neuroticism is more positively skewed in self-report (most
+  // students report low/moderate anxiety), so emotional-stability
+  // routinely clears 50 even for genuinely turbulent personalities.
   const assertive = clamp(
     Math.round(
-      emotionalStability * 0.6 +
-        Number(eqMap.self_regulation?.percentage || 50) * 0.25 +
-        Number(eqMap.motivation?.percentage || 50) * 0.15
+      emotionalStability * 0.6 + selfRegPct * 0.25 + motivationPct * 0.15
     ),
     0,
     100
   );
+  const atDim = assertive >= 60 ? "A" : "T";
 
-  const baseCode = `${extraversion >= 50 ? "E" : "I"}${openness >= 50 ? "N" : "S"}${
-    feeling >= 50 ? "F" : "T"
-  }${judging >= 50 ? "J" : "P"}`;
+  const baseCode = `${eiDim}${snDim}${tfDim}${jpDim}`;
   const archetype = PERSONALITY_ARCHETYPES[baseCode] || {
     title: "Career Explorer",
     description: "Balanced across structure, curiosity, and interpersonal awareness.",
   };
 
+  // For the trait strength bar in the report we want the WINNING pole's
+  // score, not the raw OCEAN percent — so an "I" student sees a high
+  // Introversion bar instead of a low Extraversion bar.
+  const pickStrength = (winnerScore, loserScore) =>
+    Math.max(0, Math.min(100, Math.round(winnerScore)));
+
   return {
-    code: `${baseCode}-${assertive >= 50 ? "A" : "T"}`,
+    code: `${baseCode}-${atDim}`,
     title: archetype.title,
     description: archetype.description,
     traits: [
       {
-        name: extraversion >= 50 ? "Extraversion" : "Introversion",
-        value: extraversion >= 50 ? extraversion : 100 - extraversion,
+        name: eiDim === "E" ? "Extraversion" : "Introversion",
+        value: pickStrength(eiDim === "E" ? eScore : iScore),
       },
       {
-        name: openness >= 50 ? "Intuition" : "Sensing",
-        value: openness >= 50 ? openness : 100 - openness,
+        name: snDim === "N" ? "Intuition" : "Sensing",
+        value: pickStrength(snDim === "N" ? nScore : sScore),
       },
       {
-        name: feeling >= 50 ? "Feeling" : "Thinking",
-        value: feeling >= 50 ? feeling : 100 - feeling,
+        name: tfDim === "F" ? "Feeling" : "Thinking",
+        value: pickStrength(tfDim === "F" ? fScore : tScore),
       },
       {
-        name: judging >= 50 ? "Judging" : "Perceiving",
-        value: judging >= 50 ? judging : 100 - judging,
+        name: jpDim === "J" ? "Judging" : "Perceiving",
+        value: pickStrength(jpDim === "J" ? jScore : pScore),
       },
     ],
     metrics: {
@@ -1321,8 +1383,16 @@ const buildPersonalityType = ({ bigFiveSection, emotionalSection }) => {
       agreeableness,
       conscientiousness,
       emotionalStability,
-      feeling,
-      judging,
+      // Both poles preserved so admin / debug tooling can see the gap
+      // that drove each dimension, not just the winning side.
+      eScore,
+      iScore,
+      nScore,
+      sScore,
+      fScore,
+      tScore,
+      jScore,
+      pScore,
       assertive,
     },
   };

@@ -151,6 +151,22 @@ Reverse-question IDs are defined per factor in [career500q.config.js](../backend
 
 Per-subsection interpretation strings ("Excellent verbal reasoning. Law, journalism, literature.") are pulled from the config bands by label and overlaid on the percentage-derived band.
 
+### Personality type derivation (MBTI)
+
+`buildPersonalityType({ bigFiveSection, emotionalSection })` in [career500q.js](../backend/utils/scoring/packageScoring/career500q.js).
+
+The MBTI type is **derived**, not measured by its own questionnaire — it falls out of OCEAN (Section 1) + EQ (Section 5). Each dimension scores **both poles from genuinely opposing signals** and picks whichever pole is relatively stronger for the individual student. The pre-go-live audit caught and replaced an old fixed-50% threshold that pushed 5 of 8 stored full-test reports onto the same ENFJ-A type — the new relative comparison spreads outputs across the 16 types based on which signals genuinely dominate.
+
+| Dim | Winner logic |
+|---|---|
+| E vs I | `extraversion%` vs `100 − extraversion%` — higher wins |
+| N vs S | `openness%` vs `100 − openness%` — higher wins |
+| F vs T | F = `agreeableness × 0.6 + empathy × 0.4`; T = `conscientiousness × 0.6 + self_regulation × 0.4` — higher wins |
+| J vs P | J = `conscientiousness × 0.7 + self_regulation × 0.3`; P = `openness × 0.7 + motivation × 0.3` — higher wins |
+| A vs T (suffix) | `assertive = emotionalStability × 0.6 + self_regulation × 0.25 + motivation × 0.15` — ≥ 60 → A, < 60 → T (threshold raised from 50 because neuroticism skews low in self-report) |
+
+Where `emotionalStability = likertToPercent(6 − neuroticismAverage)`. The returned `personalityType.metrics` carries both poles per dimension (`eScore/iScore/nScore/sScore/fScore/tScore/jScore/pScore`) so admin tooling can surface "close calls" (e.g. J=51, P=49). See [PERSONALITY_ASSESSMENT.md — MBTI Derivation](PERSONALITY_ASSESSMENT.md#mbti-derivation--relative-comparison-current-formula) for the full rationale and the counsellor borderline-score guidance.
+
 ### Career matching formula
 
 Implemented in [careerMatcher.js](../backend/utils/scoring/careerMatcher.js). One function: `matchCareers(profile, topN = 10)`.
@@ -165,6 +181,15 @@ Implemented in [careerMatcher.js](../backend/utils/scoring/careerMatcher.js). On
   eqProfile:             { "Empathy", "Motivation", ... }        // 5 keys, 0-100 each
 }
 ```
+
+**Question ranges feeding each bucket** (full mapping in [CAREER_MATCHING.md — Question-to-career-dimension mapping](CAREER_MATCHING.md#question-to-career-dimension-mapping)):
+
+| Bucket | Section | Question range | Per-key range |
+|---|---|---|---|
+| `hollandProfile` | Section 3 | Q201–Q236 | R: Q201–206 · I: Q207–212 · A: Q213–218 · S: Q219–224 · E: Q225–230 · C: Q231–236 |
+| `multipleIntelligences` | Section 2 | Q121–Q200 | 10 questions per intelligence, in order |
+| `aptitudeScores` | Section 4 | Q291–Q450 | 8 subsections — Verbal Q291–315, Numerical Q316–340, Abstract Q341–365, Spatial Q366–390, Mechanical Q391–410, Clerical Q411–430, Critical Thinking Q431–440, Problem Solving Q441–450 |
+| `eqProfile` | Section 5 | Q451–Q500 | Self-Awareness Q451–460 · Self-Regulation Q461–470 · Motivation Q471–480 · Empathy Q481–490 · Social Skills Q491–500 |
 
 **Per-career score:**
 
@@ -223,6 +248,33 @@ return clamp(average(values));
 ```
 
 **matchReasons generation** — for each dimension, the matcher checks which of the career's required signals scored ≥ 60% on the student's profile. If at least one signal cleared the bar, the reason reads as "Strong/High … in X and Y". Otherwise it reads as "this career leans on X, Y — partial match on your current profile."
+
+**Worked example — Software Engineer.** Career fingerprint: `hollandCodes ["I","R"]`, `intelligenceTypes ["Logical-Math","Spatial-Visual"]`, `aptitudeStrengths ["Numerical","Abstract"]`, `eqCompetencies ["Self-Regulation","Motivation"]`. Student profile: `I=85, R=72`, `Logical-Math=90, Spatial=75`, `Numerical=88, Abstract=80`, `Self-Reg=70, Motivation=75`.
+
+```
+hollandMatch       = (85 × 1.0 + 72 × 0.6) / 2  =  64.1
+intelligenceMatch  = (90 + 75) / 2              =  82.5
+aptitudeMatch      = (88 + 80) / 2              =  84.0
+eqMatch            = (70 + 75) / 2              =  72.5
+
+careerScore = 64.1 × 0.35 + 82.5 × 0.25 + 84.0 × 0.25 + 72.5 × 0.15
+            = 22.435 + 20.625 + 21.000 + 10.875
+            = 74.9 %
+```
+
+The student sees **75% Match** on the Software Engineer card (`matchPercent = Math.round(score)`).
+
+**Display rules** — applied to the top-N before rendering:
+
+| Rule | Value |
+|---|---|
+| Minimum match threshold | 60% (careers below drop off) |
+| Minimum careers shown | 3 (top by score, even if below 60% — so a low-signal profile still gets results) |
+| Maximum careers shown — full test | 15 |
+| Maximum careers shown — demo | 10 |
+| Sort | Highest match % first, ties alphabetical |
+
+Threshold + floor live in `MATCH_THRESHOLD` and `MIN_RESULTS` in [careerMatcher.js](../backend/utils/scoring/careerMatcher.js); the caps come from each scorer's `matchCareers(profile, topN)` call.
 
 ### Manual review trigger
 

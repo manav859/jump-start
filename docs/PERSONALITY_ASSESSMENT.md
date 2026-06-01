@@ -155,32 +155,27 @@ Band thresholds applied to the 1-5 average (mathematically equivalent to applyin
 | Moderate | 3.0-3.99 | 50-74% |
 | Low | 1.0-2.99 | 0-49% |
 
-### MBTI Derivation
+### MBTI Derivation — relative comparison (current formula)
 
 `buildPersonalityType({ bigFiveSection, emotionalSection })` in [career500q.js](../backend/utils/scoring/packageScoring/career500q.js).
 
+Each dimension now scores **both poles from genuinely opposing signals** and picks whichever pole is relatively stronger for the student — instead of asking "do the F-blend signals clear a fixed 50% midpoint?" The pre-go-live audit confirmed the old fixed-50 threshold pushed almost every student to ENFJ-A (5 of 8 stored full-test reports clustered there). The new formula spreads outputs across the 16 types based on which signals genuinely dominate for each individual.
+
 | Dimension | Source signals | Winner logic |
 |---|---|---|
-| **E / I** | OCEAN extraversion percentage | `percentage >= 50` → "E", else "I" |
-| **N / S** | OCEAN openness percentage | `percentage >= 50` → "N", else "S" |
-| **F / T** | Weighted blend: agreeableness×0.55 + EQ empathy×0.30 + EQ social_skills×0.15 | `feeling >= 50` → "F", else "T" |
-| **J / P** | Weighted blend: conscientiousness×0.75 + EQ self_regulation×0.25 | `judging >= 50` → "J", else "P" |
+| **E vs I** | OCEAN extraversion % | `eScore = extraversion%`, `iScore = 100 − extraversion%`. Higher wins. |
+| **N vs S** | OCEAN openness % | `nScore = openness%`, `sScore = 100 − openness%`. Higher wins. |
+| **F vs T** | Two opposing blends | `fScore = agreeableness × 0.6 + EQ empathy × 0.4`. `tScore = conscientiousness × 0.6 + EQ self_regulation × 0.4`. Higher wins. |
+| **J vs P** | Two opposing blends | `jScore = conscientiousness × 0.7 + EQ self_regulation × 0.3`. `pScore = openness × 0.7 + EQ motivation × 0.3`. Higher wins. |
+| **A vs T (suffix)** | Emotional-stability blend | `assertive = emotionalStability × 0.6 + EQ self_regulation × 0.25 + EQ motivation × 0.15`. **≥ 60 → A, < 60 → T.** Threshold raised from 50 to 60 because neuroticism skews low in self-report — the old midpoint was too easy to clear and most students landed Assertive by default. |
 
-**Why F/T and J/P are blends, not single signals.** Big Five Agreeableness alone is a noisy proxy for the F/T dimension — empathy and social skills (from the EQ section) sharpen it considerably. Same for Conscientiousness as a J/P proxy; self-regulation reinforces it. These weights are heuristics validated against the source counselling reference; they're not arbitrary but they're also not psychometric truth — they're explicit, traceable, and tunable.
+Where `emotionalStability = likertToPercent(6 − oceanNeuroticismAverage)` — the Neuroticism inversion converts "high neuroticism" into "low emotional stability" before the weighted blend.
 
-**Tiebreaker rule.** At exactly 50% (no preference signal), the comparison `percentage >= 50` evaluates to `true` and the **first letter** wins (E / N / F / J). To override, change the comparison to `>` so ties default to I/S/T/P. Currently the system defaults to the active first letter.
+**Why F/T and J/P use opposing blends.** Big Five Agreeableness alone is a noisy proxy for F/T — empathy reinforces it. The opposing T-pole pulls from conscientiousness + self-regulation (the analytical / structured signals). Same shape for J/P: J pulls from structure-loving traits, P from openness + motivation (exploration). A student whose conscientiousness-and-self-reg genuinely outweighs their agreeableness-and-empathy now gets T — under the old single-blend formula they'd have gotten F regardless because the blend was almost always > 50.
 
-**Assertiveness suffix (-A / -T).** Computed from a second weighted blend:
+**Tiebreaker.** On exact ties (e.g. `fScore === tScore`), the dimension defaults to the first letter of the pair (E / N / F / J / A) via `>=`. Rare in practice — most scores resolve to integer percentages and one side usually edges ahead.
 
-```
-emotionalStability = likertToPercent(6 - oceanNeuroticismAverage)
-assertive          = emotionalStability × 0.6
-                   + EQ self_regulation × 0.25
-                   + EQ motivation       × 0.15
-suffix             = assertive >= 50 ? "A" : "T"
-```
-
-So **low Neuroticism + high Self-Regulation + high Motivation → Assertive (-A)**. **High Neuroticism + low Self-Regulation + low Motivation → Turbulent (-T)**. The Neuroticism inversion (`6 - avg`) is the key step — it converts "high neuroticism" into "low emotional stability" before the weighted blend.
+**Counsellor note — borderline scores.** Two students can share the same MBTI type with very different underlying scores. A student with E=88 and a student with E=54 both get **E** because both score higher on Extraversion than Introversion signals. **Students within 10 points of any dimension midpoint should be treated as borderline on that dimension** — the four-letter type captures the lean but not its strength. The `metrics` field on the returned personalityType carries both poles per dimension (`eScore / iScore / nScore / sScore / fScore / tScore / jScore / pScore`) for exactly this kind of inspection — admin tooling can surface "close call on J/P (J=51, P=49)" alongside the headline type.
 
 ### 16-archetype table
 
@@ -206,6 +201,28 @@ Defined in `PERSONALITY_ARCHETYPES` in [backend/utils/resultProfiling.js](../bac
 | ESFP | Connector | Engaging, energetic, people-tuned |
 
 All 16 keys are present. The smoke probe asserts this on every run.
+
+### Work Style — categorical tally, NOT a Likert average
+
+Q73–Q96 (24 items, 3 options each) are scored by **counting how often each letter was chosen** across the section, not by averaging numeric responses. The three options carry these meanings:
+
+| Option | Profile key | Dominant style label |
+|---|---|---|
+| **A** | `structured_independent` | Structured / Independent |
+| **B** | `balanced_collaborative` | Balanced / Collaborative |
+| **C** | `dynamic_autonomous` | Dynamic / Autonomous |
+
+Scoring:
+
+```
+counts        = { A: nA, B: nB, C: nC }       // tally across answered Q73–Q96
+dominantStyle = key with the highest count
+consistency   = (counts[dominantStyle] / totalAnswered) × 100
+```
+
+Example: across 24 answers, **A × 12, B × 7, C × 5** → dominant = "Structured / Independent", consistency = 50%.
+
+The 1–5 Likert averaging formula **does not apply** to this subsection — averaging letter labels as numbers is meaningless. The categorical path is implemented in `scoreCategoricalProfile` in [career500q.js](../backend/utils/scoring/packageScoring/career500q.js): line ~528 reads each answer as an A/B/C letter, increments the matching profile counter, then computes `dominantCount / answeredCount` for `consistency`.
 
 ### Work Style — known data quirk + Likert fallback
 
