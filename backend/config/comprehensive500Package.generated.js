@@ -1,7 +1,6 @@
 // AUTO-GENERATED — comprehensive 500-question package with Gujarati translations.
 // Regenerate via:  npm run translate:questions:gu  OR  node scripts/applyGujaratiTranslations.mjs
-// Last updated: 2026-05-28T05:40:40.241Z
-
+// Last updated: 2026-06-02T09:15:49.729Z
 const PACKAGE = {
   "id": "complete-aptitude-500q",
   "title": "Complete Aptitude Test (500Q)",
@@ -6648,383 +6647,323 @@ const PACKAGE = {
         },
         {
           "questionId": "391",
-          "text": "If the weight of each pulley is equal to the load, what is the ratio between the pulling force F and the load L? (F / L = ?)",
+          "text": "If gear A turns clockwise, which direction will gear B turn?",
           "type": "single",
           "options": [
-            "1/4",
-            "1/8",
-            "1"
+            "Clockwise",
+            "Counterclockwise",
+            "Won't turn",
+            "Both directions"
           ],
-          "correctOption": "C",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "જો દરેક ગરગડીનું વજન ભારના સમાન હોય, તો ખેંચાણ બળ F અને ભાર L વચ્ચેનો ગુણોત્તર શું છે? (F / L = ?)",
-          "options_gu": [
-            "1/4",
-            "1/8",
-            "1"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "392",
-          "text": "How many revolutions does the wheel M make when K completes 4 revolutions?",
+          "text": "Which lever arrangement requires the least force to lift the weight?",
           "type": "single",
           "options": [
-            "1",
-            "2",
-            "4"
+            "Lever A",
+            "Lever B",
+            "Lever C",
+            "All equal"
           ],
-          "correctOption": "A",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "જ્યારે K 4 પરિભ્રમણ પૂર્ણ કરે છે, ત્યારે પૈડું M કેટલા પરિભ્રમણ કરે છે?",
-          "options_gu": [
-            "1",
-            "2",
-            "4"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "393",
-          "text": "Which statement is WRONG about springs?",
+          "text": "If you push down on this end, what happens to the other end?",
           "type": "single",
           "options": [
-            "Springs are a kind of simple machines",
-            "Springs can be used as energy stores",
-            "Springs constant depends on the properties of material they are made of"
+            "Goes up",
+            "Goes down",
+            "Stays same",
+            "Moves sideways"
           ],
           "correctOption": "A",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "ઝરણાં (springs) વિશે કયું વિધાન ખોટું છે?",
-          "options_gu": [
-            "Springs are a kind of simple machines",
-            "Springs can be used as energy stores",
-            "Springs constant depends on the properties of material they are made of"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "394",
-          "text": "How many inches must one pull the rope down in order to lift the load in the figure by 28 inches?",
+          "text": "Which pulley system gives the greatest mechanical advantage?",
           "type": "single",
           "options": [
-            "14 in",
-            "28 in",
-            "56 in"
+            "System A",
+            "System B",
+            "System C",
+            "All equal"
           ],
           "correctOption": "C",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "આકૃતિમાં ભારને 28 ઈંચ ઉપાડવા માટે દોરડું કેટલા ઈંચ નીચે ખેંચવું પડે?",
-          "options_gu": [
-            "14 in",
-            "28 in",
-            "56 in"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "395",
-          "text": "Electrons in a circuit flow from a place where there are __?__ electrons to a place where there are __?__ electrons.",
+          "text": "What will happen if you turn the handle clockwise?",
           "type": "single",
           "options": [
-            "Less, More",
-            "Many, No",
-            "More, Less"
+            "Weight goes up",
+            "Weight goes down",
+            "No movement",
+            "Handle breaks"
           ],
-          "correctOption": "C",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "પરિપથમાં ઈલેક્ટ્રોન જ્યાં __?__ ઈલેક્ટ્રોન હોય ત્યાંથી __?__ ઈલેક્ટ્રોન હોય ત્યાં વહે છે.",
-          "options_gu": [
-            "Less, More",
-            "Many, No",
-            "More, Less"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "396",
-          "text": "We use __?__ to measure a specific gas pressure.",
+          "text": "Which inclined plane requires less force to move the box?",
           "type": "single",
           "options": [
-            "Barometer",
-            "Thermometer",
-            "Manometer"
+            "Steep ramp",
+            "Gentle ramp",
+            "Same force",
+            "Can't determine"
           ],
-          "correctOption": "C",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "ચોક્કસ ગેસનું દબાણ માપવા માટે આપણે __?__ નો ઉપયોગ કરીએ છીએ.",
-          "options_gu": [
-            "Barometer",
-            "Thermometer",
-            "Manometer"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "397",
-          "text": "Which term is NOT related to gears?",
+          "text": "If water flows into this container, which section fills first?",
           "type": "single",
           "options": [
-            "Cogwheel",
-            "Pinion",
-            "Rack"
+            "Section A",
+            "Section B",
+            "Section C",
+            "All at once"
           ],
-          "correctOption": "C",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "કઈ વસ્તુ ગિયર્સ સાથે સંબંધિત નથી?",
-          "options_gu": [
-            "Cogwheel",
-            "Pinion",
-            "Rack"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "398",
-          "text": "A screw is a combination of:",
+          "text": "Which wheel will turn faster?",
           "type": "single",
           "options": [
-            "Nail and wedge",
-            "Inclined plane and wedge",
-            "Inclined plane and cylinder"
+            "Large wheel",
+            "Small wheel",
+            "Same speed",
+            "Neither turns"
           ],
-          "correctOption": "C",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "સ્ક્રૂ આ બેનું સંયોજન છે:",
-          "options_gu": [
-            "Nail and wedge",
-            "Inclined plane and wedge",
-            "Inclined plane and cylinder"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "399",
-          "text": "Which of the following materials can become a magnet?",
+          "text": "What's the mechanical advantage of this lever?",
           "type": "single",
           "options": [
-            "Aluminum",
-            "Copper",
-            "Zinc"
+            "1:1",
+            "2:1",
+            "3:1",
+            "4:1"
           ],
           "correctOption": "C",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "નીચેનામાંથી કઈ સામગ્રી ચુંબક બની શકે છે?",
-          "options_gu": [
-            "Aluminum",
-            "Copper",
-            "Zinc"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "400",
-          "text": "If the big wheel (A) turns 3 times at clockwise direction, how many times and in which direction does the small one (B) turn?",
+          "text": "If you turn this screw clockwise, what happens?",
           "type": "single",
           "options": [
-            "3 times counter-clockwise",
-            "6 times counter-clockwise",
-            "6 times clockwise"
+            "Goes in",
+            "Comes out",
+            "No change",
+            "Breaks"
           ],
-          "correctOption": "C",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "જો મોટું પૈડું (A) ઘડિયાળની દિશામાં 3 વખત ફરે, તો નાનું પૈડું (B) કેટલી વાર અને કઈ દિશામાં ફરે છે?",
-          "options_gu": [
-            "3 times counter-clockwise",
-            "6 times counter-clockwise",
-            "6 times clockwise"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "401",
-          "text": "What happens to the current passing through the main branch in the circuit shown in the figure if one the bulbs smashes?",
+          "text": "Which spring will compress the most under the same weight?",
           "type": "single",
           "options": [
-            "It becomes zero",
-            "It doubles",
-            "It decreases by a factor of 1.5"
+            "Spring A",
+            "Spring B",
+            "Spring C",
+            "All equal"
           ],
-          "correctOption": "C",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "આકૃતિમાં દર્શાવેલા પરિપથમાં મુખ્ય શાખામાંથી પસાર થતા પ્રવાહનું શું થાય જો એક બલ્બ ફૂટી જાય?",
-          "options_gu": [
-            "It becomes zero",
-            "It doubles",
-            "It decreases by a factor of 1.5"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "402",
-          "text": "If gear A rotates in the clockwise direction, what will the direction of wheels B, C and D be?",
+          "text": "What direction will the ball roll?",
           "type": "single",
           "options": [
-            "B clockwise, C clockwise, D counter-clockwise",
-            "B counter-clockwise, C clockwise, D clockwise",
-            "B counter-clockwise, C counter-clockwise, D counter-clockwise"
+            "Left",
+            "Right",
+            "Won't move",
+            "Up"
           ],
           "correctOption": "B",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "જો ગિયર A ઘડિયાળની દિશામાં ફરે છે, તો પૈડાં B, C અને D ની દિશા શું હશે?",
-          "options_gu": [
-            "B clockwise, C clockwise, D counter-clockwise",
-            "B counter-clockwise, C clockwise, D clockwise",
-            "B counter-clockwise, C counter-clockwise, D counter-clockwise"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "403",
-          "text": "Which of the following does NOT use magnetism to operate?",
+          "text": "Which gear will turn the fastest?",
           "type": "single",
           "options": [
-            "Compass",
-            "NMR apparatus",
-            "Vehicle"
+            "Gear A",
+            "Gear B",
+            "Gear C",
+            "Same speed"
           ],
           "correctOption": "C",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "નીચેનામાંથી કયું ચાલવા માટે ચુંબકત્વનો ઉપયોગ નથી કરતું?",
-          "options_gu": [
-            "Compass",
-            "NMR apparatus",
-            "Vehicle"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "404",
-          "text": "Belts usually are made from materials that __?__ friction.",
+          "text": "If you heat this metal rod, what happens to its length?",
           "type": "single",
           "options": [
-            "Increase",
-            "Reduce",
-            "Don't change"
+            "Gets longer",
+            "Gets shorter",
+            "Stays same",
+            "Depends on metal"
           ],
           "correctOption": "A",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "પટ્ટા સામાન્ય રીતે એવી સામગ્રીઓથી બને છે જે ઘર્ષણને __?__.",
-          "options_gu": [
-            "Increase",
-            "Reduce",
-            "Don't change"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "405",
-          "text": "What kind of lever is the hydraulic crane shown in the figure?",
+          "text": "Which bottle will empty faster if both caps are removed?",
           "type": "single",
           "options": [
-            "First class lever",
-            "Second class lever",
-            "Third class lever"
+            "Wide neck",
+            "Narrow neck",
+            "Same rate",
+            "Neither empties"
+          ],
+          "correctOption": "A",
+          "reverseScored": false,
+          "weight": 1,
+          "text_gu": "",
+          "options_gu": []
+        },
+        {
+          "questionId": "406",
+          "text": "What force is needed to balance this see-saw?",
+          "type": "single",
+          "options": [
+            "10 lbs",
+            "15 lbs",
+            "20 lbs",
+            "25 lbs"
           ],
           "correctOption": "C",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "આકૃતિમાં દર્શાવેલી હાઈડ્રોલિક ક્રેન કયા પ્રકારની લિવર છે?",
-          "options_gu": [
-            "First class lever",
-            "Second class lever",
-            "Third class lever"
-          ]
-        },
-        {
-          "questionId": "406",
-          "text": "What would happen to the distance Earth-Sun if one year became 400 days without any change in the gravitational force?",
-          "type": "single",
-          "options": [
-            "Distance would increase",
-            "Distance would decrease",
-            "Distance would remain the same"
-          ],
-          "correctOption": "B",
-          "reverseScored": false,
-          "weight": 1,
-          "text_gu": "જો ગુરુત્વાકર્ષણ બળમાં કોઈ ફેરફાર વગર એક વર્ષ 400 દિવસનું થઈ જાય, તો પૃથ્વી-સૂર્ય વચ્ચેના અંતરનું શું થશે?",
-          "options_gu": [
-            "Distance would increase",
-            "Distance would decrease",
-            "Distance would remain the same"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "407",
-          "text": "Centripetal force is proportional to…",
+          "text": "Which pendulum will swing faster?",
           "type": "single",
           "options": [
-            "Radius of curvature",
-            "Mass of the rotating object",
-            "Speed of rotation"
+            "Long pendulum",
+            "Short pendulum",
+            "Same speed",
+            "Neither swings"
           ],
-          "correctOption": "A",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "કેન્દ્રગામી બળ આના સમપ્રમાણ છે…",
-          "options_gu": [
-            "Radius of curvature",
-            "Mass of the rotating object",
-            "Speed of rotation"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "408",
-          "text": "Which statement is CORRECT?",
+          "text": "If you compress this spring, what happens to its potential energy?",
           "type": "single",
           "options": [
-            "Linear motion is a special case of circular motion",
-            "Circular motion is a special case of linear motion",
-            "When linear motion stops, circular motion begins"
-          ],
-          "correctOption": "B",
-          "reverseScored": false,
-          "weight": 1,
-          "text_gu": "કયું વિધાન સાચું છે?",
-          "options_gu": [
-            "Linear motion is a special case of circular motion",
-            "Circular motion is a special case of linear motion",
-            "When linear motion stops, circular motion begins"
-          ]
-        },
-        {
-          "questionId": "409",
-          "text": "Which statement below is WRONG about springs?",
-          "type": "single",
-          "options": [
-            "Springs are simple machines as they make the object move",
-            "The extension or compression of springs always occur in the direction of the applied force",
-            "To increase the elasticity of a system of springs, we must combine them in series"
+            "Increases",
+            "Decreases",
+            "Stays same",
+            "Becomes kinetic"
           ],
           "correctOption": "A",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "ઝરણાં વિશે નીચેનું કયું વિધાન ખોટું છે?",
-          "options_gu": [
-            "Springs are simple machines as they make the object move",
-            "The extension or compression of springs always occur in the direction of the applied force",
-            "To increase the elasticity of a system of springs, we must combine them in series"
-          ]
+          "text_gu": "",
+          "options_gu": []
         },
         {
-          "questionId": "410",
-          "text": "Why can we not use the equation P = rho * g * h for calculating the air pressure at a height h taking as a reference level the upper part of the atmosphere?",
+          "questionId": "409",
+          "text": "Which ramp will the ball reach the bottom fastest?",
           "type": "single",
           "options": [
-            "Because the atmosphere is very thick",
-            "Because the density of the atmosphere is not uniform",
-            "Because the atmosphere is not a fluid"
+            "Straight ramp",
+            "Curved ramp",
+            "Same time",
+            "Ball won't roll"
           ],
           "correctOption": "B",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "ઊંચાઈ h પર હવાના દબાણની ગણતરી માટે P = rho * g * h સમીકરણનો ઉપયોગ વાતાવરણના ઉપરના ભાગને સંદર્ભ સ્તર તરીકે લઈને કેમ થઈ શકતો નથી?",
-          "options_gu": [
-            "Because the atmosphere is very thick",
-            "Because the density of the atmosphere is not uniform",
-            "Because the atmosphere is not a fluid"
-          ]
+          "text_gu": "",
+          "options_gu": []
+        },
+        {
+          "questionId": "410",
+          "text": "What happens when you mix hot and cold water?",
+          "type": "single",
+          "options": [
+            "Temperature equalizes",
+            "Hot water rises",
+            "Cold water rises",
+            "No mixing"
+          ],
+          "correctOption": "A",
+          "reverseScored": false,
+          "weight": 1,
+          "text_gu": "",
+          "options_gu": []
         },
         {
           "questionId": "431",

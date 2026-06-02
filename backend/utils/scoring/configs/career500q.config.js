@@ -4,6 +4,26 @@ const range = (start, end) =>
 const SPATIAL_RELATION_QUESTION_NUMBERS = range(366, 390);
 const MECHANICAL_REASONING_QUESTION_NUMBERS = range(391, 410);
 
+// Activity Preferences (Q255-272) → Holland (RIASEC) routing, per the official
+// answer key. The key documents six recurring activity dimensions; each maps
+// option a/b/c to a Holland type. The 18 questions cycle through these six
+// rows three times. These map directly into the RIASEC interest scores (no
+// separate custom-profile bucket).
+const ACTIVITY_RIASEC_ROWS = [
+  { a: "realistic", b: "social", c: "investigative" }, // Stream Indicators (Technology / Social Service / Science)
+  { a: "investigative", b: "artistic", c: "realistic" }, // Holland Type
+  { a: "investigative", b: "enterprising", c: "realistic" }, // Work Style
+  { a: "social", b: "artistic", c: "enterprising" }, // Career Focus
+  { a: "investigative", b: "artistic", c: "social" }, // Activity Type
+  { a: "realistic", b: "social", c: "artistic" }, // Environment (a = Realistic/Investigative → Realistic primary)
+];
+const ACTIVITY_RIASEC_OPTION_MAP = Object.fromEntries(
+  range(255, 272).map((questionNumber, index) => {
+    const row = ACTIVITY_RIASEC_ROWS[index % ACTIVITY_RIASEC_ROWS.length];
+    return [questionNumber, { A: row.a, B: row.b, C: row.c }];
+  })
+);
+
 const likertBands = ({ high, moderate, low }) => [
   {
     label: "High",
@@ -41,8 +61,8 @@ export const CAREER_500Q_CONFIG = {
   ambiguityNotes: [
     "Leadership subsection 1.4 intentionally cross-references EQ questions 491, 498, 499, and 500 in the scoring guide.",
     "Spatial Relations 4.4 now uses explicit PDF-backed overrides from backend/config/spatialPdfQuestionBank.js for the booklet-aligned Q76-Q100 live range.",
-    "The current generated package still stores section 1.2 and 1.3 booklet prompts without the full A/B/C option metadata from the PDF, so those blocks need a seed/package refresh for fully exact live capture.",
-    "Work Style 1.3 and Interest subsections 3.3/3.4 provide summary interpretation guidance in the PDF rather than full per-question scoring keys, so those blocks use package-specific explicit profile routing informed by the booklet wording.",
+    "Work Style 1.3, Activity 3.3, and Environment 3.4 now carry full A/B/C option metadata in the generated package, so the categorical A/B/C profile-consistency scoring runs live. The official answer key's per-option direction labels are stored in each block's answerKeyOptionMap and surfaced in the exports.",
+    "Activity Preferences 3.3 routes each option to its Holland (RIASEC) type per the official answer key via optionRiasecMap (scoringMethod activity_riasec_profile). The tallied RIASEC counts feed the realistic/investigative/artistic/social/enterprising/conventional interest signals directly (blended with the 3.1 Likert RIASEC scores), not a separate custom-profile path.",
   ],
   sections: [
     {
@@ -233,6 +253,64 @@ export const CAREER_500Q_CONFIG = {
           answerType: "single",
           scoringMethod: "work_style_profile",
           scoreType: "profile_consistency",
+          // Audit fix (Work Style A/B/C): the official answer key defines an
+          // explicit per-dimension option→career direction for Q73-80. Stored
+          // here verbatim so the mapping is part of the config and surfaces in
+          // exports. Option a maps to profile A (structured_independent), b to
+          // B (balanced_collaborative), c to C (dynamic_autonomous) — the
+          // routing the scorer already applies. Q81-96 are not given explicit
+          // per-question keys in the PDF (summary guidance only) and continue
+          // to use the A/B/C profile-consistency routing.
+          answerKeyOptionMap: {
+            73: {
+              dimension: "Work preference",
+              a: { profile: "A", direction: "Independent → Research, writing" },
+              b: { profile: "B", direction: "Small teams → Consulting, design" },
+              c: { profile: "C", direction: "Large teams → Management, events" },
+            },
+            74: {
+              dimension: "Environment",
+              a: { profile: "A", direction: "Structured → Accounting, law" },
+              b: { profile: "B", direction: "Collaborative → Education, healthcare" },
+              c: { profile: "C", direction: "Dynamic → Sales, journalism" },
+            },
+            75: {
+              dimension: "Task type",
+              a: { profile: "A", direction: "Routine → Administration, quality control" },
+              b: { profile: "B", direction: "Mixed → General management" },
+              c: { profile: "C", direction: "Unpredictable → Emergency services, consulting" },
+            },
+            76: {
+              dimension: "Deadline approach",
+              a: { profile: "A", direction: "Early starter → Project management" },
+              b: { profile: "B", direction: "Burst worker → Creative fields" },
+              c: { profile: "C", direction: "Pressure worker → Journalism, emergency services" },
+            },
+            77: {
+              dimension: "Learning style",
+              a: { profile: "A", direction: "Independent → Research, technical" },
+              b: { profile: "B", direction: "Discussion → Teaching, counseling" },
+              c: { profile: "C", direction: "Hands-on → Trades, sports, healthcare" },
+            },
+            78: {
+              dimension: "Schedule",
+              a: { profile: "A", direction: "Fixed → Traditional employment" },
+              b: { profile: "B", direction: "Flexible → Modern office work" },
+              c: { profile: "C", direction: "Complete flexibility → Entrepreneurship, freelancing" },
+            },
+            79: {
+              dimension: "Problem solving",
+              a: { profile: "A", direction: "Procedures → Operations, quality assurance" },
+              b: { profile: "B", direction: "Mixed approach → Management" },
+              c: { profile: "C", direction: "Innovation → R&D, startups" },
+            },
+            80: {
+              dimension: "Productivity",
+              a: { profile: "A", direction: "Single task → Specialist roles" },
+              b: { profile: "B", direction: "Few projects → Professional services" },
+              c: { profile: "C", direction: "Multitasking → Administration, customer service" },
+            },
+          },
           profileOptions: {
             A: {
               key: "structured_independent",
@@ -787,8 +865,29 @@ export const CAREER_500Q_CONFIG = {
           displayOrder: 3,
           questionNumbers: range(255, 272),
           answerType: "single",
-          scoringMethod: "interest_activity_profile",
+          scoringMethod: "activity_riasec_profile",
           scoreType: "profile_consistency",
+          // Per-question A/B/C → RIASEC routing (see ACTIVITY_RIASEC_OPTION_MAP).
+          // The scorer tallies these into Holland interest types and the
+          // result feeds the RIASEC interest signals directly.
+          optionRiasecMap: ACTIVITY_RIASEC_OPTION_MAP,
+          // Audit fix (Activity A/B/C → Holland): the official answer key maps
+          // each activity option to a Holland/stream direction. Stored here so
+          // the mapping is part of the config and surfaces in exports. The PDF
+          // lists six mapping rows for the 255-272 block (one row per recurring
+          // activity dimension); the scorer feeds these into interest scoring
+          // via ACTIVITY_OPTION_RULES once the package seeds A/B/C option text
+          // for these items (currently empty — see ambiguityNotes).
+          answerKeyOptionMap: {
+            dimensionRows: [
+              { dimension: "Stream Indicators", a: "Technology / Realistic", b: "Social Service / Social", c: "Science / Investigative" },
+              { dimension: "Holland Type", a: "Investigative", b: "Artistic", c: "Realistic" },
+              { dimension: "Work Style", a: "Investigative", b: "Enterprising", c: "Realistic" },
+              { dimension: "Career Focus", a: "Social", b: "Artistic", c: "Enterprising" },
+              { dimension: "Activity Type", a: "Investigative", b: "Artistic", c: "Social" },
+              { dimension: "Environment", a: "Realistic / Investigative", b: "Social", c: "Artistic" },
+            ],
+          },
           dominantProfiles: {
             science: {
               label: "Science / Investigative Pull",
@@ -855,6 +954,15 @@ export const CAREER_500Q_CONFIG = {
           answerType: "single",
           scoringMethod: "environment_profile",
           scoreType: "profile_consistency",
+          // Audit fix (Environment A/B/C): per the official answer key.
+          answerKeyOptionMap: {
+            dimensionRows: [
+              { dimension: "Setting", a: "Research-focused", b: "Business-focused", c: "Active / varied" },
+              { dimension: "Atmosphere", a: "Introverted work", b: "Collaborative work", c: "High-energy work" },
+              { dimension: "Organization Size", a: "Corporate", b: "Small business", c: "Entrepreneurial" },
+              { dimension: "Schedule", a: "Traditional", b: "Modern flexible", c: "Project-based" },
+            ],
+          },
           dominantProfiles: {
             research: {
               label: "Research / Quiet / Independent",

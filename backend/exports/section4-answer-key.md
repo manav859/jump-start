@@ -1,7 +1,7 @@
 # SECTION 4 — APTITUDE BATTERY
 # Answer Key
 
-_Generated 2026-05-28 from `comprehensive500Package.generated.js` — 160 questions total._
+_Generated 2026-06-02 from `comprehensive500Package.generated.js` — 160 questions total._
 
 ---
 
@@ -923,165 +923,185 @@ _Generated 2026-05-28 from `comprehensive500Package.generated.js` — 160 questi
 
 ## MECHANICAL REASONING (Q391–Q410) — 20 questions
 
-**Q391.** If the weight of each pulley is equal to the load, what is the ratio between the pulling force F and the load L? (F / L = ?)
+**Q391.** If gear A turns clockwise, which direction will gear B turn?
 
-   A. 1/4
-   B. 1/8
-   C. 1
+   A. Clockwise
+   B. Counterclockwise
+   C. Won't turn
+   D. Both directions
 
-      Correct Answer: **C** — 1
+      Correct Answer: **B** — Counterclockwise
 
-**Q392.** How many revolutions does the wheel M make when K completes 4 revolutions?
+**Q392.** Which lever arrangement requires the least force to lift the weight?
 
-   A. 1
-   B. 2
-   C. 4
+   A. Lever A
+   B. Lever B
+   C. Lever C
+   D. All equal
 
-      Correct Answer: **A** — 1
+      Correct Answer: **C** — Lever C
 
-**Q393.** Which statement is WRONG about springs?
+**Q393.** If you push down on this end, what happens to the other end?
 
-   A. Springs are a kind of simple machines
-   B. Springs can be used as energy stores
-   C. Springs constant depends on the properties of material they are made of
+   A. Goes up
+   B. Goes down
+   C. Stays same
+   D. Moves sideways
 
-      Correct Answer: **A** — Springs are a kind of simple machines
+      Correct Answer: **A** — Goes up
 
-**Q394.** How many inches must one pull the rope down in order to lift the load in the figure by 28 inches?
+**Q394.** Which pulley system gives the greatest mechanical advantage?
 
-   A. 14 in
-   B. 28 in
-   C. 56 in
+   A. System A
+   B. System B
+   C. System C
+   D. All equal
 
-      Correct Answer: **C** — 56 in
+      Correct Answer: **C** — System C
 
-**Q395.** Electrons in a circuit flow from a place where there are __?__ electrons to a place where there are __?__ electrons.
+**Q395.** What will happen if you turn the handle clockwise?
 
-   A. Less, More
-   B. Many, No
-   C. More, Less
+   A. Weight goes up
+   B. Weight goes down
+   C. No movement
+   D. Handle breaks
 
-      Correct Answer: **C** — More, Less
+      Correct Answer: **A** — Weight goes up
 
-**Q396.** We use __?__ to measure a specific gas pressure.
+**Q396.** Which inclined plane requires less force to move the box?
 
-   A. Barometer
-   B. Thermometer
-   C. Manometer
+   A. Steep ramp
+   B. Gentle ramp
+   C. Same force
+   D. Can't determine
 
-      Correct Answer: **C** — Manometer
+      Correct Answer: **B** — Gentle ramp
 
-**Q397.** Which term is NOT related to gears?
+**Q397.** If water flows into this container, which section fills first?
 
-   A. Cogwheel
-   B. Pinion
-   C. Rack
+   A. Section A
+   B. Section B
+   C. Section C
+   D. All at once
 
-      Correct Answer: **C** — Rack
+      Correct Answer: **B** — Section B
 
-**Q398.** A screw is a combination of:
+**Q398.** Which wheel will turn faster?
 
-   A. Nail and wedge
-   B. Inclined plane and wedge
-   C. Inclined plane and cylinder
+   A. Large wheel
+   B. Small wheel
+   C. Same speed
+   D. Neither turns
 
-      Correct Answer: **C** — Inclined plane and cylinder
+      Correct Answer: **B** — Small wheel
 
-**Q399.** Which of the following materials can become a magnet?
+**Q399.** What's the mechanical advantage of this lever?
 
-   A. Aluminum
-   B. Copper
-   C. Zinc
+   A. 1:1
+   B. 2:1
+   C. 3:1
+   D. 4:1
 
-      Correct Answer: **C** — Zinc
+      Correct Answer: **C** — 3:1
 
-**Q400.** If the big wheel (A) turns 3 times at clockwise direction, how many times and in which direction does the small one (B) turn?
+**Q400.** If you turn this screw clockwise, what happens?
 
-   A. 3 times counter-clockwise
-   B. 6 times counter-clockwise
-   C. 6 times clockwise
+   A. Goes in
+   B. Comes out
+   C. No change
+   D. Breaks
 
-      Correct Answer: **C** — 6 times clockwise
+      Correct Answer: **A** — Goes in
 
-**Q401.** What happens to the current passing through the main branch in the circuit shown in the figure if one the bulbs smashes?
+**Q401.** Which spring will compress the most under the same weight?
 
-   A. It becomes zero
-   B. It doubles
-   C. It decreases by a factor of 1.5
+   A. Spring A
+   B. Spring B
+   C. Spring C
+   D. All equal
 
-      Correct Answer: **C** — It decreases by a factor of 1.5
+      Correct Answer: **B** — Spring B
 
-**Q402.** If gear A rotates in the clockwise direction, what will the direction of wheels B, C and D be?
+**Q402.** What direction will the ball roll?
 
-   A. B clockwise, C clockwise, D counter-clockwise
-   B. B counter-clockwise, C clockwise, D clockwise
-   C. B counter-clockwise, C counter-clockwise, D counter-clockwise
+   A. Left
+   B. Right
+   C. Won't move
+   D. Up
 
-      Correct Answer: **B** — B counter-clockwise, C clockwise, D clockwise
+      Correct Answer: **B** — Right
 
-**Q403.** Which of the following does NOT use magnetism to operate?
+**Q403.** Which gear will turn the fastest?
 
-   A. Compass
-   B. NMR apparatus
-   C. Vehicle
+   A. Gear A
+   B. Gear B
+   C. Gear C
+   D. Same speed
 
-      Correct Answer: **C** — Vehicle
+      Correct Answer: **C** — Gear C
 
-**Q404.** Belts usually are made from materials that __?__ friction.
+**Q404.** If you heat this metal rod, what happens to its length?
 
-   A. Increase
-   B. Reduce
-   C. Don't change
+   A. Gets longer
+   B. Gets shorter
+   C. Stays same
+   D. Depends on metal
 
-      Correct Answer: **A** — Increase
+      Correct Answer: **A** — Gets longer
 
-**Q405.** What kind of lever is the hydraulic crane shown in the figure?
+**Q405.** Which bottle will empty faster if both caps are removed?
 
-   A. First class lever
-   B. Second class lever
-   C. Third class lever
+   A. Wide neck
+   B. Narrow neck
+   C. Same rate
+   D. Neither empties
 
-      Correct Answer: **C** — Third class lever
+      Correct Answer: **A** — Wide neck
 
-**Q406.** What would happen to the distance Earth-Sun if one year became 400 days without any change in the gravitational force?
+**Q406.** What force is needed to balance this see-saw?
 
-   A. Distance would increase
-   B. Distance would decrease
-   C. Distance would remain the same
+   A. 10 lbs
+   B. 15 lbs
+   C. 20 lbs
+   D. 25 lbs
 
-      Correct Answer: **B** — Distance would decrease
+      Correct Answer: **C** — 20 lbs
 
-**Q407.** Centripetal force is proportional to…
+**Q407.** Which pendulum will swing faster?
 
-   A. Radius of curvature
-   B. Mass of the rotating object
-   C. Speed of rotation
+   A. Long pendulum
+   B. Short pendulum
+   C. Same speed
+   D. Neither swings
 
-      Correct Answer: **A** — Radius of curvature
+      Correct Answer: **B** — Short pendulum
 
-**Q408.** Which statement is CORRECT?
+**Q408.** If you compress this spring, what happens to its potential energy?
 
-   A. Linear motion is a special case of circular motion
-   B. Circular motion is a special case of linear motion
-   C. When linear motion stops, circular motion begins
+   A. Increases
+   B. Decreases
+   C. Stays same
+   D. Becomes kinetic
 
-      Correct Answer: **B** — Circular motion is a special case of linear motion
+      Correct Answer: **A** — Increases
 
-**Q409.** Which statement below is WRONG about springs?
+**Q409.** Which ramp will the ball reach the bottom fastest?
 
-   A. Springs are simple machines as they make the object move
-   B. The extension or compression of springs always occur in the direction of the applied force
-   C. To increase the elasticity of a system of springs, we must combine them in series
+   A. Straight ramp
+   B. Curved ramp
+   C. Same time
+   D. Ball won't roll
 
-      Correct Answer: **A** — Springs are simple machines as they make the object move
+      Correct Answer: **B** — Curved ramp
 
-**Q410.** Why can we not use the equation P = rho * g * h for calculating the air pressure at a height h taking as a reference level the upper part of the atmosphere?
+**Q410.** What happens when you mix hot and cold water?
 
-   A. Because the atmosphere is very thick
-   B. Because the density of the atmosphere is not uniform
-   C. Because the atmosphere is not a fluid
+   A. Temperature equalizes
+   B. Hot water rises
+   C. Cold water rises
+   D. No mixing
 
-      Correct Answer: **B** — Because the density of the atmosphere is not uniform
+      Correct Answer: **A** — Temperature equalizes
 
 ---
 

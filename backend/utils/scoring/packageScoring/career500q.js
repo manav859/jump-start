@@ -2,6 +2,7 @@ import {
   PERSONALITY_ARCHETYPES,
   buildReviewSummary,
   buildStrengths,
+  reconcileLeadershipClaim,
 } from "../../resultProfiling.js";
 import CAREER_500Q_CONFIG from "../configs/career500q.config.js";
 import {
@@ -679,6 +680,103 @@ const scoreCategoricalProfile = (subsectionConfig, questionMap, rules = []) => {
   };
 };
 
+const RIASEC_LABELS = {
+  realistic: "Realistic",
+  investigative: "Investigative",
+  artistic: "Artistic",
+  social: "Social",
+  enterprising: "Enterprising",
+  conventional: "Conventional",
+};
+
+// Activity Preferences (Q255-272). Each answered option maps to a Holland
+// (RIASEC) type via the config's optionRiasecMap (sourced from the official
+// answer key). We tally counts per type and expose them as `riasecCounts` so
+// buildFlattenedSignals can fold them into the RIASEC interest signals — the
+// activity block feeds RIASEC directly rather than producing a disconnected
+// 5-profile bucket.
+const scoreActivityRiasec = (subsectionConfig, questionMap) => {
+  const optionMap = subsectionConfig.optionRiasecMap || {};
+  const counts = {
+    realistic: 0,
+    investigative: 0,
+    artistic: 0,
+    social: 0,
+    enterprising: 0,
+    conventional: 0,
+  };
+  let answeredCount = 0;
+  const assignedQuestionNumbers = subsectionConfig.questionNumbers.filter(
+    (questionNumber) => questionMap.has(Number(questionNumber))
+  );
+
+  subsectionConfig.questionNumbers.forEach((questionNumber) => {
+    const entry = questionMap.get(Number(questionNumber));
+    if (!entry) return;
+    const answer = normalizeAnswerLetter(entry.rawAnswer);
+    if (!answer) return;
+    const riasecKey = optionMap[questionNumber]?.[answer];
+    if (!riasecKey || counts[riasecKey] == null) return;
+    counts[riasecKey] += 1;
+    answeredCount += 1;
+  });
+
+  const ranked = Object.entries(counts)
+    .filter(([, count]) => count > 0)
+    .sort(([, a], [, b]) => b - a);
+  const [dominantKey, dominantCount] = ranked[0] || ["", 0];
+  const hollandCode = ranked
+    .slice(0, 3)
+    .map(([key]) => RIASEC_LABELS[key].charAt(0))
+    .join("");
+  const profileBreakdown = ranked.map(([key, count]) => ({
+    key,
+    label: RIASEC_LABELS[key],
+    count,
+    percentage: answeredCount ? roundPercent((count / answeredCount) * 100) : null,
+    interpretation: `Activity choices indicate ${RIASEC_LABELS[key]} interest.`,
+    careerImplication: "",
+    highlights: [],
+  }));
+  const consistency = answeredCount
+    ? roundPercent((dominantCount / answeredCount) * 100)
+    : null;
+  const totalQuestions = assignedQuestionNumbers.length;
+  const topLabels = profileBreakdown
+    .slice(0, 3)
+    .map((item) => `${item.label} (${item.count})`);
+  const interpretation = dominantKey
+    ? `Activity choices map to a ${hollandCode || RIASEC_LABELS[dominantKey]} Holland interest pattern, led by ${joinList(
+        topLabels
+      )}. These feed the RIASEC interest scores.`
+    : "No activity preferences were answered, so no Holland interest pattern could be derived.";
+
+  return {
+    key: subsectionConfig.key,
+    label: subsectionConfig.label,
+    answerType: subsectionConfig.answerType,
+    scoreType: subsectionConfig.scoreType,
+    score: dominantCount || null,
+    rawScore: dominantCount || null,
+    maxScore: answeredCount || totalQuestions,
+    average: null,
+    percentage: consistency,
+    band: dominantKey ? RIASEC_LABELS[dominantKey] : "",
+    hollandCode,
+    riasecCounts: counts,
+    interpretation,
+    careerImplication: "",
+    questionNumbers: assignedQuestionNumbers,
+    questionRangeLabel: buildQuestionRangeLabel(assignedQuestionNumbers),
+    status: summarizeStatus(answeredCount, totalQuestions),
+    answeredCount,
+    totalQuestions,
+    description: interpretation,
+    dominantProfileKey: dominantKey || "",
+    profileBreakdown,
+  };
+};
+
 const scoreBandedLikertAverage = (subsectionConfig, questionMap) => {
   const metrics = computeLikertMetrics(subsectionConfig.questionNumbers, questionMap);
   const band = resolveInterpretationBand(metrics.average, subsectionConfig.bands || []);
@@ -1104,6 +1202,9 @@ const scoreSubsection = (subsectionConfig, questionMap) => {
     case "subject_cluster_profile":
       result = scoreSubjectClusterProfile(subsectionConfig, questionMap);
       break;
+    case "activity_riasec_profile":
+      result = scoreActivityRiasec(subsectionConfig, questionMap);
+      break;
     case "interest_activity_profile":
       result = scoreCategoricalProfile(
         subsectionConfig,
@@ -1414,16 +1515,34 @@ const buildFlattenedSignals = ({ sectionBreakdown = [], personalityType }) => {
 
   const personalityMetrics = personalityType?.metrics || {};
 
+  // Activity Preferences (3.3) feeds the RIASEC interest scores directly.
+  // Each RIASEC type's activity intensity is the share of activity picks
+  // relative to the most-picked type (dominant type → 100), which makes it
+  // comparable to the 0-100 Likert interest percentages from 3.1. The final
+  // signal blends the two whenever both are present.
+  const activityCounts =
+    lookupSubsection("interest", "activity_preferences")?.riasecCounts || null;
+  const activityMax = activityCounts
+    ? Math.max(0, ...Object.values(activityCounts).map((v) => Number(v) || 0))
+    : 0;
+  const activityIntensity = (riasecKey) => {
+    if (!activityCounts || activityMax <= 0) return null;
+    return roundPercent((Number(activityCounts[riasecKey] || 0) / activityMax) * 100);
+  };
+  const riasecSignal = (riasecKey) => {
+    const likert = lookupFactor("interest", "holland_riasec", riasecKey)?.percentage;
+    const activity = activityIntensity(riasecKey);
+    const present = [likert, activity].filter((v) => Number.isFinite(v));
+    return present.length ? roundPercent(average(present)) : 50;
+  };
+
   return {
-    realistic: lookupFactor("interest", "holland_riasec", "realistic")?.percentage ?? 50,
-    investigative:
-      lookupFactor("interest", "holland_riasec", "investigative")?.percentage ?? 50,
-    artistic: lookupFactor("interest", "holland_riasec", "artistic")?.percentage ?? 50,
-    social: lookupFactor("interest", "holland_riasec", "social")?.percentage ?? 50,
-    enterprising:
-      lookupFactor("interest", "holland_riasec", "enterprising")?.percentage ?? 50,
-    conventional:
-      lookupFactor("interest", "holland_riasec", "conventional")?.percentage ?? 50,
+    realistic: riasecSignal("realistic"),
+    investigative: riasecSignal("investigative"),
+    artistic: riasecSignal("artistic"),
+    social: riasecSignal("social"),
+    enterprising: riasecSignal("enterprising"),
+    conventional: riasecSignal("conventional"),
     logicalMathematical:
       lookupSubsection("multiple_intelligence", "logical_mathematical")?.percentage ?? 50,
     linguistic:
@@ -1898,6 +2017,29 @@ export const scoreCareer500QPackage = (answers = {}, sections = []) => {
     emotionalSection,
   });
 
+  // Consistency cross-check: the MBTI code is derived from Big Five + EQ and is
+  // independent of the dedicated Leadership & Social Interaction subsection
+  // (Q97-120). When a leadership-claiming archetype (e.g. ENTJ "Commander") is
+  // assigned but that subsection scored Low, the stock "naturally drawn to
+  // leadership" copy contradicts the student's own leadership answers. We keep
+  // the (valid) MBTI code but soften the description and record a consistency
+  // note rather than presenting an unqualified leadership claim.
+  const leadershipSubsection = personalitySection?.subsections?.find(
+    (item) => item.key === "leadership_social_interaction"
+  );
+  const leadershipReconciliation = reconcileLeadershipClaim({
+    code: personalityType.code,
+    title: personalityType.title,
+    description: personalityType.description,
+    leadershipPercentage: leadershipSubsection?.percentage,
+    leadershipBand: leadershipSubsection?.band,
+  });
+  const consistencyNotes = [];
+  if (leadershipReconciliation) {
+    personalityType.description = leadershipReconciliation.description;
+    consistencyNotes.push(leadershipReconciliation.consistencyNote);
+  }
+
   const flattenedSignals = buildFlattenedSignals({
     sectionBreakdown,
     personalityType,
@@ -1985,6 +2127,10 @@ export const scoreCareer500QPackage = (answers = {}, sections = []) => {
       description: personalityType.description,
       traits: personalityType.traits,
     },
+    // Surfaced when the MBTI archetype and a major subsection (currently the
+    // Leadership & Social Interaction block) contradict each other, so the
+    // report can show an honest caveat instead of an unqualified claim.
+    consistencyNotes,
     // Prompt-8: rich personality aggregator that surfaces the full
     // personality picture (MBTI + OCEAN + HSPQ + Work Style) in one
     // structured field. Lets the frontend render a complete personality
@@ -1995,7 +2141,11 @@ export const scoreCareer500QPackage = (answers = {}, sections = []) => {
     ),
     reviewSummary: {
       ...reviewSummary,
-      observations: [...(reviewSummary.observations || []), ...observations].filter(Boolean),
+      observations: [
+        ...(reviewSummary.observations || []),
+        ...observations,
+        ...consistencyNotes,
+      ].filter(Boolean),
     },
     metadata: {
       algorithmKey: CAREER_500Q_CONFIG.algorithmKey,

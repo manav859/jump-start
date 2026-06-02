@@ -418,6 +418,87 @@ export const PERSONALITY_ARCHETYPES = {
   },
 };
 
+// Archetypes whose stock description asserts a leadership / people-driving
+// orientation. The MBTI code is derived from Big Five + EQ (Q1-30, Q451-500),
+// which is INDEPENDENT of the dedicated Leadership & Social Interaction
+// subsection (Q97-120). When those two disagree — e.g., a high-conscientiousness
+// student lands ENTJ "Commander" but self-reports Low on Taking Charge — the
+// stock "naturally drawn to leadership" copy reads as broken to the client even
+// though the math is defensible. For those cases we swap in a description that
+// keeps the supported traits (structure, planning, conscientiousness) but drops
+// the unsupported leadership claim, and surface an explicit consistency note.
+const LEADERSHIP_CLAIMING_ARCHETYPES = {
+  ENTJ: {
+    title: "Commander",
+    softenedDescription:
+      "Decisive, organized, and oriented toward planning and long-range execution.",
+  },
+  ESTJ: {
+    title: "Executive",
+    softenedDescription:
+      "Organized, pragmatic, and effective with systems and operational discipline.",
+  },
+  ENFJ: {
+    title: "Mentor",
+    softenedDescription:
+      "Supportive, persuasive, and motivated by working toward shared goals.",
+  },
+  ESFJ: {
+    title: "Coordinator",
+    softenedDescription:
+      "Warm, responsible, and dependable at keeping work organized and on track.",
+  },
+};
+
+// Threshold below which the Leadership subsection is treated as contradicting a
+// leadership-claiming archetype. The subsection percentage is Likert-derived
+// (avg 3 → 50%); a value under 50 means the dominant leadership signals sit in
+// the Low band (avg < 3).
+const LEADERSHIP_CONTRADICTION_MAX_PERCENT = 50;
+
+const stripCodeSuffix = (code = "") => String(code).replace(/-[AT]$/i, "").toUpperCase();
+
+// Reconcile a leadership-claiming MBTI archetype against the dedicated
+// Leadership subsection. Returns { description, consistencyNote } when a
+// contradiction is detected, otherwise null (no change).
+export const reconcileLeadershipClaim = ({
+  code,
+  title,
+  description,
+  leadershipPercentage,
+  leadershipBand,
+} = {}) => {
+  const baseCode = stripCodeSuffix(code);
+  const claim = LEADERSHIP_CLAIMING_ARCHETYPES[baseCode];
+  if (!claim) return null;
+
+  const pct = Number(leadershipPercentage);
+  const bandIsLow = String(leadershipBand || "").trim().toLowerCase() === "low";
+  const pctIsLow = Number.isFinite(pct) && pct < LEADERSHIP_CONTRADICTION_MAX_PERCENT;
+  if (!bandIsLow && !pctIsLow) return null;
+
+  const pctLabel = Number.isFinite(pct) ? `${Math.round(pct)}%` : "Low";
+  // Prefer a band label consistent with the percentage. Some legacy stored
+  // reports carry a mislabeled band (e.g. band "Moderate" alongside 17%); the
+  // percentage is the source of truth here.
+  const displayBand = Number.isFinite(pct)
+    ? pct < 50
+      ? "Low"
+      : pct < 75
+        ? "Moderate"
+        : "High"
+    : leadershipBand || "Low";
+  const consistencyNote =
+    `Your personality type (${code} "${title || claim.title}") is derived from your Big Five ` +
+    `and emotional-intelligence responses, which lean toward a leadership-oriented profile. ` +
+    `However, your dedicated Leadership & Social Interaction responses scored ${displayBand} ` +
+    `(${pctLabel}). Treat the leadership framing of this type as potential rather than ` +
+    `demonstrated, and see the Leadership & Social Interaction section for your self-reported ` +
+    `leadership behaviours.`;
+
+  return { description: claim.softenedDescription, consistencyNote };
+};
+
 const SIGNAL_LABELS = {
   realistic: "hands-on and practical interests",
   investigative: "investigative interests",

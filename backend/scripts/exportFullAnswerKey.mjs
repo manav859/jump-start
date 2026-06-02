@@ -19,10 +19,106 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import COMPREHENSIVE_500_PACKAGE from "../config/comprehensive500Package.generated.js";
+import CAREER_500Q_CONFIG from "../utils/scoring/configs/career500q.config.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const OUTPUT_DIR = path.resolve(__dirname, "..", "exports");
+
+// ---------------------------------------------------------------------------
+// Scoring-mapping indexes derived from career500q.config.js (the scoring
+// source of truth). These let the export annotate each question with the
+// trait/factor it loads onto, whether it is REVERSE-SCORED, and — for the
+// single-select preference blocks — the answer key's per-option direction.
+// The package's own `reverseScored`/`subscale` fields are intentionally NOT
+// used: they carry an older personality model and disagree with the config.
+// ---------------------------------------------------------------------------
+const buildTraitIndex = (config) => {
+  const index = new Map(); // qnum -> { traits:Set, reverse:Set(trait reverse) }
+  const touch = (qnum) => {
+    const n = Number(qnum);
+    if (!index.has(n)) index.set(n, { traits: new Set(), reverse: false });
+    return index.get(n);
+  };
+  for (const section of config.sections || []) {
+    for (const sub of section.subsections || []) {
+      if (Array.isArray(sub.factors)) {
+        for (const factor of sub.factors) {
+          const reverseSet = new Set((factor.reverseQuestions || []).map(Number));
+          for (const qn of factor.questionNumbers || []) {
+            const entry = touch(qn);
+            entry.traits.add(factor.label);
+            if (reverseSet.has(Number(qn))) entry.reverse = true;
+          }
+        }
+      } else if (Array.isArray(sub.subjectClusters)) {
+        for (const cluster of sub.subjectClusters) {
+          for (const qn of cluster.questionNumbers || []) {
+            touch(qn).traits.add(cluster.label);
+          }
+        }
+      } else if (sub.scoringMethod === "banded_likert_average") {
+        for (const qn of sub.questionNumbers || []) {
+          touch(qn).traits.add(sub.label.replace(/^\d+(\.\d+)?\s*/, ""));
+        }
+      }
+    }
+  }
+  return index;
+};
+
+// qnum -> per-option {profile, direction} (Work Style Q73-80)
+const buildWorkStyleOptionIndex = (config) => {
+  const index = new Map();
+  for (const section of config.sections || []) {
+    for (const sub of section.subsections || []) {
+      const map = sub.answerKeyOptionMap;
+      if (map && !map.dimensionRows) {
+        for (const [qn, spec] of Object.entries(map)) index.set(Number(qn), spec);
+      }
+    }
+  }
+  return index;
+};
+
+// subsection-key -> dimensionRows (Activity / Environment preference blocks)
+const buildDimensionRowIndex = (config) => {
+  const index = new Map();
+  for (const section of config.sections || []) {
+    for (const sub of section.subsections || []) {
+      if (sub.answerKeyOptionMap?.dimensionRows) {
+        index.set(sub.key, sub.answerKeyOptionMap.dimensionRows);
+      }
+    }
+  }
+  return index;
+};
+
+const TRAIT_INDEX = buildTraitIndex(CAREER_500Q_CONFIG.default || CAREER_500Q_CONFIG);
+const WORK_STYLE_OPTION_INDEX = buildWorkStyleOptionIndex(
+  CAREER_500Q_CONFIG.default || CAREER_500Q_CONFIG
+);
+const DIMENSION_ROW_INDEX = buildDimensionRowIndex(
+  CAREER_500Q_CONFIG.default || CAREER_500Q_CONFIG
+);
+
+// One-line scoring annotation for a Likert / factor question.
+const traitAnnotation = (questionId) => {
+  const entry = TRAIT_INDEX.get(Number(questionId));
+  if (!entry || !entry.traits.size) return "";
+  const traits = [...entry.traits].join(", ");
+  return `_Scores: ${traits} · Reverse-scored: ${entry.reverse ? "Yes" : "No"}_`;
+};
+
+// Per-option direction lines for a Work Style question (Q73-80).
+const workStyleAnnotation = (questionId) => {
+  const spec = WORK_STYLE_OPTION_INDEX.get(Number(questionId));
+  if (!spec) return "";
+  const rows = ["a", "b", "c"]
+    .filter((k) => spec[k])
+    .map((k) => `   - **${k.toUpperCase()}** → ${spec[k].direction} _(profile ${spec[k].profile})_`);
+  return [`_Answer-key mapping — ${spec.dimension}:_`, ...rows].join("\n");
+};
 
 // Subsection ranges sourced from career500q.config.js. label + inclusive
 // question-id range per subsection.
@@ -148,11 +244,41 @@ const buildSectionFile = (section, meta, subsections) => {
     lines.push("");
     lines.push(`## ${label} (Q${start}–Q${end}) — ${bucket.length} questions`);
     lines.push("");
+
+    // Subsection-level answer-key option mapping for the Activity /
+    // Environment preference blocks (the PDF documents these as recurring
+    // dimension rows rather than per-question keys).
+    const dimKey = label.includes("Activity")
+      ? "activity_preferences"
+      : label.includes("Environment")
+        ? "work_environment_preferences"
+        : null;
+    if (dimKey && DIMENSION_ROW_INDEX.has(dimKey)) {
+      lines.push("_Answer-key option mapping (per recurring dimension):_");
+      lines.push("");
+      lines.push("| Dimension | Option A | Option B | Option C |");
+      lines.push("| --- | --- | --- | --- |");
+      DIMENSION_ROW_INDEX.get(dimKey).forEach((row) => {
+        lines.push(`| ${row.dimension} | ${row.a} | ${row.b} | ${row.c} |`);
+      });
+      lines.push("");
+    }
+
     bucket.forEach((q) => {
       const text = String(q.text || "").trim() || "_(question text missing)_";
       lines.push(`**Q${q.questionId}.** ${text}`);
       lines.push("");
       lines.push(renderResponseBlock(q, meta));
+      const traitNote = traitAnnotation(q.questionId);
+      const wsNote = workStyleAnnotation(q.questionId);
+      if (traitNote) {
+        lines.push("");
+        lines.push(traitNote);
+      }
+      if (wsNote) {
+        lines.push("");
+        lines.push(wsNote);
+      }
       lines.push("");
     });
   });
