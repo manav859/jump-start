@@ -24,6 +24,40 @@ const ACTIVITY_RIASEC_OPTION_MAP = Object.fromEntries(
   })
 );
 
+// Work Environment Preferences (Q273-290) → work-environment profile, per the
+// official answer key pattern. Every A/B/C option maps deterministically to
+// exactly one of four profiles (no option is left unmatched):
+//   research      → Research / Quiet / Independent (analytical, structured,
+//                   stable, independent, quiet, behind-the-scenes)
+//   collaborative → Collaborative / People / Service (teams, clients, helping)
+//   dynamic       → Dynamic / Leadership / Business (corporate, leadership,
+//                   fast-paced, results, advancement, recognition)
+//   creative      → Creative / Flexible / Innovative (creativity, flexibility,
+//                   new methods, self-expression)
+// This replaces the earlier fragile keyword matching (ENVIRONMENT_OPTION_RULES),
+// which left several options (e.g. "An office with regular business hours")
+// unmatched and therefore unscored.
+const ENVIRONMENT_OPTION_PROFILE_MAP = {
+  273: { A: "research", B: "dynamic", C: "dynamic" },
+  274: { A: "research", B: "collaborative", C: "dynamic" },
+  275: { A: "dynamic", B: "collaborative", C: "dynamic" },
+  276: { A: "research", B: "creative", C: "dynamic" },
+  277: { A: "research", B: "collaborative", C: "creative" },
+  278: { A: "research", B: "collaborative", C: "creative" },
+  279: { A: "research", B: "collaborative", C: "dynamic" },
+  280: { A: "dynamic", B: "collaborative", C: "research" },
+  281: { A: "research", B: "dynamic", C: "creative" },
+  282: { A: "collaborative", B: "collaborative", C: "dynamic" },
+  283: { A: "research", B: "creative", C: "collaborative" },
+  284: { A: "research", B: "dynamic", C: "collaborative" },
+  285: { A: "research", B: "collaborative", C: "creative" },
+  286: { A: "research", B: "creative", C: "collaborative" },
+  287: { A: "research", B: "dynamic", C: "collaborative" },
+  288: { A: "dynamic", B: "creative", C: "collaborative" },
+  289: { A: "research", B: "creative", C: "collaborative" },
+  290: { A: "research", B: "collaborative", C: "dynamic" },
+};
+
 const likertBands = ({ high, moderate, low }) => [
   {
     label: "High",
@@ -954,6 +988,9 @@ export const CAREER_500Q_CONFIG = {
           answerType: "single",
           scoringMethod: "environment_profile",
           scoreType: "profile_consistency",
+          // Explicit per-question A/B/C → profile mapping (replaces fragile
+          // keyword matching). Every option maps to exactly one profile.
+          optionProfileMap: ENVIRONMENT_OPTION_PROFILE_MAP,
           // Audit fix (Environment A/B/C): per the official answer key.
           answerKeyOptionMap: {
             dimensionRows: [

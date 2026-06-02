@@ -175,6 +175,19 @@ The four buckets the matcher consumes (`hollandProfile`, `multipleIntelligences`
 | E — Enterprising | Q225–Q230 | Influence, persuade, lead |
 | C — Conventional | Q231–Q236 | Structure, precision, systems |
 
+The Q201–Q236 items above are Likert (1–5, **averaged** per code). In addition, the **Activity Preferences block (Q255–Q272) also feeds the Holland scores** — but by **point-accumulation, not averaging**: each A/B/C choice maps to a Holland type per the official answer key, and each pick adds one point to that type. The accumulated tallies are blended into the six RIASEC interest scores (see [ALGORITHM.md — Preference scoring](ALGORITHM.md#preference-scoring-point-accumulation)). The 18 questions cycle through six recurring answer-key dimensions:
+
+| Dimension (questions) | Option A → | Option B → | Option C → |
+|---|---|---|---|
+| Stream Indicators (Q255, 261, 267) | Technology / Realistic | Social Service / Social | Science / Investigative |
+| Holland Type (Q256, 262, 268) | Investigative | Artistic | Realistic |
+| Work Style (Q257, 263, 269) | Investigative | Enterprising | Realistic |
+| Career Focus (Q258, 264, 270) | Social | Artistic | Enterprising |
+| Activity Type (Q259, 265, 271) | Investigative | Artistic | Social |
+| Environment (Q260, 266, 272) | Realistic / Investigative | Social | Artistic |
+
+Two further Section 3 preference blocks shape the interest profile but are **not** Holland buckets fed to the matcher: **Subject Preferences (Q237–Q254)** are interest-rated 1–5 and **averaged** into four subject clusters (STEM, Humanities, Arts, Social Sciences); **Work Environment (Q273–Q290)** options are routed by keyword into four work-environment preference profiles (Research / Collaborative / Dynamic / Creative) by point-accumulation. The per-option mapping for every Section 3 preference question is printed in [`backend/exports/section3-interest-assessment.md`](../backend/exports/section3-interest-assessment.md).
+
 **Multiple Intelligences (weight 0.25)** — from Section 2 (Q121–Q200, 10 questions per intelligence, Likert averaged and normalised to 0–100).
 
 | Intelligence | Questions |

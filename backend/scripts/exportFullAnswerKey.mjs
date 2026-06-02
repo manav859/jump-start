@@ -1,3 +1,5 @@
+
+
 // Export one markdown answer-key / question-bank file per section of the
 // complete 500-question test. Produces five files in backend/exports/:
 //
@@ -120,6 +122,74 @@ const workStyleAnnotation = (questionId) => {
   return [`_Answer-key mapping — ${spec.dimension}:_`, ...rows].join("\n");
 };
 
+// ---------------------------------------------------------------------------
+// Section 3 preference-question option → trait/Holland mappings.
+// Activity Preferences (Q255-272) route each A/B/C option to a Holland (RIASEC)
+// type via the answer key's recurring dimension rows (the 18 questions cycle
+// through the six documented rows). Work Environment (Q273-290) routes each
+// option's text into one of four work-environment preference profiles using the
+// SAME rules the runtime scorer applies (ENVIRONMENT_OPTION_RULES), so the
+// export matches exactly how a response is scored.
+// ---------------------------------------------------------------------------
+const ACTIVITY_DIMENSION_ROWS =
+  DIMENSION_ROW_INDEX.get("activity_preferences") || [];
+const ENV_SUBSECTION = (CAREER_500Q_CONFIG.default || CAREER_500Q_CONFIG).sections
+  .flatMap((s) => s.subsections || [])
+  .find((s) => s.key === "work_environment_preferences");
+const ENV_PROFILE_LABELS = Object.fromEntries(
+  Object.entries(ENV_SUBSECTION?.dominantProfiles || {}).map(([key, val]) => [
+    key,
+    val.label || key,
+  ])
+);
+const ENV_OPTION_PROFILE_MAP = ENV_SUBSECTION?.optionProfileMap || {};
+
+// Returns the trait/Holland/profile label an option maps to, or "" if none.
+const optionTraitLabel = (subsectionKey, questionId, optionIndex) => {
+  if (subsectionKey === "activity_preferences") {
+    if (!ACTIVITY_DIMENSION_ROWS.length) return "";
+    const row = ACTIVITY_DIMENSION_ROWS[(Number(questionId) - 255 + ACTIVITY_DIMENSION_ROWS.length * 100) % ACTIVITY_DIMENSION_ROWS.length];
+    return [row.a, row.b, row.c][optionIndex] || "";
+  }
+  if (subsectionKey === "work_environment_preferences") {
+    const letter = String.fromCharCode(65 + optionIndex);
+    const profileKey = ENV_OPTION_PROFILE_MAP[Number(questionId)]?.[letter];
+    return profileKey ? ENV_PROFILE_LABELS[profileKey] || profileKey : "";
+  }
+  return "";
+};
+
+// "HOW THIS IS SCORED" note block per Section 3 preference subsection.
+const SCORING_NOTES = {
+  subject_preferences: [
+    "**HOW THIS IS SCORED:**",
+    "These are interest-rating questions (1 = Not at all interested → 5 = Extremely interested).",
+    "Each subject belongs to a subject cluster (STEM, Humanities, Arts, Social Sciences). Your",
+    "ratings are **averaged** within each cluster — the higher the average, the stronger that",
+    "cluster's pull. (Note: this block is averaged, not point-accumulation.)",
+  ].join("\n"),
+  activity_preferences: [
+    "**HOW THIS IS SCORED:**",
+    "These are preference questions (not agree/disagree). Each option maps to a Holland interest",
+    "type. When you choose an option, it adds a point to that interest area. After all questions,",
+    "the interest type with the most points becomes part of your interest profile, which feeds",
+    "career matching. This is **point-accumulation, not averaging**.",
+    "",
+    "Example: choosing the \"science museum\" option on Q256 adds to your Investigative score;",
+    "choosing \"concert/art\" adds to Artistic.",
+  ].join("\n"),
+  work_environment_preferences: [
+    "**HOW THIS IS SCORED:**",
+    "These are preference questions (not agree/disagree). Every option maps to exactly one of four",
+    "work-environment preference profiles — Research / Quiet / Independent, Collaborative / People /",
+    "Service, Dynamic / Leadership / Business, or Creative / Flexible / Innovative. Choosing an",
+    "option adds a point to that profile; the profile with the most points becomes your dominant",
+    "work-environment preference. This is **point-accumulation, not averaging**.",
+    "",
+    "_The profile each option maps to is shown next to it below._",
+  ].join("\n"),
+};
+
 // Subsection ranges sourced from career500q.config.js. label + inclusive
 // question-id range per subsection.
 const SUBSECTIONS = {
@@ -181,7 +251,7 @@ const INTEREST_SCALE = "Scale: 1 = Not at all interested → 5 = Extremely inter
 const optionLetter = (i) => String.fromCharCode(65 + i);
 
 // Render the answer / scale block under a question.
-const renderResponseBlock = (question, meta) => {
+const renderResponseBlock = (question, meta, subsectionKey = "") => {
   const opts = Array.isArray(question.options) ? question.options : [];
 
   // Section 4 — definitive correct answer.
@@ -201,14 +271,29 @@ const renderResponseBlock = (question, meta) => {
     return [...lines, "", answerLine].filter(Boolean).join("\n");
   }
 
-  // Non-Section-4 single-select preference items (e.g. Work Style,
-  // Activity Preferences) — list the options, no "correct" answer.
+  // Non-Section-4 single-select preference items (Activity, Environment,
+  // Work Style). List the options and, where the answer key / scorer defines
+  // it, show the trait/Holland type each option maps to.
   if (opts.length) {
-    return opts.map((opt, i) => `   ${optionLetter(i)}. ${opt}`).join("\n");
+    return opts
+      .map((opt, i) => {
+        const label = optionTraitLabel(subsectionKey, question.questionId, i);
+        return `   ${optionLetter(i)}. ${opt}${label ? `   → ${label}` : ""}`;
+      })
+      .join("\n");
   }
 
   // Likert items — show the response scale.
   return meta.interestScale ? INTEREST_SCALE : AGREEMENT_SCALE;
+};
+
+// Resolve the config subsection key from the export's display label.
+const subsectionKeyForLabel = (label = "") => {
+  if (label.includes("Subject")) return "subject_preferences";
+  if (label.includes("Activity")) return "activity_preferences";
+  if (label.includes("Environment")) return "work_environment_preferences";
+  if (label.includes("Holland")) return "holland_riasec";
+  return "";
 };
 
 const buildSectionFile = (section, meta, subsections) => {
@@ -245,20 +330,28 @@ const buildSectionFile = (section, meta, subsections) => {
     lines.push(`## ${label} (Q${start}–Q${end}) — ${bucket.length} questions`);
     lines.push("");
 
-    // Subsection-level answer-key option mapping for the Activity /
-    // Environment preference blocks (the PDF documents these as recurring
-    // dimension rows rather than per-question keys).
-    const dimKey = label.includes("Activity")
-      ? "activity_preferences"
-      : label.includes("Environment")
-        ? "work_environment_preferences"
-        : null;
-    if (dimKey && DIMENSION_ROW_INDEX.has(dimKey)) {
-      lines.push("_Answer-key option mapping (per recurring dimension):_");
+    const subsectionKey = subsectionKeyForLabel(label);
+
+    // "HOW THIS IS SCORED" explainer for the Section 3 preference blocks.
+    if (SCORING_NOTES[subsectionKey]) {
+      lines.push(SCORING_NOTES[subsectionKey]);
+      lines.push("");
+    }
+
+    // Subsection-level answer-key option mapping reference. Activity cycles
+    // through six recurring dimension rows across its 18 questions; the
+    // Environment block's four documented dimensions are illustrated by its
+    // first four questions (Q273–276).
+    if (DIMENSION_ROW_INDEX.has(subsectionKey)) {
+      lines.push(
+        subsectionKey === "activity_preferences"
+          ? "_Answer-key option mapping — the 18 questions cycle through these six recurring dimensions:_"
+          : "_Answer-key core environment dimensions (illustrated by Q273–276):_"
+      );
       lines.push("");
       lines.push("| Dimension | Option A | Option B | Option C |");
       lines.push("| --- | --- | --- | --- |");
-      DIMENSION_ROW_INDEX.get(dimKey).forEach((row) => {
+      DIMENSION_ROW_INDEX.get(subsectionKey).forEach((row) => {
         lines.push(`| ${row.dimension} | ${row.a} | ${row.b} | ${row.c} |`);
       });
       lines.push("");
@@ -268,7 +361,7 @@ const buildSectionFile = (section, meta, subsections) => {
       const text = String(q.text || "").trim() || "_(question text missing)_";
       lines.push(`**Q${q.questionId}.** ${text}`);
       lines.push("");
-      lines.push(renderResponseBlock(q, meta));
+      lines.push(renderResponseBlock(q, meta, subsectionKey));
       const traitNote = traitAnnotation(q.questionId);
       const wsNote = workStyleAnnotation(q.questionId);
       if (traitNote) {

@@ -230,6 +230,12 @@ _Scores: Conventional · Reverse-scored: No_
 
 ## Subject Preferences (Q237–Q254) — 18 questions
 
+**HOW THIS IS SCORED:**
+These are interest-rating questions (1 = Not at all interested → 5 = Extremely interested).
+Each subject belongs to a subject cluster (STEM, Humanities, Arts, Social Sciences). Your
+ratings are **averaged** within each cluster — the higher the average, the stronger that
+cluster's pull. (Note: this block is averaged, not point-accumulation.)
+
 **Q237.** Mathematics and Statistics
 
 Scale: 1 = Not at all interested → 5 = Extremely interested
@@ -336,7 +342,16 @@ _Scores: Arts Subjects · Reverse-scored: No_
 
 ## Activity Preferences (Q255–Q272) — 18 questions
 
-_Answer-key option mapping (per recurring dimension):_
+**HOW THIS IS SCORED:**
+These are preference questions (not agree/disagree). Each option maps to a Holland interest
+type. When you choose an option, it adds a point to that interest area. After all questions,
+the interest type with the most points becomes part of your interest profile, which feeds
+career matching. This is **point-accumulation, not averaging**.
+
+Example: choosing the "science museum" option on Q256 adds to your Investigative score;
+choosing "concert/art" adds to Artistic.
+
+_Answer-key option mapping — the 18 questions cycle through these six recurring dimensions:_
 
 | Dimension | Option A | Option B | Option C |
 | --- | --- | --- | --- |
@@ -349,117 +364,126 @@ _Answer-key option mapping (per recurring dimension):_
 
 **Q255.** I would most enjoy:
 
-   A. Designing a website or mobile app
-   B. Organizing a charity fundraising event
-   C. Conducting a chemistry experiment
+   A. Designing a website or mobile app   → Technology / Realistic
+   B. Organizing a charity fundraising event   → Social Service / Social
+   C. Conducting a chemistry experiment   → Science / Investigative
 
 **Q256.** For a weekend activity, I would choose:
 
-   A. Visiting a science museum
-   B. Attending a concert or art exhibition
-   C. Participating in a sports competition
+   A. Visiting a science museum   → Investigative
+   B. Attending a concert or art exhibition   → Artistic
+   C. Participating in a sports competition   → Realistic
 
 **Q257.** I would rather:
 
-   A. Write a research paper on a topic I'm passionate about
-   B. Create a presentation for a business proposal
-   C. Build a model or prototype of an invention
+   A. Write a research paper on a topic I'm passionate about   → Investigative
+   B. Create a presentation for a business proposal   → Enterprising
+   C. Build a model or prototype of an invention   → Realistic
 
 **Q258.** Given these options, I would select:
 
-   A. Tutoring younger students in mathematics
-   B. Performing in a school play or musical
-   C. Leading a student government campaign
+   A. Tutoring younger students in mathematics   → Social
+   B. Performing in a school play or musical   → Artistic
+   C. Leading a student government campaign   → Enterprising
 
 **Q259.** I would be most interested in:
 
-   A. Analyzing survey data for market research
-   B. Designing costumes for a theater production
-   C. Coaching a youth sports team
+   A. Analyzing survey data for market research   → Investigative
+   B. Designing costumes for a theater production   → Artistic
+   C. Coaching a youth sports team   → Social
 
 **Q260.** My preferred summer activity would be:
 
-   A. Interning at a technology company
-   B. Volunteering at a hospital or clinic
-   C. Working at an art gallery or museum
+   A. Interning at a technology company   → Realistic / Investigative
+   B. Volunteering at a hospital or clinic   → Social
+   C. Working at an art gallery or museum   → Artistic
 
 **Q261.** I would enjoy:
 
-   A. Debating current events and political issues
-   B. Creating digital artwork or animations
-   C. Planning and organizing a major event
+   A. Debating current events and political issues   → Technology / Realistic
+   B. Creating digital artwork or animations   → Social Service / Social
+   C. Planning and organizing a major event   → Science / Investigative
 
 **Q262.** For a group project, I would want to:
 
-   A. Research and gather information
-   B. Present findings to the class
-   C. Design visual materials and displays
+   A. Research and gather information   → Investigative
+   B. Present findings to the class   → Artistic
+   C. Design visual materials and displays   → Realistic
 
 **Q263.** I would rather spend time:
 
-   A. Reading about scientific discoveries
-   B. Visiting historical sites and landmarks
-   C. Exploring nature and outdoor environments
+   A. Reading about scientific discoveries   → Investigative
+   B. Visiting historical sites and landmarks   → Enterprising
+   C. Exploring nature and outdoor environments   → Realistic
 
 **Q264.** Given these choices, I would pick:
 
-   A. Learning a new programming language
-   B. Taking a creative writing workshop
-   C. Participating in a debate tournament
+   A. Learning a new programming language   → Social
+   B. Taking a creative writing workshop   → Artistic
+   C. Participating in a debate tournament   → Enterprising
 
 **Q265.** I would be most excited about:
 
-   A. Shadowing a doctor or nurse for a day
-   B. Attending a business entrepreneur workshop
-   C. Joining an environmental conservation project
+   A. Shadowing a doctor or nurse for a day   → Investigative
+   B. Attending a business entrepreneur workshop   → Artistic
+   C. Joining an environmental conservation project   → Social
 
 **Q266.** My ideal extracurricular activity would be:
 
-   A. Science olympiad or math competition
-   B. Drama club or school newspaper
-   C. Student council or community service club
+   A. Science olympiad or math competition   → Realistic / Investigative
+   B. Drama club or school newspaper   → Social
+   C. Student council or community service club   → Artistic
 
 **Q267.** I would prefer to:
 
-   A. Solve puzzles and brain teasers
-   B. Create music playlists and mixes
-   C. Organize social events and parties
+   A. Solve puzzles and brain teasers   → Technology / Realistic
+   B. Create music playlists and mixes   → Social Service / Social
+   C. Organize social events and parties   → Science / Investigative
 
 **Q268.** For a career exploration opportunity, I would choose:
 
-   A. Job shadowing an engineer or architect
-   B. Volunteering at a social services agency
-   C. Interning at a marketing or advertising firm
+   A. Job shadowing an engineer or architect   → Investigative
+   B. Volunteering at a social services agency   → Artistic
+   C. Interning at a marketing or advertising firm   → Realistic
 
 **Q269.** I would most enjoy:
 
-   A. Building and programming robots
-   B. Writing and editing for a publication
-   C. Planning and managing a budget
+   A. Building and programming robots   → Investigative
+   B. Writing and editing for a publication   → Enterprising
+   C. Planning and managing a budget   → Realistic
 
 **Q270.** Given these activities, I would select:
 
-   A. Participating in a science fair
-   B. Joining a cultural exchange program
-   C. Starting a small business or entrepreneurial venture
+   A. Participating in a science fair   → Social
+   B. Joining a cultural exchange program   → Artistic
+   C. Starting a small business or entrepreneurial venture   → Enterprising
 
 **Q271.** I would rather:
 
-   A. Study foreign cultures and languages
-   B. Experiment with new technologies
-   C. Coordinate volunteer activities
+   A. Study foreign cultures and languages   → Investigative
+   B. Experiment with new technologies   → Artistic
+   C. Coordinate volunteer activities   → Social
 
 **Q272.** My preferred learning experience would be:
 
-   A. Hands-on laboratory work
-   B. Group discussions and seminars
-   C. Individual research projects
+   A. Hands-on laboratory work   → Realistic / Investigative
+   B. Group discussions and seminars   → Social
+   C. Individual research projects   → Artistic
 
 ---
 
 ## Work Environment Preferences (Q273–Q290) — 18 questions
 
-_Answer-key option mapping (per recurring dimension):_
+**HOW THIS IS SCORED:**
+These are preference questions (not agree/disagree). Every option maps to exactly one of four
+work-environment preference profiles — Research / Quiet / Independent, Collaborative / People /
+Service, Dynamic / Leadership / Business, or Creative / Flexible / Innovative. Choosing an
+option adds a point to that profile; the profile with the most points becomes your dominant
+work-environment preference. This is **point-accumulation, not averaging**.
+
+_The profile each option maps to is shown next to it below._
+
+_Answer-key core environment dimensions (illustrated by Q273–276):_
 
 | Dimension | Option A | Option B | Option C |
 | --- | --- | --- | --- |
@@ -470,111 +494,111 @@ _Answer-key option mapping (per recurring dimension):_
 
 **Q273.** My ideal work setting would be:
 
-   A. A laboratory or research facility
-   B. An office with regular business hours
-   C. Outdoors or frequently traveling
+   A. A laboratory or research facility   → Research / Quiet / Independent
+   B. An office with regular business hours   → Dynamic / Leadership / Business
+   C. Outdoors or frequently traveling   → Dynamic / Leadership / Business
 
 **Q274.** I would prefer to work:
 
-   A. In a quiet, focused environment
-   B. In a collaborative, social atmosphere
-   C. In a fast-paced, dynamic setting
+   A. In a quiet, focused environment   → Research / Quiet / Independent
+   B. In a collaborative, social atmosphere   → Collaborative / People / Service
+   C. In a fast-paced, dynamic setting   → Dynamic / Leadership / Business
 
 **Q275.** I would rather work for:
 
-   A. A large, established corporation
-   B. A small, close-knit organization
-   C. Myself as an entrepreneur
+   A. A large, established corporation   → Dynamic / Leadership / Business
+   B. A small, close-knit organization   → Collaborative / People / Service
+   C. Myself as an entrepreneur   → Dynamic / Leadership / Business
 
 **Q276.** My preferred work schedule would be:
 
-   A. Standard 9 to 5 weekday hours
-   B. Flexible hours with some remote work
-   C. Variable schedule based on projects
+   A. Standard 9 to 5 weekday hours   → Research / Quiet / Independent
+   B. Flexible hours with some remote work   → Creative / Flexible / Innovative
+   C. Variable schedule based on projects   → Dynamic / Leadership / Business
 
 **Q277.** I would enjoy working:
 
-   A. With cutting-edge technology and equipment
-   B. Directly with clients and customers
-   C. With creative materials and tools
+   A. With cutting-edge technology and equipment   → Research / Quiet / Independent
+   B. Directly with clients and customers   → Collaborative / People / Service
+   C. With creative materials and tools   → Creative / Flexible / Innovative
 
 **Q278.** I prefer workplaces that are:
 
-   A. Highly structured and organized
-   B. Balanced between structure and flexibility
-   C. Creative and innovative
+   A. Highly structured and organized   → Research / Quiet / Independent
+   B. Balanced between structure and flexibility   → Collaborative / People / Service
+   C. Creative and innovative   → Creative / Flexible / Innovative
 
 **Q279.** I would rather work:
 
-   A. Independently on specialized projects
-   B. As part of a diverse team
-   C. In leadership roles directing others
+   A. Independently on specialized projects   → Research / Quiet / Independent
+   B. As part of a diverse team   → Collaborative / People / Service
+   C. In leadership roles directing others   → Dynamic / Leadership / Business
 
 **Q280.** My ideal work location would be:
 
-   A. In a major city with many opportunities
-   B. In a suburban area with good work-life balance
-   C. In a rural or natural setting
+   A. In a major city with many opportunities   → Dynamic / Leadership / Business
+   B. In a suburban area with good work-life balance   → Collaborative / People / Service
+   C. In a rural or natural setting   → Research / Quiet / Independent
 
 **Q281.** I would prefer a job that:
 
-   A. Provides stability and security
-   B. Offers opportunities for advancement
-   C. Allows for creativity and self-expression
+   A. Provides stability and security   → Research / Quiet / Independent
+   B. Offers opportunities for advancement   → Dynamic / Leadership / Business
+   C. Allows for creativity and self-expression   → Creative / Flexible / Innovative
 
 **Q282.** I would enjoy working in:
 
-   A. A hospital or healthcare facility
-   B. A school or educational institution
-   C. A business or corporate environment
+   A. A hospital or healthcare facility   → Collaborative / People / Service
+   B. A school or educational institution   → Collaborative / People / Service
+   C. A business or corporate environment   → Dynamic / Leadership / Business
 
 **Q283.** I prefer work that:
 
-   A. Follows established procedures and protocols
-   B. Allows me to develop new methods and approaches
-   C. Involves helping and serving others
+   A. Follows established procedures and protocols   → Research / Quiet / Independent
+   B. Allows me to develop new methods and approaches   → Creative / Flexible / Innovative
+   C. Involves helping and serving others   → Collaborative / People / Service
 
 **Q284.** My ideal work atmosphere would be:
 
-   A. Calm and peaceful
-   B. Energetic and stimulating
-   C. Supportive and collaborative
+   A. Calm and peaceful   → Research / Quiet / Independent
+   B. Energetic and stimulating   → Dynamic / Leadership / Business
+   C. Supportive and collaborative   → Collaborative / People / Service
 
 **Q285.** I would rather work:
 
-   A. With data, numbers, and analysis
-   B. With people and relationships
-   C. With ideas and concepts
+   A. With data, numbers, and analysis   → Research / Quiet / Independent
+   B. With people and relationships   → Collaborative / People / Service
+   C. With ideas and concepts   → Creative / Flexible / Innovative
 
 **Q286.** I prefer jobs that:
 
-   A. Have clear expectations and requirements
-   B. Allow for creativity and innovation
-   C. Make a positive impact on society
+   A. Have clear expectations and requirements   → Research / Quiet / Independent
+   B. Allow for creativity and innovation   → Creative / Flexible / Innovative
+   C. Make a positive impact on society   → Collaborative / People / Service
 
 **Q287.** I would enjoy working:
 
-   A. Behind the scenes on important projects
-   B. In the spotlight with public recognition
-   C. In partnership with colleagues and clients
+   A. Behind the scenes on important projects   → Research / Quiet / Independent
+   B. In the spotlight with public recognition   → Dynamic / Leadership / Business
+   C. In partnership with colleagues and clients   → Collaborative / People / Service
 
 **Q288.** My preferred work culture would be:
 
-   A. Professional and formal
-   B. Casual and relaxed
-   C. Mission-driven and purposeful
+   A. Professional and formal   → Dynamic / Leadership / Business
+   B. Casual and relaxed   → Creative / Flexible / Innovative
+   C. Mission-driven and purposeful   → Collaborative / People / Service
 
 **Q289.** I would rather have a job that:
 
-   A. Challenges me intellectually
-   B. Allows me to express my creativity
-   C. Helps me make a difference in the world
+   A. Challenges me intellectually   → Research / Quiet / Independent
+   B. Allows me to express my creativity   → Creative / Flexible / Innovative
+   C. Helps me make a difference in the world   → Collaborative / People / Service
 
 **Q290.** I prefer work environments that are:
 
-   A. Technology-focused and innovative
-   B. People-centered and relationship-based
-   C. Results-oriented and achievement-focused
+   A. Technology-focused and innovative   → Research / Quiet / Independent
+   B. People-centered and relationship-based   → Collaborative / People / Service
+   C. Results-oriented and achievement-focused   → Dynamic / Leadership / Business
 
 ---
 

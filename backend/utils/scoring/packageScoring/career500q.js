@@ -452,12 +452,9 @@ const ACTIVITY_OPTION_RULES = [
   { profile: "technical", patterns: [/technology|prototype|invention|engineering|build|sports competition/i] },
 ];
 
-const ENVIRONMENT_OPTION_RULES = [
-  { profile: "research", patterns: [/laboratory|research|quiet|independently|specialized|rural|natural/i] },
-  { profile: "collaborative", patterns: [/collaborative|clients|customers|team|suburban|balance|remote work/i] },
-  { profile: "dynamic", patterns: [/fast-paced|leadership|entrepreneur|traveling|project|major city/i] },
-  { profile: "creative", patterns: [/creative|innovative|materials|tools|flexible/i] },
-];
+// Work Environment scoring previously used fragile keyword rules here; it now
+// uses the explicit per-question optionProfileMap in career500q.config.js (see
+// scoreEnvironmentProfile), so every option maps deterministically.
 
 const classifyByRules = (text = "", rules = []) => {
   const normalized = String(text || "").trim();
@@ -772,6 +769,75 @@ const scoreActivityRiasec = (subsectionConfig, questionMap) => {
     answeredCount,
     totalQuestions,
     description: interpretation,
+    dominantProfileKey: dominantKey || "",
+    profileBreakdown,
+  };
+};
+
+// Work Environment Preferences (Q273-290). Each answered option maps to a
+// work-environment profile via the config's explicit optionProfileMap (every
+// A/B/C option is mapped — none are left unscored). Highest-count profile is
+// the dominant work-environment preference.
+const scoreEnvironmentProfile = (subsectionConfig, questionMap) => {
+  const optionMap = subsectionConfig.optionProfileMap || {};
+  const profiles = subsectionConfig.dominantProfiles || {};
+  const counts = Object.fromEntries(Object.keys(profiles).map((key) => [key, 0]));
+  let answeredCount = 0;
+  const assignedQuestionNumbers = subsectionConfig.questionNumbers.filter(
+    (questionNumber) => questionMap.has(Number(questionNumber))
+  );
+
+  subsectionConfig.questionNumbers.forEach((questionNumber) => {
+    const entry = questionMap.get(Number(questionNumber));
+    if (!entry) return;
+    const answer = normalizeAnswerLetter(entry.rawAnswer);
+    if (!answer) return;
+    const profileKey = optionMap[questionNumber]?.[answer];
+    if (!profileKey || counts[profileKey] == null) return;
+    counts[profileKey] += 1;
+    answeredCount += 1;
+  });
+
+  const ranked = Object.entries(counts)
+    .filter(([, count]) => count > 0)
+    .sort(([, a], [, b]) => b - a);
+  const [dominantKey, dominantCount] = ranked[0] || ["", 0];
+  const dominant = profiles[dominantKey] || null;
+  const profileBreakdown = ranked.map(([key, count]) => ({
+    key,
+    label: profiles[key]?.label || key,
+    count,
+    percentage: answeredCount ? roundPercent((count / answeredCount) * 100) : null,
+    interpretation: profiles[key]?.interpretation || "",
+    careerImplication: profiles[key]?.careerImplication || "",
+    highlights: Array.isArray(profiles[key]?.highlights) ? profiles[key].highlights : [],
+  }));
+  const consistency = answeredCount
+    ? roundPercent((dominantCount / answeredCount) * 100)
+    : null;
+  const totalQuestions = assignedQuestionNumbers.length;
+  const fallback =
+    "No dominant work-environment preference could be resolved from the answered options.";
+
+  return {
+    key: subsectionConfig.key,
+    label: subsectionConfig.label,
+    answerType: subsectionConfig.answerType,
+    scoreType: subsectionConfig.scoreType,
+    score: dominantCount || null,
+    rawScore: dominantCount || null,
+    maxScore: answeredCount || totalQuestions,
+    average: null,
+    percentage: consistency,
+    band: dominant?.label || "",
+    interpretation: dominant?.interpretation || fallback,
+    careerImplication: dominant?.careerImplication || "",
+    questionNumbers: assignedQuestionNumbers,
+    questionRangeLabel: buildQuestionRangeLabel(assignedQuestionNumbers),
+    status: summarizeStatus(answeredCount, totalQuestions),
+    answeredCount,
+    totalQuestions,
+    description: dominant?.interpretation || fallback,
     dominantProfileKey: dominantKey || "",
     profileBreakdown,
   };
@@ -1213,11 +1279,7 @@ const scoreSubsection = (subsectionConfig, questionMap) => {
       );
       break;
     case "environment_profile":
-      result = scoreCategoricalProfile(
-        subsectionConfig,
-        questionMap,
-        ENVIRONMENT_OPTION_RULES
-      );
+      result = scoreEnvironmentProfile(subsectionConfig, questionMap);
       break;
     case "objective_correct":
     case "manual_review_only":
