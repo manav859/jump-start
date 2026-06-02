@@ -168,7 +168,7 @@ The Section 3 preference blocks are **not** agree/disagree Likert items and are 
 
 > Example: choosing the "science museum" option on Q256 adds a point to **Investigative**; choosing "concert/art exhibition" adds to **Artistic**.
 
-**Work Environment (Q273–Q290) → work-environment profile.** Each option's text is routed by keyword (`ENVIRONMENT_OPTION_RULES`, `scoreCategoricalProfile`) into one of four profiles — Research / Quiet / Independent, Collaborative / People / Service, Dynamic / Leadership / Business, Creative / Flexible / Innovative — by point-accumulation; the highest-count profile is the dominant work-environment preference. (Options not matched by any keyword rule are not counted.)
+**Work Environment (Q273–Q290) → work-environment profile.** Each A/B/C option maps to one of four profiles — Research / Quiet / Independent, Collaborative / People / Service, Dynamic / Leadership / Business, Creative / Flexible / Innovative — via an explicit per-question `optionProfileMap` in [career500q.config.js](../backend/utils/scoring/configs/career500q.config.js) (scored by `scoreEnvironmentProfile`). **Every option maps to exactly one profile** — there is no unmatched/unscored option. Scoring is point-accumulation; the highest-count profile is the dominant work-environment preference. (This replaced earlier fragile keyword matching that left options such as "An office with regular business hours" unscored.)
 
 **Subject Preferences (Q237–Q254)** are the exception in Section 3: they are interest-rated 1–5 and **averaged** into four subject clusters (STEM, Humanities, Arts, Social Sciences) — averaging, not accumulation.
 

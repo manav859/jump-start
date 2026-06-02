@@ -186,7 +186,7 @@ The Q201–Q236 items above are Likert (1–5, **averaged** per code). In additi
 | Activity Type (Q259, 265, 271) | Investigative | Artistic | Social |
 | Environment (Q260, 266, 272) | Realistic / Investigative | Social | Artistic |
 
-Two further Section 3 preference blocks shape the interest profile but are **not** Holland buckets fed to the matcher: **Subject Preferences (Q237–Q254)** are interest-rated 1–5 and **averaged** into four subject clusters (STEM, Humanities, Arts, Social Sciences); **Work Environment (Q273–Q290)** options are routed by keyword into four work-environment preference profiles (Research / Collaborative / Dynamic / Creative) by point-accumulation. The per-option mapping for every Section 3 preference question is printed in [`backend/exports/section3-interest-assessment.md`](../backend/exports/section3-interest-assessment.md).
+Two further Section 3 preference blocks shape the interest profile but are **not** Holland buckets fed to the matcher: **Subject Preferences (Q237–Q254)** are interest-rated 1–5 and **averaged** into four subject clusters (STEM, Humanities, Arts, Social Sciences); **Work Environment (Q273–Q290)** options each map (via an explicit per-question `optionProfileMap`) to one of four work-environment preference profiles (Research / Collaborative / Dynamic / Creative) by point-accumulation — every option maps to exactly one profile. The per-option mapping for every Section 3 preference question is printed in [`backend/exports/section3-interest-assessment.md`](../backend/exports/section3-interest-assessment.md).
 
 **Multiple Intelligences (weight 0.25)** — from Section 2 (Q121–Q200, 10 questions per intelligence, Likert averaged and normalised to 0–100).
 

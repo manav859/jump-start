@@ -127,9 +127,9 @@ const workStyleAnnotation = (questionId) => {
 // Activity Preferences (Q255-272) route each A/B/C option to a Holland (RIASEC)
 // type via the answer key's recurring dimension rows (the 18 questions cycle
 // through the six documented rows). Work Environment (Q273-290) routes each
-// option's text into one of four work-environment preference profiles using the
-// SAME rules the runtime scorer applies (ENVIRONMENT_OPTION_RULES), so the
-// export matches exactly how a response is scored.
+// option to one of four work-environment profiles via the config's explicit
+// per-question optionProfileMap — the SAME mapping the runtime scorer applies,
+// so the export matches exactly how a response is scored. Every option maps.
 // ---------------------------------------------------------------------------
 const ACTIVITY_DIMENSION_ROWS =
   DIMENSION_ROW_INDEX.get("activity_preferences") || [];
