@@ -1429,7 +1429,7 @@ const buildSectionResult = (sectionConfig, questionMap) => {
 //   A vs T — emotional-stability blend, threshold raised from 50% to 60%
 //            (neuroticism is genuinely lower-skewed in self-report so
 //             the midpoint is too easy to clear)
-const buildPersonalityType = ({ bigFiveSection, emotionalSection }) => {
+export const buildPersonalityType = ({ bigFiveSection, emotionalSection }) => {
   const factorMap = Object.fromEntries(
     (bigFiveSection?.factorResults || []).map((item) => [item.key, item])
   );
