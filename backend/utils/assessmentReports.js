@@ -230,6 +230,13 @@ export const cloneResultProfile = (profile = {}) => ({
   multipleIntelligences: cloneScoreMap(profile?.multipleIntelligences),
   aptitudeScores: cloneScoreMap(profile?.aptitudeScores),
   eqProfile: cloneScoreMap(profile?.eqProfile),
+  // Career-matching engine provenance ({ version, source, at }). Preserved
+  // through the sanitize hook so a later app-triggered save doesn't strip the
+  // marker the scorer/migration set — which would let the rematch migration
+  // re-process (and double-ipsatize) the report on a future run.
+  careerRematch: profile?.careerRematch
+    ? JSON.parse(JSON.stringify(profile.careerRematch))
+    : null,
   personalityType: {
     code: profile?.personalityType?.code || "",
     title: profile?.personalityType?.title || "",

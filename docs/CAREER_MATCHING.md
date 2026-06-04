@@ -1,14 +1,14 @@
 # Career Matching
 
-This document covers the 125-career database, the four dimensions used to match a student to careers, and the weighted formula that produces each match score.
+This document covers the 129-career database, the four dimensions used to match a student to careers, and the weighted formula that produces each match score.
 
 ---
 
 ## For Clients: How career matching works
 
-### The 125-career database
+### The 129-career database
 
-Jumpstart maintains a curated list of **125 careers** spanning 12 categories. Each career has a "fingerprint" describing the kind of person who tends to do well in it — primary interests, dominant intelligence types, key aptitudes, and the EQ traits the role rewards.
+Jumpstart maintains a curated list of **129 careers** spanning 12 categories. Each career has a "fingerprint" describing the kind of person who tends to do well in it — primary interests, dominant intelligence types, key aptitudes, and the EQ traits the role rewards.
 
 The 12 categories:
 
@@ -44,6 +44,12 @@ The Holland system describes vocational interests in six themes. Most careers le
 | **E** | Enterprising | "If you score high on Enterprising, careers like business, sales, law, and politics match — anything that involves influence, persuasion, and leadership." |
 | **C** | Conventional | "If you score high on Conventional, careers like accounting, banking, and administration match — anything that rewards structure, precision, and reliable systems." |
 
+#### 1b. Acquiescence correction — why a "yes to everything" student still gets a focused result
+
+The six Holland interest scores have one failure mode worth calling out. The interest questions are all positively worded ("I enjoy leading a team", "I like solving puzzles"), so a high-energy student who answers *everything* enthusiastically scores high on all six themes at once — and the most outgoing themes (Enterprising, Social) inflate the most. Left uncorrected, that collapses the interest signal: every enthusiastic student looks Enterprising/Social and is pushed toward the same cluster of business and sales careers regardless of what they actually prefer.
+
+To prevent this, each student's six interest scores are **re-centered on their own average** before matching. A student whose scores are all high becomes flat (no false Enterprising lean); a student who genuinely prefers Investigative work over everything else keeps — and sharpens — that lean. Career direction is decided by the *shape* of your interests, not by how agreeable you were with the questions.
+
 #### 2. Multiple Intelligences (25% weight) — how your mind works best
 
 Drawn from Howard Gardner's framework. Most people are strong in two or three of these and weaker in the others.
@@ -59,7 +65,7 @@ Drawn from Howard Gardner's framework. Most people are strong in two or three of
 | **Intrapersonal** | "High Intrapersonal points to writing, psychology, entrepreneurship — careers that need strong self-reflection and self-direction." |
 | **Naturalistic** | "High Naturalistic points to environmental science, biology, veterinary medicine — careers tied to natural systems and living things." |
 
-#### 3. Aptitudes (25% weight) — the skills the algorithm could measure objectively
+#### 3. Aptitudes (30% weight) — the skills the algorithm could measure objectively
 
 These come from your Section 4 aptitude battery — actual right-or-wrong test items, not self-assessment.
 
@@ -74,9 +80,9 @@ These come from your Section 4 aptitude battery — actual right-or-wrong test i
 | **Critical Thinking** | "Strong critical thinking → law, research, leadership, analysis." |
 | **Problem Solving** | "Strong problem solving → engineering, consulting, entrepreneurship." |
 
-#### 4. Emotional Intelligence (15% weight) — the human-side skills
+#### 4. Emotional Intelligence (10% weight) — the human-side skills
 
-EQ is the strongest single predictor of long-term career success across most fields, so it earns a meaningful weight even though it's the smallest of the four.
+EQ matters for long-term success in most fields, so it earns a place in the formula — but it's deliberately the lightest of the four. Social Skills and Motivation run high for almost every sociable student and are listed as a requirement on a large share of careers, so a heavier EQ weight added a flat lift that floated every business/people career (Sales Manager especially) to the top regardless of a student's real interests. Keeping EQ light lets the interest, intelligence, and aptitude signals decide direction.
 
 | Competency | Everyday example |
 |---|---|
@@ -124,7 +130,7 @@ Career recommendations are a **starting point**, not a verdict. Use them this wa
 
 [backend/data/careerMappingData.js](../backend/data/careerMappingData.js)
 
-Exports `CAREER_MAPPINGS` — an array of 125 career objects, plus the supporting constants used by the matcher:
+Exports `CAREER_MAPPINGS` — an array of 129 career objects, plus the supporting constants used by the matcher:
 
 ```js
 export const CAREER_MAPPINGS = [
@@ -175,16 +181,16 @@ The four buckets the matcher consumes (`hollandProfile`, `multipleIntelligences`
 | E — Enterprising | Q225–Q230 | Influence, persuade, lead |
 | C — Conventional | Q231–Q236 | Structure, precision, systems |
 
-The Q201–Q236 items above are Likert (1–5, **averaged** per code). In addition, the **Activity Preferences block (Q255–Q272) also feeds the Holland scores** — but by **point-accumulation, not averaging**: each A/B/C choice maps to a Holland type per the official answer key, and each pick adds one point to that type. The accumulated tallies are blended into the six RIASEC interest scores (see [ALGORITHM.md — Preference scoring](ALGORITHM.md#preference-scoring-point-accumulation)). The 18 questions cycle through six recurring answer-key dimensions:
+The Q201–Q236 items above are Likert (1–5, **averaged** per code), then **acquiescence-corrected** (ipsatized) before matching — see the "Acquiescence correction" client note above and `ipsatizeInterestScores` in [career500q.js](../backend/utils/scoring/packageScoring/career500q.js). In addition, the **Activity Preferences block (Q255–Q272) also feeds the Holland scores** — but by **point-accumulation, not averaging**: each A/B/C choice maps to a Holland type, and each pick adds one point to that type. The accumulated tallies are blended into the six RIASEC interest scores (see [ALGORITHM.md — Preference scoring](ALGORITHM.md#preference-scoring-point-accumulation)). The 18 questions cycle through six recurring dimensions. These rows were **rebalanced** so all six Holland codes are reachable — the earlier mapping left Conventional unreachable (0 slots) and Enterprising barely reachable (6); each code now gets equal coverage (9 of 54 slots):
 
 | Dimension (questions) | Option A → | Option B → | Option C → |
 |---|---|---|---|
-| Stream Indicators (Q255, 261, 267) | Technology / Realistic | Social Service / Social | Science / Investigative |
-| Holland Type (Q256, 262, 268) | Investigative | Artistic | Realistic |
-| Work Style (Q257, 263, 269) | Investigative | Enterprising | Realistic |
-| Career Focus (Q258, 264, 270) | Social | Artistic | Enterprising |
-| Activity Type (Q259, 265, 271) | Investigative | Artistic | Social |
-| Environment (Q260, 266, 272) | Realistic / Investigative | Social | Artistic |
+| Stream Indicators (Q255, 261, 267) | Realistic | Social | Investigative |
+| Holland Type (Q256, 262, 268) | Investigative | Enterprising | Artistic |
+| Work Style (Q257, 263, 269) | Artistic | Conventional | Realistic |
+| Career Focus (Q258, 264, 270) | Social | Realistic | Enterprising |
+| Activity Type (Q259, 265, 271) | Enterprising | Investigative | Conventional |
+| Environment (Q260, 266, 272) | Conventional | Artistic | Social |
 
 Two further Section 3 preference blocks shape the interest profile but are **not** Holland buckets fed to the matcher: **Subject Preferences (Q237–Q254)** are interest-rated 1–5 and **averaged** into four subject clusters (STEM, Humanities, Arts, Social Sciences); **Work Environment (Q273–Q290)** options each map (via an explicit per-question `optionProfileMap`) to one of four work-environment preference profiles (Research / Collaborative / Dynamic / Creative) by point-accumulation — every option maps to exactly one profile. The per-option mapping for every Section 3 preference question is printed in [`backend/exports/section3-interest-assessment.md`](../backend/exports/section3-interest-assessment.md).
 
@@ -201,7 +207,7 @@ Two further Section 3 preference blocks shape the interest profile but are **not
 | Intrapersonal | Q181–Q190 |
 | Naturalistic | Q191–Q200 |
 
-**Aptitude Scores (weight 0.25)** — from Section 4 (Q291–Q450). Each subsection is graded objectively: `score = (correctCount / scorableCount) × 100`. Subsection ranges:
+**Aptitude Scores (weight 0.30)** — from Section 4 (Q291–Q450). Each subsection is graded objectively: `score = (correctCount / scorableCount) × 100`. Subsection ranges:
 
 | Aptitude | Questions |
 |---|---|
@@ -214,7 +220,7 @@ Two further Section 3 preference blocks shape the interest profile but are **not
 | Critical Thinking | Q431–Q440 |
 | Problem Solving | Q441–Q450 |
 
-**EQ Competencies (weight 0.15)** — from Section 5 Emotional Intelligence Assessment (Q451–Q500, 10 questions per competency, Likert averaged and normalised to 0–100).
+**EQ Competencies (weight 0.10)** — from Section 5 Emotional Intelligence Assessment (Q451–Q500, 10 questions per competency, Likert averaged and normalised to 0–100).
 
 | Competency | Questions |
 |---|---|
@@ -254,7 +260,7 @@ Section 1 (Personality) does **not** feed the career matcher directly — its OC
 }
 ```
 
-**Input — `topN`**: integer 1-125, clamped automatically. Defaults to 10 for the full test; the demo wrapper passes 6.
+**Input — `topN`**: integer 1-129, clamped automatically. Defaults to 10 for the full test; the demo wrapper passes 6.
 
 **Output**: array of `topN` careers sorted by `score` descending (ties broken alphabetically by title):
 
@@ -294,9 +300,9 @@ Section 1 (Personality) does **not** feed the career matcher directly — its OC
 
 ```
 careerScore = hollandMatch       × 0.35
-            + intelligenceMatch  × 0.25
-            + aptitudeMatch      × 0.25
-            + eqMatch            × 0.15
+            + intelligenceMatch  × 0.25      // peak-rewarded (see below)
+            + aptitudeMatch      × 0.30      // peak-rewarded (see below)
+            + eqMatch            × 0.10
 ```
 
 Weights are frozen in `CAREER_MATCH_WEIGHTS`:
@@ -305,8 +311,8 @@ Weights are frozen in `CAREER_MATCH_WEIGHTS`:
 export const CAREER_MATCH_WEIGHTS = Object.freeze({
   holland:      0.35,
   intelligence: 0.25,
-  aptitude:     0.25,
-  eq:           0.15
+  aptitude:     0.30,   // nudged up: objective + most discriminating signal
+  eq:           0.10    // cut down: high-baseline, was a flat people-skills lift
 });
 ```
 
@@ -332,30 +338,29 @@ aptitudeStrengths: ["Numerical", "Abstract"]
 eqCompetencies:    ["Self-Regulation", "Motivation"]
 ```
 
-**Holland match** — primary at 1.0×, secondary at 0.6×, averaged:
+**Holland match** — primary-dominant (primary × 0.75 + secondary-avg × 0.25):
 
 ```
-weighted = [ 85 × 1.0,  72 × 0.6 ]  =  [ 85, 43.2 ]
-hollandMatch = (85 + 43.2) / 2  =  64.1
+hollandMatch = 85 × 0.75 + 72 × 0.25  =  81.75
 ```
 
-**Intelligence / Aptitude / EQ matches** — plain averages over the names the career lists:
+**Intelligence / Aptitude matches** — peak-rewarded blend (`0.6 × avg + 0.4 × max`); **EQ match** — plain average:
 
 ```
-intelligenceMatch = (90 + 75) / 2   =  82.5
-aptitudeMatch     = (88 + 80) / 2   =  84.0
-eqMatch           = (70 + 75) / 2   =  72.5
+intelligenceMatch = 0.6 × avg(90,75) + 0.4 × max(90,75)  =  85.5
+aptitudeMatch     = 0.6 × avg(88,80) + 0.4 × max(88,80)  =  85.6
+eqMatch           = (70 + 75) / 2                        =  72.5
 ```
 
 **Final compatibility:**
 
 ```
-careerScore = 64.1 × 0.35 + 82.5 × 0.25 + 84.0 × 0.25 + 72.5 × 0.15
-            = 22.435 + 20.625 + 21.000 + 10.875
-            = 74.9 %      // clamped 0–100, rounded to one decimal
+careerScore = 81.75 × 0.35 + 85.5 × 0.25 + 85.6 × 0.30 + 72.5 × 0.10
+            = 28.6125 + 21.375 + 25.680 + 7.250
+            = 82.9 %      // clamped 0–100, rounded to one decimal
 ```
 
-The displayed match badge shows **75% Match** (`matchPercent = Math.round(score)`). The student's expandable "Why this matched you" lines surface the source signals: dominant interest code I, strong Logical-Math + Spatial intelligences, strong Numerical + Abstract aptitudes, high Self-Regulation + Motivation.
+The displayed match badge shows **83% Match** (`matchPercent = Math.round(score)`). The student's expandable "Why this matched you" lines surface the source signals: dominant interest code I, strong Logical-Math + Spatial intelligences, strong Numerical + Abstract aptitudes, high Self-Regulation + Motivation.
 
 ### Display rules
 
@@ -373,33 +378,42 @@ Threshold and floor are captured in `MATCH_THRESHOLD` and `MIN_RESULTS` in [care
 
 ### Holland-match: primary vs secondary
 
-Holland is the one dimension where the order of codes matters in the career fingerprint. A career listed as `["A", "I", "R"]` is principally Artistic with Investigative and Realistic as secondary qualifiers. The matcher honours this:
+Holland is the one dimension where the order of codes matters in the career fingerprint. A career listed as `["A", "I", "R"]` is principally Artistic with Investigative and Realistic as secondary qualifiers. The matcher is **primary-dominant** — the primary code carries 75% of the Holland score, the secondary codes split the remaining 25%:
 
 ```js
-const SECONDARY_HOLLAND_WEIGHT = 0.6;
-const weighted = career.hollandCodes.map((code, idx) => {
-  const rawProfileScore = profile.hollandProfile[code] ?? 50;
-  return idx === 0
-    ? rawProfileScore           // primary at 1.0×
-    : rawProfileScore * 0.6;    // secondary at 0.6×
-});
-return clamp(average(weighted));
+const PRIMARY_HOLLAND_WEIGHT = 0.75;
+const codes = career.hollandCodes;                       // primary first
+const primary = profile.hollandProfile[codes[0]] ?? 50;
+if (codes.length === 1) return clamp(primary);
+const secondaryAvg = average(codes.slice(1).map((c) => profile.hollandProfile[c] ?? 50));
+return clamp(primary * PRIMARY_HOLLAND_WEIGHT + secondaryAvg * (1 - PRIMARY_HOLLAND_WEIGHT));
 ```
 
-Why 0.6 specifically: heuristic from career-counselling literature. A secondary code is "moderately important" — 60% of the influence of a primary. Strong primary plus weak secondary still scores well; weak primary with strong secondaries does not. Adjust `SECONDARY_HOLLAND_WEIGHT` to retune if needed; the rest of the matcher will follow automatically.
+This replaced an earlier formula that averaged primary (1.0×) with each secondary (0.6×). The averaging had a subtle bias: a **single-code** career (e.g. Sales Manager `["E"]`) took the student's full primary score with no dilution, while a **multi-code** career whose primary matched the student's peak (e.g. Banking `["C","E"]` for a C-dominant student) was averaged *below* its primary — so single-code business/people careers systematically out-ranked better-fitting multi-code ones. Anchoring on the primary (and treating secondaries as a bonus that can only add) removes that bias. Adjust `PRIMARY_HOLLAND_WEIGHT` to retune; the rest of the matcher follows automatically.
 
-### Intelligence / Aptitude / EQ match: straight average
+### Intelligence / Aptitude match: peak-rewarded blend · EQ match: straight average
 
-For these three dimensions the career fingerprint is unordered. The match is a plain mean of the student's scores on the names the career lists:
+For these dimensions the career fingerprint is unordered. **Intelligence and aptitude** use a peak-rewarded blend — a fraction (`PEAK_BLEND = 0.4`) of the bucket score is driven by the student's *single strongest* aligned dimension, so a genuine spike (e.g. high Musical intelligence, high Spatial Relations aptitude) pulls the careers that need it instead of being averaged away:
 
 ```js
+const PEAK_BLEND = 0.4;
 const values = career.intelligenceTypes.map(
   (name) => profile.multipleIntelligences[name] ?? 50
+);
+const avg = average(values), peak = Math.max(...values);
+return clamp(avg * (1 - PEAK_BLEND) + peak * PEAK_BLEND);
+```
+
+**EQ** stays a plain mean at low weight — peak-rewarding it would re-introduce the flat people-skills lift that pushed every sociable student toward business/sales careers:
+
+```js
+const values = career.eqCompetencies.map(
+  (name) => profile.eqProfile[name] ?? 50
 );
 return clamp(average(values));
 ```
 
-The fallback `?? 50` means a career that references an intelligence the student didn't score on (because the section wasn't completed) is treated as neutral on that signal — neither penalised nor rewarded.
+The fallback `?? 50` means a career that references a dimension the student didn't score on (because the section wasn't completed) is treated as neutral on that signal — neither penalised nor rewarded.
 
 ### `matchReasons` generation
 
@@ -433,7 +447,7 @@ Run `npm run smoke:career-500q` after touching the matcher or the career data.
 
 | File | Purpose |
 |---|---|
-| [backend/data/careerMappingData.js](../backend/data/careerMappingData.js) | 125-career source-of-truth |
+| [backend/data/careerMappingData.js](../backend/data/careerMappingData.js) | 129-career source-of-truth |
 | [backend/utils/scoring/careerMatcher.js](../backend/utils/scoring/careerMatcher.js) | `matchCareers` weighted engine |
 | [backend/utils/scoring/packageScoring/career500q.js](../backend/utils/scoring/packageScoring/career500q.js) | Calls `matchCareers(namedProfile, 10)` for the full test |
 | [backend/utils/scoring/packageScoring/career500qDemo.js](../backend/utils/scoring/packageScoring/career500qDemo.js) | Calls `matchCareers(namedProfile, 6)` for the demo |

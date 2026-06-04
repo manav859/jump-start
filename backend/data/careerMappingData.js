@@ -1,8 +1,11 @@
 // Career-aptitude mapping source-of-truth.
 //
 // Transcribed from career_aptitude_mapping.html (repo root). The HTML title
-// reads "121 Careers" but the underlying data array contains 125 entries
-// across 12 categories — every entry from that source is preserved here.
+// reads "121 Careers" but the underlying data array contained 125 entries
+// across 12 categories — every entry from that source is preserved here. Four
+// further Conventional-primary roles were appended (Bookkeeper / Accounting
+// Clerk, Compliance Officer, Database Administrator, Administrative / Office
+// Manager) to rebalance the thin C code, bringing the total to 129.
 //
 // Field conventions match the careerMatcher contract:
 //   hollandCodes:      ordered ["primary", "secondary", ...]  (R/I/A/S/E/C)
@@ -92,6 +95,8 @@ export const CAREER_MAPPINGS = [
   { title: "Architect", category: "Technology & Engineering", hollandCodes: ["A", "I", "R"], intelligenceTypes: ["Spatial", "Logical-Math"], aptitudeStrengths: ["Spatial Relations", "Numerical", "Abstract"], eqCompetencies: ["Motivation"] },
   { title: "UX / UI Designer", category: "Technology & Engineering", hollandCodes: ["A", "I"], intelligenceTypes: ["Spatial", "Interpersonal"], aptitudeStrengths: ["Abstract", "Spatial Relations"], eqCompetencies: ["Empathy", "Social Skills"] },
   { title: "Network Administrator", category: "Technology & Engineering", hollandCodes: ["R", "C"], intelligenceTypes: ["Logical-Math"], aptitudeStrengths: ["Abstract", "Clerical", "Problem Solving"], eqCompetencies: ["Self-Regulation"] },
+  // Conventional top-up (see Finance & Accounting): a C-primary tech role.
+  { title: "Database Administrator", category: "Technology & Engineering", hollandCodes: ["C", "I"], intelligenceTypes: ["Logical-Math"], aptitudeStrengths: ["Clerical", "Abstract", "Problem Solving"], eqCompetencies: ["Self-Regulation"] },
 
   // -- Healthcare & Medicine --
   { title: "Medical Doctor", category: "Healthcare & Medicine", hollandCodes: ["I", "S"], intelligenceTypes: ["Logical-Math", "Interpersonal"], aptitudeStrengths: ["Numerical", "Critical Thinking", "Verbal"], eqCompetencies: ["Empathy", "Self-Regulation"] },
@@ -155,6 +160,8 @@ export const CAREER_MAPPINGS = [
   { title: "Product Manager", category: "Business & Entrepreneurship", hollandCodes: ["E", "I"], intelligenceTypes: ["Logical-Math", "Interpersonal"], aptitudeStrengths: ["Problem Solving", "Critical Thinking", "Verbal"], eqCompetencies: ["Empathy", "Social Skills"] },
   { title: "Human Resources Manager", category: "Business & Entrepreneurship", hollandCodes: ["S", "E", "C"], intelligenceTypes: ["Interpersonal"], aptitudeStrengths: ["Verbal", "Critical Thinking", "Clerical"], eqCompetencies: ["Empathy", "Social Skills"] },
   { title: "Operations Manager", category: "Business & Entrepreneurship", hollandCodes: ["E", "C"], intelligenceTypes: ["Logical-Math", "Interpersonal"], aptitudeStrengths: ["Numerical", "Problem Solving", "Clerical"], eqCompetencies: ["Social Skills", "Self-Regulation"] },
+  // Conventional top-up (see Finance & Accounting): a C-primary admin role.
+  { title: "Administrative / Office Manager", category: "Business & Entrepreneurship", hollandCodes: ["C", "E"], intelligenceTypes: ["Interpersonal", "Logical-Math"], aptitudeStrengths: ["Clerical", "Verbal", "Numerical"], eqCompetencies: ["Self-Regulation", "Social Skills"] },
   { title: "Supply Chain Manager", category: "Business & Entrepreneurship", hollandCodes: ["E", "C"], intelligenceTypes: ["Logical-Math"], aptitudeStrengths: ["Numerical", "Problem Solving", "Clerical"], eqCompetencies: ["Self-Regulation"] },
   { title: "Real Estate Agent", category: "Business & Entrepreneurship", hollandCodes: ["E", "S"], intelligenceTypes: ["Interpersonal"], aptitudeStrengths: ["Numerical", "Verbal"], eqCompetencies: ["Social Skills"] },
   { title: "Investment Banker", category: "Business & Entrepreneurship", hollandCodes: ["E", "C", "I"], intelligenceTypes: ["Logical-Math"], aptitudeStrengths: ["Numerical", "Critical Thinking"], eqCompetencies: ["Motivation", "Self-Regulation"] },
@@ -183,6 +190,11 @@ export const CAREER_MAPPINGS = [
   { title: "Banking Professional", category: "Finance & Accounting", hollandCodes: ["C", "E"], intelligenceTypes: ["Logical-Math", "Interpersonal"], aptitudeStrengths: ["Numerical", "Verbal", "Clerical"], eqCompetencies: ["Social Skills"] },
   { title: "Economist", category: "Finance & Accounting", hollandCodes: ["I", "C"], intelligenceTypes: ["Logical-Math"], aptitudeStrengths: ["Numerical", "Critical Thinking", "Abstract"], eqCompetencies: ["Motivation"] },
   { title: "Risk Manager", category: "Finance & Accounting", hollandCodes: ["C", "I"], intelligenceTypes: ["Logical-Math"], aptitudeStrengths: ["Numerical", "Critical Thinking", "Problem Solving"], eqCompetencies: ["Self-Regulation"] },
+  // Conventional top-up: the C primary code was thin (9 careers) relative to
+  // the other five, leaving structure/precision profiles under-served. These
+  // are genuinely Conventional-primary roles.
+  { title: "Bookkeeper / Accounting Clerk", category: "Finance & Accounting", hollandCodes: ["C"], intelligenceTypes: ["Logical-Math"], aptitudeStrengths: ["Numerical", "Clerical"], eqCompetencies: ["Self-Regulation"] },
+  { title: "Compliance Officer", category: "Finance & Accounting", hollandCodes: ["C", "I"], intelligenceTypes: ["Logical-Math", "Linguistic"], aptitudeStrengths: ["Clerical", "Critical Thinking", "Verbal"], eqCompetencies: ["Self-Regulation"] },
 
   // -- Nature & Environment --
   { title: "Environmental Consultant", category: "Nature & Environment", hollandCodes: ["I", "R", "S"], intelligenceTypes: ["Naturalistic", "Logical-Math"], aptitudeStrengths: ["Numerical", "Critical Thinking", "Verbal"], eqCompetencies: ["Empathy"] },

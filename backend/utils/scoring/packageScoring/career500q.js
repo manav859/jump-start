@@ -18,7 +18,7 @@ import {
   getAptitudeSubsectionKeyForQuestionId,
   isManualReviewRequired,
 } from "../specs/career500qEvaluationSpec.js";
-import { matchCareers } from "../careerMatcher.js";
+import { matchCareers, CAREER_MATCHER_VERSION } from "../careerMatcher.js";
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -1564,6 +1564,32 @@ export const buildPersonalityType = ({ bigFiveSection, emotionalSection }) => {
 const getSectionByKey = (sectionBreakdown = [], key) =>
   sectionBreakdown.find((item) => item.key === key) || null;
 
+// Acquiescence correction for the six RIASEC interest scores. The RIASEC
+// Likert (Q201-236) has no reverse-keyed items, so a high-energy "yes to
+// everything" student (e.g. ENFP/ENTP/ENTJ) inflates ALL six interest types
+// together — and the gregarious Enterprising/Social items inflate most. That
+// collapses the highest-weighted matcher component (Holland) toward a common
+// E/S shape, which is the primary driver of the "everyone gets Sales Manager"
+// clustering. Re-centering each student's six scores on their own mean removes
+// that common offset (a flat profile maps to flat 50, not E/S-dominant) while
+// the GAIN amplifies the genuine differential shape that remains. This is the
+// standard ipsative treatment for interest inventories — relative shape, not
+// absolute agreement level, is what should drive career direction.
+export const INTEREST_SPREAD_GAIN = 1.4;
+
+export const ipsatizeInterestScores = (scores = {}, gain = INTEREST_SPREAD_GAIN) => {
+  const keys = Object.keys(scores || {});
+  if (!keys.length) return {};
+  const vals = keys.map((key) => Number(scores[key]) || 0);
+  const mean = vals.reduce((sum, value) => sum + value, 0) / vals.length;
+  const out = {};
+  keys.forEach((key) => {
+    const centered = 50 + (Number(scores[key] || 0) - mean) * gain;
+    out[key] = clamp(Math.round(centered), 0, 100);
+  });
+  return out;
+};
+
 const buildFlattenedSignals = ({ sectionBreakdown = [], personalityType }) => {
   const lookupSubsection = (sectionKey, subsectionKey) =>
     getSectionByKey(sectionBreakdown, sectionKey)?.subsections?.find(
@@ -1598,13 +1624,26 @@ const buildFlattenedSignals = ({ sectionBreakdown = [], personalityType }) => {
     return present.length ? roundPercent(average(present)) : 50;
   };
 
-  return {
+  // Raw blended RIASEC signals (Likert 3.1 + Activity 3.3), then acquiescence-
+  // corrected so the six types stop inflating together. See
+  // ipsatizeInterestScores above.
+  const rawRiasec = {
     realistic: riasecSignal("realistic"),
     investigative: riasecSignal("investigative"),
     artistic: riasecSignal("artistic"),
     social: riasecSignal("social"),
     enterprising: riasecSignal("enterprising"),
     conventional: riasecSignal("conventional"),
+  };
+  const riasec = ipsatizeInterestScores(rawRiasec);
+
+  return {
+    realistic: riasec.realistic,
+    investigative: riasec.investigative,
+    artistic: riasec.artistic,
+    social: riasec.social,
+    enterprising: riasec.enterprising,
+    conventional: riasec.conventional,
     logicalMathematical:
       lookupSubsection("multiple_intelligence", "logical_mathematical")?.percentage ?? 50,
     linguistic:
@@ -2179,6 +2218,10 @@ export const scoreCareer500QPackage = (answers = {}, sections = []) => {
     multipleIntelligences: namedProfile.multipleIntelligences,
     aptitudeScores: namedProfile.aptitudeScores,
     eqProfile: namedProfile.eqProfile,
+    // Provenance: this report's careerRecommendations were produced by the
+    // current (ipsatized interest + re-tuned weights) engine. Lets the rematch
+    // migration skip it instead of re-ipsatizing an already-ipsatized profile.
+    careerRematch: { version: CAREER_MATCHER_VERSION, source: "live" },
     // Section 4 manual-review queue. Persisted on the report (not the
     // profile) once the user submits — see createAssessmentReportEntry.
     manualReviewItems,

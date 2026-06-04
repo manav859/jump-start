@@ -290,6 +290,12 @@ const resultProfileSchema = new mongoose.Schema(
     personalityType: { type: personalityTypeSchema, default: () => ({}) },
     reviewSummary: { type: reviewSummarySchema, default: () => ({}) },
     metadata: { type: resultMetadataSchema, default: () => ({}) },
+    // Provenance stamp for the career-matching engine that produced
+    // `careerRecommendations` — { version, source: "live" | "migration", at }.
+    // Set by the scorer on fresh reports and by the rematch migration on
+    // backfilled ones. Mixed so the small object persists without per-key
+    // schema. null on reports written before this field landed.
+    careerRematch: { type: mongoose.Schema.Types.Mixed, default: null },
   },
   { _id: false }
 );

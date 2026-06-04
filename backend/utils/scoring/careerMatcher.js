@@ -8,14 +8,54 @@ import {
 
 // Public scoring weights — exported so tests and downstream tooling can
 // inspect the contract without re-deriving it.
+// Clustering fix — differentiation-tuned weights:
+//   - eq cut 0.15 -> 0.10: Social Skills / Motivation are high-baseline for
+//     almost every sociable student and are required by a large share of
+//     careers, so a heavy EQ weight added a flat lift that floated every
+//     business/people career (Sales Manager especially) for anyone outgoing.
+//   - aptitude nudged 0.25 -> 0.30: it's the only objective, right/wrong
+//     signal and varies most between students, so it discriminates best. The
+//     nudge is deliberately modest — over-weighting aptitude penalises
+//     intelligence-driven arts/music careers whose aptitude requirement is
+//     thin (e.g. Musician lists only "Abstract").
+//   - holland (0.35) and intelligence (0.25) held: Holland is the interest
+//     anchor (now de-biased upstream by ipsatizeInterestScores) and
+//     intelligence carries the arts/music spikes (Musical, Spatial).
 export const CAREER_MATCH_WEIGHTS = Object.freeze({
   holland: 0.35,
   intelligence: 0.25,
-  aptitude: 0.25,
-  eq: 0.15,
+  aptitude: 0.30,
+  eq: 0.10,
 });
 
-const SECONDARY_HOLLAND_WEIGHT = 0.6;
+// Holland match is PRIMARY-DOMINANT: the career's primary code carries this
+// share of the score and the secondary codes split the rest. The earlier
+// formula averaged primary (1.0x) with each secondary (0.6x), which had two
+// bad effects: (1) a strong secondary-less single-code career (e.g. Sales
+// Manager ["E"]) got the student's full E with no dilution, while (2) a
+// multi-code career whose PRIMARY matches the student's peak (e.g. Banking
+// ["C","E"] for a C-dominant student) was dragged BELOW its primary by the
+// averaging — so single-code "people/business" careers won unfairly. Anchoring
+// on the primary fixes both: a career is scored mainly on how well the
+// student's interest matches its principal theme, with secondaries as a bonus.
+const PRIMARY_HOLLAND_WEIGHT = 0.75;
+
+// Bumped whenever the scoring engine changes in a way that alters stored
+// careerRecommendations (interest ipsatization + the re-tuned weights below).
+// Reports carry this on `profile.careerRematch.version`; the rematch migration
+// (backend/scratch/migrateCareerRematch.mjs) uses it to skip reports already
+// produced by — or already migrated to — the current engine, which keeps the
+// migration idempotent and stops it from double-ipsatizing fresh reports.
+export const CAREER_MATCHER_VERSION = "ipsatize-weights-v1";
+
+// Peak-reward blend for the intelligence and aptitude buckets. Instead of a
+// flat mean over the career's required dimensions, a fraction of the bucket
+// score is driven by the student's SINGLE strongest aligned dimension. This
+// rewards careers whose requirements line up with where a student genuinely
+// spikes (e.g. a spatial-spiker toward design/engineering) and stops a career
+// that asks only for universally-high "easy" dimensions from out-scoring a
+// career that needs a specific strength the student actually has.
+const PEAK_BLEND = 0.4;
 
 // Profile lookups gracefully fall back to 50 (neutral) when a signal is
 // missing. The matcher never throws on partial profiles.
@@ -52,23 +92,34 @@ const scoreHollandMatch = (career, profile) => {
   const codes = Array.isArray(career.hollandCodes) ? career.hollandCodes : [];
   if (!codes.length) return NEUTRAL_SCORE;
 
-  // Primary code: full weight. Each secondary code is scaled by 0.6 — same
-  // shape the task spec describes — then averaged across the matched values.
-  const weighted = codes.map((code, idx) => {
-    const raw = lookupScore(profile.hollandProfile, code, NEUTRAL_SCORE);
-    return idx === 0 ? raw : raw * SECONDARY_HOLLAND_WEIGHT;
-  });
-
-  return clamp(average(weighted) || NEUTRAL_SCORE);
+  // Primary-dominant: anchor on the primary code; secondary codes split the
+  // remaining weight as a bonus (never diluting the primary below itself).
+  const primary = lookupScore(profile.hollandProfile, codes[0], NEUTRAL_SCORE);
+  if (codes.length === 1) return clamp(primary);
+  const secondaryAvg =
+    average(codes.slice(1).map((code) => lookupScore(profile.hollandProfile, code, NEUTRAL_SCORE))) ??
+    NEUTRAL_SCORE;
+  return clamp(primary * PRIMARY_HOLLAND_WEIGHT + secondaryAvg * (1 - PRIMARY_HOLLAND_WEIGHT));
 };
 
-const scoreBucketAverage = (career, profile, careerKey, profileKey) => {
+const scoreBucketAverage = (
+  career,
+  profile,
+  careerKey,
+  profileKey,
+  { peakReward = false } = {}
+) => {
   const requested = Array.isArray(career[careerKey]) ? career[careerKey] : [];
   if (!requested.length) return NEUTRAL_SCORE;
   const values = requested.map((name) =>
     lookupScore(profile[profileKey], name, NEUTRAL_SCORE)
   );
-  return clamp(average(values) || NEUTRAL_SCORE);
+  const avg = average(values) || NEUTRAL_SCORE;
+  if (!peakReward) return clamp(avg);
+  // Blend the mean with the strongest aligned dimension so genuine spikes
+  // pull careers that need them. avg-only would wash individuality out.
+  const peak = Math.max(...values);
+  return clamp(avg * (1 - PEAK_BLEND) + peak * PEAK_BLEND);
 };
 
 const joinList = (items = []) => {
@@ -199,14 +250,19 @@ export const matchCareers = (profile, maxN = 15) => {
       career,
       safeProfile,
       "intelligenceTypes",
-      "multipleIntelligences"
+      "multipleIntelligences",
+      { peakReward: true }
     );
     const aptitudeMatch = scoreBucketAverage(
       career,
       safeProfile,
       "aptitudeStrengths",
-      "aptitudeScores"
+      "aptitudeScores",
+      { peakReward: true }
     );
+    // EQ stays a plain mean (and low weight): it's a baseline human-skills
+    // signal, not a differentiator — peak-rewarding it would re-introduce the
+    // flat people-skills lift this fix is removing.
     const eqMatch = scoreBucketAverage(
       career,
       safeProfile,

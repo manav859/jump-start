@@ -9,13 +9,24 @@ const MECHANICAL_REASONING_QUESTION_NUMBERS = range(391, 410);
 // option a/b/c to a Holland type. The 18 questions cycle through these six
 // rows three times. These map directly into the RIASEC interest scores (no
 // separate custom-profile bucket).
+//
+// REBALANCE (clustering fix): the previous rows left Conventional UNREACHABLE
+// (0 of 54 option-slots) and Enterprising barely reachable (6), while R/I/A/S
+// each had 12. Because buildFlattenedSignals blends this activity intensity
+// with the Likert RIASEC by averaging, a genuinely Conventional student had
+// their C score halved (activity contributed 0) and the block could never pull
+// anyone toward C — so the activity signal could not correct Likert inflation
+// for half the spectrum. The rows below are a balanced design: across the six
+// rows each Holland code appears exactly once per option-column (a/b/c), so
+// every code gets equal coverage (9 of 54 slots each) and all six are
+// reachable. Each row still maps three distinct codes to a/b/c.
 const ACTIVITY_RIASEC_ROWS = [
   { a: "realistic", b: "social", c: "investigative" }, // Stream Indicators (Technology / Social Service / Science)
-  { a: "investigative", b: "artistic", c: "realistic" }, // Holland Type
-  { a: "investigative", b: "enterprising", c: "realistic" }, // Work Style
-  { a: "social", b: "artistic", c: "enterprising" }, // Career Focus
-  { a: "investigative", b: "artistic", c: "social" }, // Activity Type
-  { a: "realistic", b: "social", c: "artistic" }, // Environment (a = Realistic/Investigative → Realistic primary)
+  { a: "investigative", b: "enterprising", c: "artistic" }, // Holland Type
+  { a: "artistic", b: "conventional", c: "realistic" }, // Work Style
+  { a: "social", b: "realistic", c: "enterprising" }, // Career Focus
+  { a: "enterprising", b: "investigative", c: "conventional" }, // Activity Type
+  { a: "conventional", b: "artistic", c: "social" }, // Environment
 ];
 const ACTIVITY_RIASEC_OPTION_MAP = Object.fromEntries(
   range(255, 272).map((questionNumber, index) => {
