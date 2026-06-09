@@ -1,35 +1,31 @@
 /**
  * Mechanical Reasoning Question Media (Section 4, Subsection 4.5)
  *
- * ── Implementation Notes (matching spatial question pattern) ──────────────
- * Field used          : Derived from questionId via helper functions
- * Image storage       : /public/question-media/mechanical/q<ID>/stimulus.png
- * Naming convention   : q391/, q392/ … q410/ — each contains stimulus.png
- * Source PDF          : "Mechanical & Spatial Questions.pdf"
- * Extraction script   : backend/scripts/extractMechanicalQuestionMedia.mjs
+ * ── Stimulus images are DISABLED (text/image mismatch fix) ────────────────
+ * The diagram files under /public/question-media/mechanical/q<ID>/ were
+ * extracted from the OLD "Mechanical & Spatial Questions.pdf" question set
+ * (Earth–Sun orbit, Earth atmosphere, belt-driven wheels, gear-trains,
+ * circuits, compound pulleys, a syringe-lever, …). The live Q391–410 TEXT was
+ * later replaced with the official answer-key booklet's generic gear / lever /
+ * pulley / see-saw items, but those images were never re-extracted — so the
+ * ID-derived mapping was serving a diagram that belonged to a *different*
+ * question (e.g. Q406 "balance this see-saw?" showed an Earth–Sun orbit).
  *
- * Unlike spatial questions, mechanical questions have TEXT answer options,
- * so only stimulus/diagram images are needed (no option-A/B/C/D images).
+ * There is no valid current-text → image pairing (the booklet questions have
+ * no matching diagrams on disk), and we must not change correct answers, so
+ * the only non-misleading fix is to serve NO stimulus. The block renders
+ * text-only, exactly like the 11 questions that were already text-only.
  *
- * Questions that reference diagrams/figures:
- *   Q391 — Pulley system (force & load ratio)
- *   Q392 — Gear/wheel revolutions
- *   Q394 — Pulley rope length
- *   Q400 — Wheel A/B gear direction
- *   Q401 — Circuit with bulbs
- *   Q402 — Gear train A/B/C/D direction
- *
- * All other questions (393, 395-399, 403-410) are text-only.
+ * FOLLOW-UP (content, out of scope here): the booklet items that inherently
+ * need a figure ("Which lever arrangement…", "Which pulley system…", the
+ * see-saw, etc.) should get purpose-drawn diagrams, OR the original PDF
+ * question set + its answer key should be restored to match these images.
+ * Until then the diagrams stay disabled rather than mismatched.
  * ──────────────────────────────────────────────────────────────────────────
  */
 
 const MECHANICAL_QUESTION_ID_START = 391;
 const MECHANICAL_QUESTION_ID_END = 410;
-
-// Question IDs that are purely text-based and have no diagram/figure.
-const TEXT_ONLY_MECHANICAL_IDS = new Set([
-  393, 395, 396, 397, 398, 399, 403, 404, 407, 408, 409,
-]);
 
 export const isMechanicalQuestionId = (questionId) => {
   const numericId = Number(questionId);
@@ -43,18 +39,13 @@ export const isMechanicalQuestionId = (questionId) => {
 export const getMechanicalQuestionNumber = (questionId) => {
   const numericId = Number(questionId);
   if (!isMechanicalQuestionId(numericId)) return null;
-  // Display question number: the offset within the section.
-  // In Section 4, mechanical starts after 100 questions (verbal 25 + numerical 25 + abstract 25 + spatial 25),
-  // so Q391 appears as UI question 101. However, the folder names use the raw question ID.
   return numericId;
 };
 
+// Stimulus disabled: no on-disk diagram matches the current Q391–410 text, so
+// returning null keeps the block text-only instead of showing a wrong figure.
+// (Re-enable per-ID here once purpose-drawn diagrams exist for the live items.)
 export const getMechanicalStimulusSrc = (questionId) => {
-  const numericId = Number(questionId);
-  if (!isMechanicalQuestionId(numericId)) return null;
-
-  // Text-only questions have no stimulus image
-  if (TEXT_ONLY_MECHANICAL_IDS.has(numericId)) return null;
-
-  return `/question-media/mechanical/q${String(numericId).padStart(3, "0")}/stimulus.webp?v=2`;
+  if (!isMechanicalQuestionId(questionId)) return null;
+  return null;
 };

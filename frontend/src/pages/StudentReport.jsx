@@ -11,6 +11,7 @@ import {
   Target,
 } from "lucide-react";
 import api from "../api/api";
+import jumpstartLogo from "../assets/jumpstart-logo.png";
 import { localisedPackageField } from "../utils/packageLabel";
 import { StudentReportSkeleton } from "../components/Skeletons";
 import ResultPendingPanel from "../components/ResultPendingPanel";
@@ -148,6 +149,21 @@ export default function StudentReport() {
   return (
     <div className="report-print-page bg-[#F7F8FA]">
       <div className="report-print-root mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+        {/* Brand letterhead — PRINT ONLY. On screen the site header already
+            shows the logo, so this is hidden (`hidden`) to avoid a duplicate;
+            in the PDF the site header is removed, and this becomes the
+            letterhead at the top of page 1 (`report-print-only` flips it to
+            display:block in print). Kept compact so it doesn't push the
+            Student Information card off page 1; findings still begin on
+            page 2. */}
+        <div className="report-print-only hidden mb-6 border-b border-[#E8EDF3] pb-5">
+          <img
+            src={jumpstartLogo}
+            alt="Jumpstart"
+            className="report-print-logo h-12 w-auto sm:h-14"
+          />
+        </div>
+
         {report?.isDemo ? (
           <div className="mb-6 flex items-start gap-3 rounded-[18px] border border-[#F5D9A6] bg-[#FFF9EE] px-5 py-4 text-[#8C5A00] sm:rounded-[22px] sm:px-6">
             <Sparkles className="mt-1 h-5 w-5 shrink-0 text-[#F59F0A]" />

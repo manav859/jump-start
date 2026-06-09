@@ -5723,44 +5723,44 @@ const PACKAGE = {
         },
         {
           "questionId": "367",
-          "text": "When folded, what pattern is possible?",
+          "text": "Which of the boxes comes next in the sequence?",
           "type": "single",
           "options": [
-            "⅃",
-            "Γ",
-            "⌐",
-            "└"
+            "A",
+            "B",
+            "C",
+            "D"
           ],
-          "correctOption": "C",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 0.1,
-          "text_gu": "ગડી કરવામાં આવે ત્યારે કયો પેટર્ન શક્ય છે?",
+          "text_gu": "ક્રમમાં આગળ કયું બોક્સ આવે છે?",
           "options_gu": [
-            "⅃",
-            "Γ",
-            "⌐",
-            "└"
+            "A",
+            "B",
+            "C",
+            "D"
           ]
         },
         {
           "questionId": "368",
-          "text": "Which figure represents the assembly of the following pieces?",
+          "text": "Which of the boxes comes next in the sequence?",
           "type": "single",
           "options": [
-            "View A",
-            "View B",
-            "View C",
-            "View D"
+            "A",
+            "B",
+            "C",
+            "D"
           ],
           "correctOption": "D",
           "reverseScored": false,
           "weight": 0.1,
-          "text_gu": "નીચેના ટુકડાઓના જોડાણને કયો આકાર રજૂ કરે છે?",
+          "text_gu": "ક્રમમાં આગળ કયું બોક્સ આવે છે?",
           "options_gu": [
-            "View A",
-            "View B",
-            "View C",
-            "View D"
+            "A",
+            "B",
+            "C",
+            "D"
           ]
         },
         {

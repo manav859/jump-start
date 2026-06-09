@@ -4,6 +4,8 @@ import { LogOut, Menu, UserRound, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { AuthContext } from "../context/AuthContext";
 import ConfirmDialog from "./ConfirmDialog";
+import jumpstartLogo from "../assets/jumpstart-logo.png";
+import jumpstartIcon from "../assets/jumpstart-icon.png";
 
 // Nav items live by translation key now. The `to` path is preserved;
 // `labelKey` looks up the localized string under the `common.nav`
@@ -139,11 +141,19 @@ export default function Header() {
       <header className="sticky top-0 z-40 border-b border-[#E8EDF3] bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-10">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#188B8B] text-lg font-bold text-white shadow-[0_10px_24px_rgba(24,139,139,0.22)]">
-                J
-              </div>
-              <span className="text-2xl font-bold text-[#0F1729]">Jumpstart</span>
+            <Link to="/" className="flex items-center" aria-label="Jumpstart home">
+              {/* Full wordmark logo on sm+; icon-only mark on the narrowest
+                  screens where the wordmark would crowd the header bar. */}
+              <img
+                src={jumpstartLogo}
+                alt="Jumpstart"
+                className="hidden h-11 w-auto sm:block"
+              />
+              <img
+                src={jumpstartIcon}
+                alt="Jumpstart"
+                className="h-10 w-10 sm:hidden"
+              />
             </Link>
 
             <nav className="hidden items-center gap-8 lg:flex">{desktopNavLinks}</nav>
@@ -214,11 +224,8 @@ export default function Header() {
           onClick={(event) => event.stopPropagation()}
         >
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#188B8B] text-lg font-bold text-white">
-                J
-              </div>
-              <span className="text-2xl font-bold text-[#0F1729]">Jumpstart</span>
+            <div className="flex items-center">
+              <img src={jumpstartLogo} alt="Jumpstart" className="h-10 w-auto" />
             </div>
             <button
               type="button"

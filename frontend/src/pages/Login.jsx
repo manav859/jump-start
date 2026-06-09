@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, CheckCircle2, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
+import jumpstartLogo from "../assets/jumpstart-logo.png";
 import {
   googleClientId,
   googleConfigMessage,
@@ -114,6 +115,11 @@ export default function Login() {
     <div className="bg-white">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
         <div className="surface-card rounded-[32px] p-8 sm:p-10">
+          <img
+            src={jumpstartLogo}
+            alt="Jumpstart"
+            className="mb-6 h-12 w-auto"
+          />
           <div className="inline-flex items-center gap-2 rounded-full bg-[#E8F9F8] px-4 py-2 text-sm font-semibold text-[#188B8B]">
             <ShieldCheck className="h-4 w-4" />
             {adminLoginRequired ? t("auth.adminAccess") : t("auth.loginTitle")}

@@ -16,6 +16,7 @@ import {
 import { AuthContext } from "../../context/AuthContext";
 import api from "../../api/api";
 import ConfirmDialog from "../../components/ConfirmDialog";
+import jumpstartIcon from "../../assets/jumpstart-icon.png";
 import {
   ADMIN_NOTIFICATIONS_REFRESH_EVENT,
   loadAdminNotificationState,
@@ -275,7 +276,14 @@ const AdminHeader = ({ isSidebarOpen, setIsSidebarOpen }) => {
         >
           <Menu size={20} />
         </button>
-        {/* <h1 className="hidden sm:block text-lg font-bold text-gray-800 tracking-tight">HealthAdmin</h1> */}
+        {/* Brand mark — icon-only on small screens, icon + wordmark on sm+.
+            Mirrors the collapsed-sidebar icon for a consistent admin look. */}
+        <div className="flex items-center gap-2">
+          <img src={jumpstartIcon} alt="Jumpstart" className="h-8 w-8" />
+          <span className="hidden text-lg font-bold tracking-tight text-[#0F1729] sm:block">
+            Jumpstart
+          </span>
+        </div>
       </div>
 
       {/* RIGHT */}

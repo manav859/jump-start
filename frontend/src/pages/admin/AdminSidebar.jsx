@@ -1,5 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import jumpstartIcon from "../../assets/jumpstart-icon.png";
 import {
   LayoutDashboard,
   Users,
@@ -52,10 +53,12 @@ const AdminSidebar = ({ isOpen, onClose }) => {
         ${isOpen ? "w-20" : "w-0 overflow-hidden -translate-x-full"}`}
       >
         <div className="flex flex-col items-center py-6">
-          {/* Logo */}
-          <div className="w-10 h-10 bg-[#14b8a6] rounded-lg flex items-center justify-center text-white font-bold text-xl mb-10">
-            J
-          </div>
+          {/* Logo — icon-only mark for the collapsed (w-20) sidebar rail. */}
+          <img
+            src={jumpstartIcon}
+            alt="Jumpstart"
+            className="w-10 h-10 mb-10"
+          />
 
           {/* Navigation */}
           <nav className="flex flex-col gap-6">

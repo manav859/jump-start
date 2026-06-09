@@ -3,6 +3,7 @@
 // a default gray placeholder.
 
 import { useTranslation } from "react-i18next";
+import jumpstartIcon from "../assets/jumpstart-icon.png";
 
 export default function PageLoader() {
   const { t } = useTranslation();
@@ -13,11 +14,20 @@ export default function PageLoader() {
       aria-label={t("loading.page")}
       className="flex min-h-[60vh] items-center justify-center px-6"
     >
-      <div className="flex flex-col items-center gap-3">
-        <div
-          className="h-10 w-10 animate-spin rounded-full border-[3px] border-[#E1E7EF] border-t-[#188B8B]"
-          aria-hidden="true"
-        />
+      <div className="flex flex-col items-center gap-4">
+        {/* Brand icon mark pulses, ringed by a teal spinner. */}
+        <div className="relative flex h-14 w-14 items-center justify-center">
+          <span
+            className="absolute inset-0 animate-spin rounded-full border-[3px] border-[#E1E7EF] border-t-[#188B8B]"
+            aria-hidden="true"
+          />
+          <img
+            src={jumpstartIcon}
+            alt=""
+            aria-hidden="true"
+            className="h-9 w-9 animate-pulse"
+          />
+        </div>
         <p className="text-sm font-semibold text-[#4E5D72]">{t("loading.page")}</p>
       </div>
     </div>

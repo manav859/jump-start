@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Mail, MapPin, Phone } from "lucide-react";
 import api from "../api/api";
+import jumpstartIcon from "../assets/jumpstart-icon.png";
 import {
   fallbackSupportPages,
   supportPageDefinitions,
@@ -74,9 +75,13 @@ export default function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.15fr_0.85fr_0.85fr_1fr] lg:px-8">
         <div>
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#188B8B] text-lg font-bold text-white">
-              J
-            </div>
+            {/* Icon mark + white wordmark: the full logo's wordmark is dark
+                charcoal and would vanish on this near-black footer. */}
+            <img
+              src={jumpstartIcon}
+              alt="Jumpstart"
+              className="h-10 w-10 shrink-0"
+            />
             <h3 className="text-2xl font-bold">Jumpstart</h3>
           </div>
           <p className="mt-4 max-w-xs text-sm leading-6 text-white/70">

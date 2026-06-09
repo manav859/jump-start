@@ -67,12 +67,6 @@ const ABSTRACT_RANGE = { start: 341, end: 365 };
 const SPATIAL_RANGE = { start: 366, end: 390 };
 const MECHANICAL_RANGE = { start: 391, end: 410 };
 
-// Mechanical questions that are purely text-based in the source booklet
-// (no diagram). Kept for the frontend media-URL parity helper below.
-const TEXT_ONLY_MECHANICAL_IDS = new Set([
-  393, 395, 396, 397, 398, 399, 403, 404, 407, 408, 409,
-]);
-
 const inRange = (id, { start, end }) =>
   Number.isFinite(id) && id >= start && id <= end;
 
@@ -96,10 +90,11 @@ export const getQuestionMediaUrl = (questionId) => {
     return `/question-media/spatial/q${String(folderNumber).padStart(3, "0")}/stimulus.png?v=2`;
   }
 
-  if (inRange(id, MECHANICAL_RANGE)) {
-    if (TEXT_ONLY_MECHANICAL_IDS.has(id)) return null;
-    return `/question-media/mechanical/q${String(id).padStart(3, "0")}/stimulus.png?v=2`;
-  }
+  // Mechanical (Q391-410) stimulus is disabled: the on-disk diagrams belong to
+  // an older, different question set and don't match the current booklet text,
+  // so we serve no image rather than a mismatched one. See
+  // frontend/src/data/mechanicalQuestionMedia.js for the full root cause.
+  if (inRange(id, MECHANICAL_RANGE)) return null;
 
   // Abstract reasoning (Q341-365) is text-only in the current build.
   return null;

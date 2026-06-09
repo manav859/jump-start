@@ -133,9 +133,13 @@ textarea {
 }
 
 .jumpstart-report-print-mode .report-print-root {
-  max-width: 1120px !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+  /* Fit the printable page width. A fixed 1120px here is wider than an
+     A4/Letter printable area, which pushed content off the right edge and
+     produced a horizontal scrollbar. With @page margin 0 (no browser
+     header/footer text), the page margin is recreated as padding here.
+     box-sizing: border-box keeps it within the sheet, so no overflow. */
+  max-width: none !important;
+  padding: 14mm 12mm !important;
 }
 
 .jumpstart-report-print-mode .surface-card,
@@ -149,6 +153,14 @@ textarea {
 .jumpstart-report-print-mode .report-print-link {
   color: #0f1729 !important;
   text-decoration: none !important;
+}
+
+/* Brand letterhead logo on the report — fixed, modest print height so it
+   reads as a letterhead and never balloons regardless of which responsive
+   breakpoint the print engine resolves. */
+.jumpstart-report-print-mode .report-print-logo {
+  height: 48px !important;
+  width: auto !important;
 }
 
 /* Reveal print-only content when our Download flow toggles print mode
@@ -173,22 +185,37 @@ textarea {
 }
 
 @media print {
-  /* Tighter margin so we fit the long report in fewer pages. The old
-     14mm value pushed the section-breakdown content onto an extra
-     page-pair. 10mm matches the typical "narrow" print preset. */
+  /* Zero page margin so the browser cannot inject its header/footer text
+     (URL, date, page number, document title) into the margin boxes — there
+     is no margin box to render them in. The visual page margin is recreated
+     with padding on .report-print-root below, which keeps the content clean
+     and free of the localhost URL caption the print preview was showing. */
   @page {
-    margin: 10mm;
+    margin: 0;
   }
 
   html,
   body {
     background: white !important;
+    /* Guard against any single wide child forcing the page wider than the
+       sheet (which shows as a horizontal scrollbar + clipped left edge in
+       the print preview). */
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
   }
 
   body {
     color: #0f1729;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+
+  .report-print-page,
+  .report-print-root {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
   }
 
   header,
@@ -209,7 +236,10 @@ textarea {
 
   .report-print-root {
     max-width: none !important;
-    padding: 0 !important;
+    /* Page margin lives here now that @page margin is 0 (so no browser
+       header/footer text). box-sizing: border-box keeps this within the
+       page width, so no horizontal overflow. */
+    padding: 14mm 12mm !important;
   }
 
   .surface-card,
@@ -255,5 +285,11 @@ textarea {
   .report-print-link {
     color: #0f1729 !important;
     text-decoration: none !important;
+  }
+
+  /* Letterhead logo size for the native Ctrl+P / Save-as-PDF path. */
+  .report-print-logo {
+    height: 48px !important;
+    width: auto !important;
   }
 }
