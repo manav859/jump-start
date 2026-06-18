@@ -2,7 +2,7 @@
 # Section 1 — Personality Assessment
 # Answer Key / Question Bank
 
-_Generated 2026-06-02 — 120 questions (Q1–Q120)_
+_Generated 2026-06-16 — 120 questions (Q1–Q120)_
 
 _This section is scored by averages. There are no correct or incorrect answers._
 

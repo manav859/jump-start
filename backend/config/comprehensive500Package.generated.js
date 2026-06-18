@@ -5723,7 +5723,7 @@ const PACKAGE = {
         },
         {
           "questionId": "367",
-          "text": "Which of the boxes comes next in the sequence?",
+          "text": "When folded, what pattern is possible?",
           "type": "single",
           "options": [
             "A",
@@ -5731,10 +5731,10 @@ const PACKAGE = {
             "C",
             "D"
           ],
-          "correctOption": "B",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 0.1,
-          "text_gu": "ક્રમમાં આગળ કયું બોક્સ આવે છે?",
+          "text_gu": "ગડી કરવામાં આવે ત્યારે કયો પેટર્ન શક્ય છે?",
           "options_gu": [
             "A",
             "B",
@@ -5744,7 +5744,7 @@ const PACKAGE = {
         },
         {
           "questionId": "368",
-          "text": "Which of the boxes comes next in the sequence?",
+          "text": "Which figure represents the assembly of the following pieces?",
           "type": "single",
           "options": [
             "A",
@@ -5755,7 +5755,7 @@ const PACKAGE = {
           "correctOption": "D",
           "reverseScored": false,
           "weight": 0.1,
-          "text_gu": "ક્રમમાં આગળ કયું બોક્સ આવે છે?",
+          "text_gu": "નીચેના ટુકડાઓના જોડાણને કયો આકાર રજૂ કરે છે?",
           "options_gu": [
             "A",
             "B",
@@ -6647,323 +6647,389 @@ const PACKAGE = {
         },
         {
           "questionId": "391",
-          "text": "If gear A turns clockwise, which direction will gear B turn?",
+          "text": "Which statement is WRONG about springs?",
           "type": "single",
           "options": [
-            "Clockwise",
-            "Counterclockwise",
-            "Won't turn",
-            "Both directions"
+            "Springs are a kind of simple machines",
+            "Springs can be used as energy stores",
+            "Spring's constant depends on the properties of the material they are made of"
           ],
-          "correctOption": "B",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "ઝરણાં (springs) વિશે કયું વિધાન ખોટું છે?",
+          "options_gu": [
+            "ઝરણાં એ એક પ્રકારના સાદા યંત્રો છે",
+            "ઝરણાંનો ઉપયોગ ઊર્જા સંગ્રહ તરીકે થઈ શકે છે",
+            "ઝરણાંનો અચળાંક તે જે સામગ્રીમાંથી બને છે તેના ગુણધર્મો પર આધાર રાખે છે"
+          ]
         },
         {
           "questionId": "392",
-          "text": "Which lever arrangement requires the least force to lift the weight?",
+          "text": "Electrons in a circuit flow from a place where there are __?__ electrons to a place where there are __?__ electrons.",
           "type": "single",
           "options": [
-            "Lever A",
-            "Lever B",
-            "Lever C",
-            "All equal"
+            "Less, More",
+            "Many, No",
+            "More, Less"
           ],
           "correctOption": "C",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "પરિપથમાં ઈલેક્ટ્રોન જ્યાં __?__ ઈલેક્ટ્રોન હોય ત્યાંથી __?__ ઈલેક્ટ્રોન હોય ત્યાં વહે છે.",
+          "options_gu": [
+            "ઓછા, વધારે",
+            "ઘણા, કોઈ નહીં",
+            "વધારે, ઓછા"
+          ]
         },
         {
           "questionId": "393",
-          "text": "If you push down on this end, what happens to the other end?",
+          "text": "We use __?__ to measure a specific gas pressure.",
           "type": "single",
           "options": [
-            "Goes up",
-            "Goes down",
-            "Stays same",
-            "Moves sideways"
+            "Barometer",
+            "Thermometer",
+            "Manometer"
           ],
-          "correctOption": "A",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "ચોક્કસ ગેસનું દબાણ માપવા માટે આપણે __?__ નો ઉપયોગ કરીએ છીએ.",
+          "options_gu": [
+            "બેરોમીટર",
+            "થર્મોમીટર",
+            "મેનોમીટર"
+          ]
         },
         {
           "questionId": "394",
-          "text": "Which pulley system gives the greatest mechanical advantage?",
+          "text": "Which term is NOT related to gears?",
           "type": "single",
           "options": [
-            "System A",
-            "System B",
-            "System C",
-            "All equal"
+            "Cogwheel",
+            "Pinion",
+            "Rack"
           ],
           "correctOption": "C",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "કઈ વસ્તુ ગિયર્સ સાથે સંબંધિત નથી?",
+          "options_gu": [
+            "કોગવ્હીલ",
+            "પિનિયન",
+            "રેક"
+          ]
         },
         {
           "questionId": "395",
-          "text": "What will happen if you turn the handle clockwise?",
+          "text": "Which of the following materials can become a magnet?",
           "type": "single",
           "options": [
-            "Weight goes up",
-            "Weight goes down",
-            "No movement",
-            "Handle breaks"
+            "Aluminum",
+            "Copper",
+            "Zinc"
           ],
-          "correctOption": "A",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "નીચેનામાંથી કઈ સામગ્રી ચુંબક બની શકે છે?",
+          "options_gu": [
+            "એલ્યુમિનિયમ",
+            "તાંબુ",
+            "જસત"
+          ]
         },
         {
           "questionId": "396",
-          "text": "Which inclined plane requires less force to move the box?",
+          "text": "Which of the following does NOT use magnetism to operate?",
           "type": "single",
           "options": [
-            "Steep ramp",
-            "Gentle ramp",
-            "Same force",
-            "Can't determine"
+            "Compass",
+            "NMR apparatus",
+            "Vehicle"
           ],
-          "correctOption": "B",
+          "correctOption": "C",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "નીચેનામાંથી કયું ચાલવા માટે ચુંબકત્વનો ઉપયોગ નથી કરતું?",
+          "options_gu": [
+            "હોકાયંત્ર",
+            "NMR ઉપકરણ",
+            "વાહન"
+          ]
         },
         {
           "questionId": "397",
-          "text": "If water flows into this container, which section fills first?",
+          "text": "Belts usually are made from materials that __?__ friction.",
           "type": "single",
           "options": [
-            "Section A",
-            "Section B",
-            "Section C",
-            "All at once"
+            "Increase",
+            "Reduce",
+            "Don't change"
           ],
-          "correctOption": "B",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "પટ્ટા સામાન્ય રીતે એવી સામગ્રીઓથી બને છે જે ઘર્ષણને __?__.",
+          "options_gu": [
+            "વધારે છે",
+            "ઘટાડે છે",
+            "બદલતી નથી"
+          ]
         },
         {
           "questionId": "398",
-          "text": "Which wheel will turn faster?",
+          "text": "Which statement about levers is CORRECT?",
           "type": "single",
           "options": [
-            "Large wheel",
-            "Small wheel",
-            "Same speed",
-            "Neither turns"
+            "All levers have the same value of mechanical advantage",
+            "A lever is a kind of simple machine",
+            "Crowbar is an example of third class levers"
           ],
           "correctOption": "B",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "લિવર વિશે કયું વિધાન સાચું છે?",
+          "options_gu": [
+            "બધી લિવરનો યાંત્રિક લાભ સમાન મૂલ્યનો હોય છે",
+            "લિવર એ એક પ્રકારનું સાદું યંત્ર છે",
+            "ક્રોબાર એ ત્રીજા વર્ગની લિવરનું ઉદાહરણ છે"
+          ]
         },
         {
           "questionId": "399",
-          "text": "What's the mechanical advantage of this lever?",
+          "text": "What would happen to the distance Earth-Sun if one year became 400 days without any change in the gravitational force?",
           "type": "single",
           "options": [
-            "1:1",
-            "2:1",
-            "3:1",
-            "4:1"
+            "Distance would increase",
+            "Distance would decrease",
+            "Distance would remain the same"
           ],
-          "correctOption": "C",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "જો ગુરુત્વાકર્ષણ બળમાં કોઈ ફેરફાર વગર એક વર્ષ 400 દિવસનું થઈ જાય, તો પૃથ્વી-સૂર્ય વચ્ચેના અંતરનું શું થશે?",
+          "options_gu": [
+            "અંતર વધશે",
+            "અંતર ઘટશે",
+            "અંતર સમાન રહેશે"
+          ]
         },
         {
           "questionId": "400",
-          "text": "If you turn this screw clockwise, what happens?",
+          "text": "Centripetal force is proportional to...",
           "type": "single",
           "options": [
-            "Goes in",
-            "Comes out",
-            "No change",
-            "Breaks"
+            "Radius of curvature",
+            "Mass of the rotating object",
+            "Speed of rotation"
           ],
           "correctOption": "A",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "કેન્દ્રગામી બળ આના સમપ્રમાણ છે...",
+          "options_gu": [
+            "વક્રતાની ત્રિજ્યા",
+            "ફરતા પદાર્થનું દળ",
+            "પરિભ્રમણની ઝડપ"
+          ]
         },
         {
           "questionId": "401",
-          "text": "Which spring will compress the most under the same weight?",
+          "text": "Which statement below is WRONG about springs?",
           "type": "single",
           "options": [
-            "Spring A",
-            "Spring B",
-            "Spring C",
-            "All equal"
+            "Springs are simple machines as they make the object move",
+            "The extension or compression of springs always occurs in the direction of the applied force",
+            "To increase the elasticity of a system of springs, we must combine them in series"
           ],
-          "correctOption": "B",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "ઝરણાં વિશે નીચેનું કયું વિધાન ખોટું છે?",
+          "options_gu": [
+            "ઝરણાં સાદા યંત્રો છે કારણ કે તે પદાર્થને ગતિ કરાવે છે",
+            "ઝરણાંનું ખેંચાણ કે સંકોચન હંમેશા લાગુ પડેલા બળની દિશામાં થાય છે",
+            "ઝરણાંની પ્રણાલીની સ્થિતિસ્થાપકતા વધારવા માટે, આપણે તેમને શ્રેણીમાં જોડવા જોઈએ"
+          ]
         },
         {
           "questionId": "402",
-          "text": "What direction will the ball roll?",
+          "text": "Why can we not use the equation P = ρ × g × h for calculating the air pressure at a height h, taking the upper part of the atmosphere as reference level?",
           "type": "single",
           "options": [
-            "Left",
-            "Right",
-            "Won't move",
-            "Up"
+            "Because the atmosphere is very thick",
+            "Because the density of the atmosphere is not uniform",
+            "Because the atmosphere is not a fluid"
           ],
           "correctOption": "B",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "ઊંચાઈ h પર હવાના દબાણની ગણતરી માટે P = ρ × g × h સમીકરણનો ઉપયોગ વાતાવરણના ઉપરના ભાગને સંદર્ભ સ્તર તરીકે લઈને કેમ થઈ શકતો નથી?",
+          "options_gu": [
+            "કારણ કે વાતાવરણ ખૂબ જાડું છે",
+            "કારણ કે વાતાવરણની ઘનતા એકસમાન નથી",
+            "કારણ કે વાતાવરણ પ્રવાહી નથી"
+          ]
         },
         {
           "questionId": "403",
-          "text": "Which gear will turn the fastest?",
+          "text": "Which statement regarding magnets is CORRECT?",
           "type": "single",
           "options": [
-            "Gear A",
-            "Gear B",
-            "Gear C",
-            "Same speed"
+            "When a magnet is divided in two pieces, two magnets with a single pole each are formed",
+            "Magnetic field lines are closed lines",
+            "A magnet can attract or repel all materials around"
           ],
-          "correctOption": "C",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "ચુંબક અંગે કયું વિધાન સાચું છે?",
+          "options_gu": [
+            "જ્યારે ચુંબકને બે ટુકડામાં વહેંચવામાં આવે, ત્યારે દરેકમાં એક જ ધ્રુવ ધરાવતા બે ચુંબક બને છે",
+            "ચુંબકીય ક્ષેત્રની રેખાઓ બંધ રેખાઓ છે",
+            "ચુંબક તેની આસપાસની બધી સામગ્રીને આકર્ષી કે અપાકર્ષી શકે છે"
+          ]
         },
         {
           "questionId": "404",
-          "text": "If you heat this metal rod, what happens to its length?",
+          "text": "The advantage(s) of a series circuit over a parallel one is that...",
           "type": "single",
           "options": [
-            "Gets longer",
-            "Gets shorter",
-            "Stays same",
-            "Depends on metal"
-          ],
-          "correctOption": "A",
-          "reverseScored": false,
-          "weight": 1,
-          "text_gu": "",
-          "options_gu": []
-        },
-        {
-          "questionId": "405",
-          "text": "Which bottle will empty faster if both caps are removed?",
-          "type": "single",
-          "options": [
-            "Wide neck",
-            "Narrow neck",
-            "Same rate",
-            "Neither empties"
-          ],
-          "correctOption": "A",
-          "reverseScored": false,
-          "weight": 1,
-          "text_gu": "",
-          "options_gu": []
-        },
-        {
-          "questionId": "406",
-          "text": "What force is needed to balance this see-saw?",
-          "type": "single",
-          "options": [
-            "10 lbs",
-            "15 lbs",
-            "20 lbs",
-            "25 lbs"
+            "It is easier to build up",
+            "All circuit elements operate at full capacity",
+            "Both A and B"
           ],
           "correctOption": "C",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "સમાંતર પરિપથની સરખામણીમાં શ્રેણી પરિપથનો ફાયદો/ફાયદાઓ એ છે કે...",
+          "options_gu": [
+            "તેને બનાવવું સરળ છે",
+            "બધા પરિપથ ઘટકો સંપૂર્ણ ક્ષમતાએ કાર્ય કરે છે",
+            "A અને B બંને"
+          ]
+        },
+        {
+          "questionId": "405",
+          "text": "If a liquid becomes twice denser and the depth of an immersed object in this liquid halves, the liquid's pressure:",
+          "type": "single",
+          "options": [
+            "Quadruples",
+            "Reduces by a factor of 4",
+            "Doesn't change"
+          ],
+          "correctOption": "C",
+          "reverseScored": false,
+          "weight": 1,
+          "text_gu": "જો કોઈ પ્રવાહી બમણું ઘટ્ટ બને અને તે પ્રવાહીમાં ડૂબેલા પદાર્થની ઊંડાઈ અડધી થાય, તો પ્રવાહીનું દબાણ:",
+          "options_gu": [
+            "ચાર ગણું થાય છે",
+            "4 ગણાથી ઘટે છે",
+            "બદલાતું નથી"
+          ]
+        },
+        // FLAG (source PDF "Mechanical & Spatial Questions.pdf", Mechanical #24):
+        // the booklet's quoted answer is "C" (cables carry no electricity while the
+        // iron runs), which is physically dubious — the textbook-correct answer is
+        // arguably "B" (the iron converts electricity into heat). Kept as "C" to
+        // match the client's confirmed source of truth; flagged for later review.
+        {
+          "questionId": "406",
+          "text": "An electric iron gets hotter but the cable carrying the current to the iron is cool. This is because:",
+          "type": "single",
+          "options": [
+            "Cables have coolers inside them",
+            "Electric iron converts electricity into heat",
+            "Cables do not carry any electricity when the iron is operating"
+          ],
+          "correctOption": "C",
+          "reverseScored": false,
+          "weight": 1,
+          "text_gu": "ઇલેક્ટ્રિક ઇસ્ત્રી વધુ ગરમ થાય છે પણ ઇસ્ત્રી સુધી પ્રવાહ વહન કરતો કેબલ ઠંડો રહે છે. આનું કારણ:",
+          "options_gu": [
+            "કેબલમાં અંદર કૂલર હોય છે",
+            "ઇલેક્ટ્રિક ઇસ્ત્રી વીજળીને ગરમીમાં રૂપાંતરિત કરે છે",
+            "ઇસ્ત્રી ચાલુ હોય ત્યારે કેબલ કોઈ વીજળી વહન કરતા નથી"
+          ],
+          "notes": "FLAG: source PDF Mechanical #24 — quoted answer 'C' is physically dubious (textbook answer likely 'B'); kept to match client source PDF, review later."
         },
         {
           "questionId": "407",
-          "text": "Which pendulum will swing faster?",
+          "text": "What is the main difference between a cell and a capacitor?",
           "type": "single",
           "options": [
-            "Long pendulum",
-            "Short pendulum",
-            "Same speed",
-            "Neither swings"
+            "A cell provides the force needed to make charges flow through the circuit, while a capacitor accumulates charges on its plates",
+            "A cell produces electricity while a capacitor stores it",
+            "A cell stores electricity in the form of chemical energy while a capacitor consumes it"
           ],
-          "correctOption": "B",
+          "correctOption": "A",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "સેલ અને કેપેસિટર વચ્ચેનો મુખ્ય તફાવત શું છે?",
+          "options_gu": [
+            "સેલ પરિપથમાં ચાર્જને વહેવા માટે જરૂરી બળ પૂરું પાડે છે, જ્યારે કેપેસિટર તેની પ્લેટો પર ચાર્જ સંગ્રહે છે",
+            "સેલ વીજળી ઉત્પન્ન કરે છે જ્યારે કેપેસિટર તેને સંગ્રહે છે",
+            "સેલ વીજળીને રાસાયણિક ઊર્જાના સ્વરૂપમાં સંગ્રહે છે જ્યારે કેપેસિટર આ વીજળીનો વપરાશ કરે છે"
+          ]
         },
         {
           "questionId": "408",
-          "text": "If you compress this spring, what happens to its potential energy?",
+          "text": "Which statement is CORRECT about air pressure?",
           "type": "single",
           "options": [
-            "Increases",
-            "Decreases",
-            "Stays same",
-            "Becomes kinetic"
-          ],
-          "correctOption": "A",
-          "reverseScored": false,
-          "weight": 1,
-          "text_gu": "",
-          "options_gu": []
-        },
-        {
-          "questionId": "409",
-          "text": "Which ramp will the ball reach the bottom fastest?",
-          "type": "single",
-          "options": [
-            "Straight ramp",
-            "Curved ramp",
-            "Same time",
-            "Ball won't roll"
+            "At 100 km above the ground, air pressure is about 1 atm",
+            "At 100 km above the ground, air pressure is less than 1 atm",
+            "At 100 km above the ground, air pressure is more than 1 atm"
           ],
           "correctOption": "B",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "હવાના દબાણ વિશે કયું વિધાન સાચું છે?",
+          "options_gu": [
+            "જમીનથી 100 કિમી ઉપર, હવાનું દબાણ આશરે 1 atm હોય છે",
+            "જમીનથી 100 કિમી ઉપર, હવાનું દબાણ 1 atm કરતાં ઓછું હોય છે",
+            "જમીનથી 100 કિમી ઉપર, હવાનું દબાણ 1 atm કરતાં વધારે હોય છે"
+          ]
+        },
+        {
+          "questionId": "409",
+          "text": "Which statement is WRONG about circular motion?",
+          "type": "single",
+          "options": [
+            "Circular motion is a special case of linear motion",
+            "Linear motion is a special case of circular motion",
+            "Linear and circular motion have no relationship at all"
+          ],
+          "correctOption": "B",
+          "reverseScored": false,
+          "weight": 1,
+          "text_gu": "વર્તુળાકાર ગતિ વિશે કયું વિધાન ખોટું છે?",
+          "options_gu": [
+            "વર્તુળાકાર ગતિ એ રેખીય ગતિનો વિશેષ કિસ્સો છે",
+            "રેખીય ગતિ એ વર્તુળાકાર ગતિનો વિશેષ કિસ્સો છે",
+            "રેખીય અને વર્તુળાકાર ગતિ વચ્ચે કોઈ સંબંધ જ નથી"
+          ]
         },
         {
           "questionId": "410",
-          "text": "What happens when you mix hot and cold water?",
+          "text": "We must put a __?__ before an expensive circuit component to prevent it from burning due to excessive current.",
           "type": "single",
           "options": [
-            "Temperature equalizes",
-            "Hot water rises",
-            "Cold water rises",
-            "No mixing"
+            "Resistor",
+            "Fuse",
+            "Bulb"
           ],
-          "correctOption": "A",
+          "correctOption": "B",
           "reverseScored": false,
           "weight": 1,
-          "text_gu": "",
-          "options_gu": []
+          "text_gu": "ખર્ચાળ પરિપથ ઘટકને વધુ પડતા પ્રવાહથી બળી જતો અટકાવવા માટે આપણે તેની આગળ __?__ મૂકવું જોઈએ.",
+          "options_gu": [
+            "રેઝિસ્ટર",
+            "ફ્યુઝ",
+            "બલ્બ"
+          ]
         },
         {
           "questionId": "431",

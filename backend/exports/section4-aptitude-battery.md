@@ -2,7 +2,7 @@
 # Section 4 — Aptitude Battery
 # Answer Key / Question Bank
 
-_Generated 2026-06-02 — 160 questions (Q291–Q450)_
+_Generated 2026-06-16 — 160 questions (Q291–Q450)_
 
 ---
 
@@ -630,19 +630,19 @@ Correct Answer: **B** — Pattern B
 
 **Q367.** When folded, what pattern is possible?
 
-   A. ⅃
-   B. Γ
-   C. ⌐
-   D. └
-Correct Answer: **C** — ⌐
+   A. A
+   B. B
+   C. C
+   D. D
+Correct Answer: **C** — C
 
 **Q368.** Which figure represents the assembly of the following pieces?
 
-   A. View A
-   B. View B
-   C. View C
-   D. View D
-Correct Answer: **D** — View D
+   A. A
+   B. B
+   C. C
+   D. D
+Correct Answer: **D** — D
 
 **Q369.** Which cube is obtained by folding the shape below?
 
@@ -824,165 +824,145 @@ Correct Answer: **D** — 6
 
 ## Mechanical Reasoning (Q391–Q410) — 20 questions
 
-**Q391.** If gear A turns clockwise, which direction will gear B turn?
+**Q391.** Which statement is WRONG about springs?
 
-   A. Clockwise
-   B. Counterclockwise
-   C. Won't turn
-   D. Both directions
-Correct Answer: **B** — Counterclockwise
+   A. Springs are a kind of simple machines
+   B. Springs can be used as energy stores
+   C. Spring's constant depends on the properties of the material they are made of
+Correct Answer: **A** — Springs are a kind of simple machines
 
-**Q392.** Which lever arrangement requires the least force to lift the weight?
+**Q392.** Electrons in a circuit flow from a place where there are __?__ electrons to a place where there are __?__ electrons.
 
-   A. Lever A
-   B. Lever B
-   C. Lever C
-   D. All equal
-Correct Answer: **C** — Lever C
+   A. Less, More
+   B. Many, No
+   C. More, Less
+Correct Answer: **C** — More, Less
 
-**Q393.** If you push down on this end, what happens to the other end?
+**Q393.** We use __?__ to measure a specific gas pressure.
 
-   A. Goes up
-   B. Goes down
-   C. Stays same
-   D. Moves sideways
-Correct Answer: **A** — Goes up
+   A. Barometer
+   B. Thermometer
+   C. Manometer
+Correct Answer: **C** — Manometer
 
-**Q394.** Which pulley system gives the greatest mechanical advantage?
+**Q394.** Which term is NOT related to gears?
 
-   A. System A
-   B. System B
-   C. System C
-   D. All equal
-Correct Answer: **C** — System C
+   A. Cogwheel
+   B. Pinion
+   C. Rack
+Correct Answer: **C** — Rack
 
-**Q395.** What will happen if you turn the handle clockwise?
+**Q395.** Which of the following materials can become a magnet?
 
-   A. Weight goes up
-   B. Weight goes down
-   C. No movement
-   D. Handle breaks
-Correct Answer: **A** — Weight goes up
+   A. Aluminum
+   B. Copper
+   C. Zinc
+Correct Answer: **C** — Zinc
 
-**Q396.** Which inclined plane requires less force to move the box?
+**Q396.** Which of the following does NOT use magnetism to operate?
 
-   A. Steep ramp
-   B. Gentle ramp
-   C. Same force
-   D. Can't determine
-Correct Answer: **B** — Gentle ramp
+   A. Compass
+   B. NMR apparatus
+   C. Vehicle
+Correct Answer: **C** — Vehicle
 
-**Q397.** If water flows into this container, which section fills first?
+**Q397.** Belts usually are made from materials that __?__ friction.
 
-   A. Section A
-   B. Section B
-   C. Section C
-   D. All at once
-Correct Answer: **B** — Section B
+   A. Increase
+   B. Reduce
+   C. Don't change
+Correct Answer: **A** — Increase
 
-**Q398.** Which wheel will turn faster?
+**Q398.** Which statement about levers is CORRECT?
 
-   A. Large wheel
-   B. Small wheel
-   C. Same speed
-   D. Neither turns
-Correct Answer: **B** — Small wheel
+   A. All levers have the same value of mechanical advantage
+   B. A lever is a kind of simple machine
+   C. Crowbar is an example of third class levers
+Correct Answer: **B** — A lever is a kind of simple machine
 
-**Q399.** What's the mechanical advantage of this lever?
+**Q399.** What would happen to the distance Earth-Sun if one year became 400 days without any change in the gravitational force?
 
-   A. 1:1
-   B. 2:1
-   C. 3:1
-   D. 4:1
-Correct Answer: **C** — 3:1
+   A. Distance would increase
+   B. Distance would decrease
+   C. Distance would remain the same
+Correct Answer: **B** — Distance would decrease
 
-**Q400.** If you turn this screw clockwise, what happens?
+**Q400.** Centripetal force is proportional to...
 
-   A. Goes in
-   B. Comes out
-   C. No change
-   D. Breaks
-Correct Answer: **A** — Goes in
+   A. Radius of curvature
+   B. Mass of the rotating object
+   C. Speed of rotation
+Correct Answer: **A** — Radius of curvature
 
-**Q401.** Which spring will compress the most under the same weight?
+**Q401.** Which statement below is WRONG about springs?
 
-   A. Spring A
-   B. Spring B
-   C. Spring C
-   D. All equal
-Correct Answer: **B** — Spring B
+   A. Springs are simple machines as they make the object move
+   B. The extension or compression of springs always occurs in the direction of the applied force
+   C. To increase the elasticity of a system of springs, we must combine them in series
+Correct Answer: **A** — Springs are simple machines as they make the object move
 
-**Q402.** What direction will the ball roll?
+**Q402.** Why can we not use the equation P = ρ × g × h for calculating the air pressure at a height h, taking the upper part of the atmosphere as reference level?
 
-   A. Left
-   B. Right
-   C. Won't move
-   D. Up
-Correct Answer: **B** — Right
+   A. Because the atmosphere is very thick
+   B. Because the density of the atmosphere is not uniform
+   C. Because the atmosphere is not a fluid
+Correct Answer: **B** — Because the density of the atmosphere is not uniform
 
-**Q403.** Which gear will turn the fastest?
+**Q403.** Which statement regarding magnets is CORRECT?
 
-   A. Gear A
-   B. Gear B
-   C. Gear C
-   D. Same speed
-Correct Answer: **C** — Gear C
+   A. When a magnet is divided in two pieces, two magnets with a single pole each are formed
+   B. Magnetic field lines are closed lines
+   C. A magnet can attract or repel all materials around
+Correct Answer: **A** — When a magnet is divided in two pieces, two magnets with a single pole each are formed
 
-**Q404.** If you heat this metal rod, what happens to its length?
+**Q404.** The advantage(s) of a series circuit over a parallel one is that...
 
-   A. Gets longer
-   B. Gets shorter
-   C. Stays same
-   D. Depends on metal
-Correct Answer: **A** — Gets longer
+   A. It is easier to build up
+   B. All circuit elements operate at full capacity
+   C. Both A and B
+Correct Answer: **C** — Both A and B
 
-**Q405.** Which bottle will empty faster if both caps are removed?
+**Q405.** If a liquid becomes twice denser and the depth of an immersed object in this liquid halves, the liquid's pressure:
 
-   A. Wide neck
-   B. Narrow neck
-   C. Same rate
-   D. Neither empties
-Correct Answer: **A** — Wide neck
+   A. Quadruples
+   B. Reduces by a factor of 4
+   C. Doesn't change
+Correct Answer: **C** — Doesn't change
 
-**Q406.** What force is needed to balance this see-saw?
+**Q406.** An electric iron gets hotter but the cable carrying the current to the iron is cool. This is because:
 
-   A. 10 lbs
-   B. 15 lbs
-   C. 20 lbs
-   D. 25 lbs
-Correct Answer: **C** — 20 lbs
+   A. Cables have coolers inside them
+   B. Electric iron converts electricity into heat
+   C. Cables do not carry any electricity when the iron is operating
+Correct Answer: **C** — Cables do not carry any electricity when the iron is operating
 
-**Q407.** Which pendulum will swing faster?
+**Q407.** What is the main difference between a cell and a capacitor?
 
-   A. Long pendulum
-   B. Short pendulum
-   C. Same speed
-   D. Neither swings
-Correct Answer: **B** — Short pendulum
+   A. A cell provides the force needed to make charges flow through the circuit, while a capacitor accumulates charges on its plates
+   B. A cell produces electricity while a capacitor stores it
+   C. A cell stores electricity in the form of chemical energy while a capacitor consumes it
+Correct Answer: **A** — A cell provides the force needed to make charges flow through the circuit, while a capacitor accumulates charges on its plates
 
-**Q408.** If you compress this spring, what happens to its potential energy?
+**Q408.** Which statement is CORRECT about air pressure?
 
-   A. Increases
-   B. Decreases
-   C. Stays same
-   D. Becomes kinetic
-Correct Answer: **A** — Increases
+   A. At 100 km above the ground, air pressure is about 1 atm
+   B. At 100 km above the ground, air pressure is less than 1 atm
+   C. At 100 km above the ground, air pressure is more than 1 atm
+Correct Answer: **B** — At 100 km above the ground, air pressure is less than 1 atm
 
-**Q409.** Which ramp will the ball reach the bottom fastest?
+**Q409.** Which statement is WRONG about circular motion?
 
-   A. Straight ramp
-   B. Curved ramp
-   C. Same time
-   D. Ball won't roll
-Correct Answer: **B** — Curved ramp
+   A. Circular motion is a special case of linear motion
+   B. Linear motion is a special case of circular motion
+   C. Linear and circular motion have no relationship at all
+Correct Answer: **B** — Linear motion is a special case of circular motion
 
-**Q410.** What happens when you mix hot and cold water?
+**Q410.** We must put a __?__ before an expensive circuit component to prevent it from burning due to excessive current.
 
-   A. Temperature equalizes
-   B. Hot water rises
-   C. Cold water rises
-   D. No mixing
-Correct Answer: **A** — Temperature equalizes
+   A. Resistor
+   B. Fuse
+   C. Bulb
+Correct Answer: **B** — Fuse
 
 ---
 
