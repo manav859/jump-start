@@ -64,7 +64,7 @@ const GUJARATI_PACKAGE = {
   id: "complete-aptitude-500q-gujarati",
   title: "Complete Aptitude Test - Gujarati (500Q)",
   badge: "ગુજરાતી",
-  amount: 2499,
+  amount: 1999,
   strikeAmount: COMPREHENSIVE_500_PACKAGE.strikeAmount ?? null,
   features: [
     "500 પ્રશ્નો સંપૂર્ણ રીતે ગુજરાતીમાં",

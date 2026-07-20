@@ -489,6 +489,26 @@ export const buildStudentReportDetail = (report, user, packageLookup) => {
     careerRecommendations: Array.isArray(profile.careerRecommendations)
       ? profile.careerRecommendations
       : [],
+    // Rich scoring maps + aggregators surfaced for the redesigned
+    // downloadable report. These already exist on the stored profile
+    // (career500q scorer output) but were previously not exposed on the
+    // student-facing payload. Surfacing them lets the report render the
+    // MBTI/OCEAN/HSPQ, Multiple-Intelligence, RIASEC, Aptitude, and EQ
+    // panels directly instead of re-deriving everything from
+    // sectionBreakdown.subsections. Legacy/heuristic reports that lack
+    // these fields fall through to null/{} and the frontend degrades
+    // gracefully (shows a dash / "pending"). Both this endpoint and the
+    // admin adminView student-view endpoint share this builder, so both
+    // paths get the enriched shape.
+    personalityProfile: profile.personalityProfile || null,
+    hollandProfile: profile.hollandProfile || {},
+    multipleIntelligences: profile.multipleIntelligences || {},
+    aptitudeScores: profile.aptitudeScores || {},
+    eqProfile: profile.eqProfile || {},
+    overallPercentile: profile.overallPercentile || "",
+    consistencyNotes: Array.isArray(profile.consistencyNotes)
+      ? profile.consistencyNotes
+      : [],
     metadata: profile.metadata || {},
   };
 };

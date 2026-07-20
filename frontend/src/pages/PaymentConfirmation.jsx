@@ -104,9 +104,13 @@ export default function PaymentConfirmation() {
     };
   }, [navigate, paymentState.plan]);
 
-  const subtotal = paymentState.subtotal ?? plan?.amount ?? 0;
-  const gstAmount = paymentState.gstAmount ?? Math.round(subtotal * GST_RATE);
-  const total = paymentState.total ?? subtotal + gstAmount;
+  // Prices are GST-INCLUSIVE: `total` is the amount actually paid, and the
+  // GST shown is back-calculated as already-included (base + GST = total).
+  // Nothing is added on top.
+  const total = paymentState.total ?? plan?.amount ?? 0;
+  const subtotal =
+    paymentState.subtotal ?? Math.round(total / (1 + GST_RATE));
+  const gstAmount = paymentState.gstAmount ?? total - subtotal;
   const validityEnd = useMemo(() => addDays(issuedAt, 15), [issuedAt]);
   const features = plan?.features?.length
     ? plan.features.slice(0, 4)
@@ -120,9 +124,9 @@ export default function PaymentConfirmation() {
       `Email: ${user?.email || "Not available"}`,
       `Package: ${plan?.title || "Selected Package"}`,
       `Payment Method: ${String(method).toUpperCase()}`,
-      `Subtotal: INR ${subtotal}`,
-      `GST (18%): INR ${gstAmount}`,
-      `Total: INR ${total}`,
+      `Base price (excl. GST): INR ${subtotal}`,
+      `GST (18%, included): INR ${gstAmount}`,
+      `Total (incl. GST): INR ${total}`,
       `Valid Until: ${formatDate(validityEnd)}`,
     ];
 
@@ -288,7 +292,7 @@ export default function PaymentConfirmation() {
                 </span>
               </div>
               <div className="flex items-center justify-between gap-4">
-                <span className="text-[#65758B]">GST (18%)</span>
+                <span className="text-[#65758B]">GST (18%, included)</span>
                 <span className="text-[#65758B]">{formatPrice(gstAmount)}</span>
               </div>
               <div className="flex items-center justify-between gap-4">
@@ -307,6 +311,9 @@ export default function PaymentConfirmation() {
                 {formatPrice(total)}
               </span>
             </div>
+            <p className="mt-1 text-[11px] text-[#65758B]">
+              Inclusive of all taxes (GST included)
+            </p>
 
             <button
               type="button"

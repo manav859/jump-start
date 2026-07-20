@@ -33,14 +33,19 @@ const Payment = () => {
   }, [plan, navigate]);
 
   const formatPrice = (n) => `₹${Number(n).toLocaleString("en-IN")}`;
-  const subtotal = plan?.amount ?? 0;
-  // Discount applies pre-GST so the GST is computed on the actual
-  // collected base. Backend's purchasePackage applies the discount to
-  // pkg.amount directly — the two agree on `finalAmount`.
+  // Package prices are GST-INCLUSIVE. plan.amount already contains the GST,
+  // so we must NOT add 18% on top. We back-calculate the base and the GST
+  // component that is *already inside* the price so the invoice reads
+  // base + GST = the inclusive price the student actually pays.
+  const grossPrice = plan?.amount ?? 0; // GST-inclusive list price
+  const baseAmount = Math.round(grossPrice / (1 + GST_RATE));
+  const gstAmount = grossPrice - baseAmount; // included GST (base + gst = gross)
+  // Coupons discount the inclusive price directly. Backend's
+  // purchasePackage applies the discount to pkg.amount, so the two agree
+  // on the final collected amount.
   const discount = appliedCoupon?.discountAmount || 0;
-  const subtotalAfterDiscount = Math.max(0, subtotal - discount);
-  const gstAmount = Math.round(subtotalAfterDiscount * GST_RATE);
-  const total = subtotalAfterDiscount + gstAmount;
+  const subtotal = baseAmount; // shown as "base price (excl. GST)"
+  const total = Math.max(0, grossPrice - discount); // inclusive payable
 
   const handleApplyCoupon = async () => {
     const code = couponInput.trim().toUpperCase();
@@ -295,8 +300,11 @@ const Payment = () => {
                   <span className="font-semibold">− {formatPrice(discount)}</span>
                 </div>
               ) : null}
+              {/* GST is already INCLUDED in the package price (base + GST =
+                  the total payable). It is shown for transparency, never
+                  added on top. */}
               <div className="flex justify-between text-slate-500">
-                <span className="text-[#65758B]">GST (18%)</span>
+                <span className="text-[#65758B]">GST (18%, included)</span>
                 <span>{formatPrice(gstAmount)}</span>
               </div>
             </div>
@@ -373,10 +381,13 @@ const Payment = () => {
 
             <div className="border-t border-[#E1E7EF] my-6" />
 
-            <div className="flex justify-between items-center mb-6 font-inter">
+            <div className="flex justify-between items-center mb-1 font-inter">
               <span className="font-semibold text-[#0F1729]">Total Amount</span>
               <span className="text-2xl font-bold text-[#188B8B]">{formatPrice(total)}</span>
             </div>
+            <p className="text-[11px] text-[#65758B] mb-6 font-inter">
+              Inclusive of all taxes (GST included)
+            </p>
 
             <label className="grid auto-cols-auto grid-flow-col items-start gap-3 text-sm mb-6 cursor-pointer select-none">
               <input

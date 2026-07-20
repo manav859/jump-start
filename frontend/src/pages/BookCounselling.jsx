@@ -302,21 +302,28 @@ const BookCounselling = () => {
               </li>
             </ul>
 
+            {/* Counselling fee is GST-INCLUSIVE (₹999 is the amount paid).
+                The GST is back-calculated as already-included so the rows
+                reconcile: base (₹847) + GST (₹152) = ₹999. No 18% is added
+                on top. */}
             <div className="border-y border-[#E1E7EF] mt-4 py-4 text-sm space-y-2 font-inter">
               <div className="flex justify-between">
                 <span className="text-sm text-[#65758B]">{t("bookCounselling.sessionFee")}</span>
-                <span className="text-base text-[#0F1729] font-semibold">₹999</span>
+                <span className="text-base text-[#0F1729] font-semibold">₹847</span>
               </div>
               <div className="flex justify-between text-slate-500">
                 <span className="text-sm text-[#65758B]">{t("bookCounselling.gst")}</span>
-                <span className="text-[#0F1729]">₹180</span>
+                <span className="text-[#0F1729]">₹152</span>
               </div>
             </div>
 
             <div className="flex justify-between mt-4 font-inter">
               <span className="text-base text-[#0F1729] font-semibold">{t("bookCounselling.total")}</span>
-              <span className="text-2xl text-[#188B8B] font-bold">₹1,179</span>
+              <span className="text-2xl text-[#188B8B] font-bold">₹999</span>
             </div>
+            <p className="text-xs text-[#65758B] mt-1 font-inter">
+              {t("bookCounselling.inclTaxes")}
+            </p>
 
             <button
               disabled={!selectedTime}

@@ -126,7 +126,7 @@ export default function Footer() {
           <ul className="mt-5 space-y-4 text-sm text-white/80">
             <li className="flex items-center gap-3">
               <Mail className="h-4 w-4 text-[#34D3CB]" />
-              support@jumpstart.com
+              jumpstartedu.com@gmail.com
             </li>
             <li className="flex items-center gap-3">
               <Phone className="h-4 w-4 text-[#34D3CB]" />

@@ -472,8 +472,9 @@
     "featureActionPlan": "વ્યક્તિગત કાર્ય યોજના",
     "featureFollowUp": "ફોલો-અપ સંસાધનો",
     "sessionFee": "સત્ર ફી",
-    "gst": "GST (18%)",
+    "gst": "GST (18%, સમાવિષ્ટ)",
     "total": "કુલ",
+    "inclTaxes": "બધા કરવેરા સહિત (GST સમાવિષ્ટ)",
     "confirmAndPay": "ખાતરી અને ચુકવણી",
     "cancellationNotice": "તમે સત્રના 24 કલાક પહેલા સુધી રિશિડ્યૂલ અથવા રદ કરી શકો છો"
   },

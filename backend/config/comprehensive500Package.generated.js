@@ -5,7 +5,7 @@ const PACKAGE = {
   "id": "complete-aptitude-500q",
   "title": "Complete Aptitude Test (500Q)",
   "badge": "Comprehensive",
-  "amount": 2499,
+  "amount": 1999,
   "strikeAmount": null,
   "features": [
     "500 total questions",

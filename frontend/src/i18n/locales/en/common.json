@@ -472,8 +472,9 @@
     "featureActionPlan": "Personalized action plan",
     "featureFollowUp": "Follow-up resources",
     "sessionFee": "Session Fee",
-    "gst": "GST (18%)",
+    "gst": "GST (18%, included)",
     "total": "Total",
+    "inclTaxes": "Inclusive of all taxes (GST included)",
     "confirmAndPay": "Confirm & Pay",
     "cancellationNotice": "You can reschedule or cancel up to 24 hours before the session"
   },
