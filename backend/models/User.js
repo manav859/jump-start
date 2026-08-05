@@ -55,6 +55,18 @@ const sanitizeAssessmentReports = (reports = []) =>
           // Keep the persisted flag in sync with the items — preventing the
           // approval gate from misfiring if the items are edited directly.
           hasUnreviewedItems: computeHasUnreviewedItems(items),
+          // Carried explicitly rather than left to the spread above. The
+          // spread preserves them today, but this hook runs on EVERY save
+          // and is the exact mechanism that silently dropped fields before
+          // (`key` on sectionBreakdown). Listing them means a future
+          // refactor from spread to explicit-build can't lose the raw
+          // answers without deleting these lines on purpose.
+          rawAnswers:
+            rawReport.rawAnswers && typeof rawReport.rawAnswers === "object"
+              ? rawReport.rawAnswers
+              : {},
+          normVersion: rawReport.normVersion || "",
+          scoringVersion: rawReport.scoringVersion || "",
         };
       })
     : [];
@@ -442,6 +454,32 @@ const assessmentReportSchema = new mongoose.Schema({
   manualReviewItems: { type: [manualReviewItemSchema], default: [] },
   hasUnreviewedItems: { type: Boolean, default: false },
   manualReviewCompletedAt: { type: Date, default: null },
+  // Verbatim snapshot of the answer set this report was scored from,
+  // written in the same save that creates the report. Without it a report
+  // can never be re-scored: `user.testProgress.answers` is a single
+  // user-level buffer that the submit path clears immediately (and that
+  // package-switch/purchase also wipe), so once it's gone the raw
+  // responses are unrecoverable. Keys match the scorer's own answer-key
+  // format (`${sectionId}-${questionIndex}`, see getAnswerKey in
+  // career500q.js) so this object can be fed straight back into
+  // computeAssessmentResult.
+  //
+  // `immutable` blocks direct reassignment on a loaded document. Note it
+  // is NOT absolute: the pre-validate sanitize hook rebuilds the whole
+  // assessmentReports array, and re-cast subdocuments accept the value
+  // again. It stops accidental writes, not determined ones.
+  rawAnswers: {
+    type: mongoose.Schema.Types.Mixed,
+    default: () => ({}),
+    immutable: true,
+  },
+  // Provenance. `scoringVersion` is the scorer that produced the profile
+  // (profile.metadata.algorithmKey, e.g. "career-500q-v1");
+  // `normVersion` is the banding/threshold table applied on top of it.
+  // Both are recorded so a later re-band can tell which reports were
+  // produced under which rules without re-deriving it from createdAt.
+  normVersion: { type: String, default: "" },
+  scoringVersion: { type: String, default: "" },
   // Wall-clock duration of the attempt. `totalDurationMinutes` is the
   // delta between the test's `startedAt` and the submission timestamp;
   // `sectionDurations` is the per-section breakdown. Both stay null on

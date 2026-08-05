@@ -2246,11 +2246,23 @@ export const scoreCareer500QPackage = (answers = {}, sections = []) => {
     ),
     reviewSummary: {
       ...reviewSummary,
+      // De-duplicated: buildReviewSummary (resultProfiling.js) and
+      // buildSpecialObservations above both emit the identical
+      // "Estimated personality profile: CODE (Title)." line, so every
+      // report used to carry it twice. Dedupe here rather than dropping
+      // it from one of the producers — buildReviewSummary is shared with
+      // the generic scorer, which has no buildSpecialObservations to
+      // fall back on and still needs the line. Set preserves first-seen
+      // order, so the observation ordering is unchanged.
       observations: [
-        ...(reviewSummary.observations || []),
-        ...observations,
-        ...consistencyNotes,
-      ].filter(Boolean),
+        ...new Set(
+          [
+            ...(reviewSummary.observations || []),
+            ...observations,
+            ...consistencyNotes,
+          ].filter(Boolean)
+        ),
+      ],
     },
     metadata: {
       algorithmKey: CAREER_500Q_CONFIG.algorithmKey,

@@ -40,7 +40,7 @@ const SUBSECTION_LABEL_KEYS = {
 export default function ReviewSubmission() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { userId } = useParams();
+  const { reportId } = useParams();
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState(null);
   const [error, setError] = useState("");
@@ -59,13 +59,13 @@ export default function ReviewSubmission() {
   });
 
   useEffect(() => {
-    if (!userId) return;
+    if (!reportId) return;
 
     setLoading(true);
     Promise.all([
-      api.get(`/v1/admin/submissions/${userId}`),
+      api.get(`/v1/admin/submissions/${reportId}`),
       api
-        .get(`/v1/admin/results/${userId}/manual-review`)
+        .get(`/v1/admin/results/${reportId}/manual-review`)
         .catch(() => ({ data: { data: null } })),
     ])
       .then(([submission, review]) => {
@@ -96,10 +96,10 @@ export default function ReviewSubmission() {
       })
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
+  }, [reportId]);
 
   const recordDecision = async (questionId, decision) => {
-    if (!userId) return;
+    if (!reportId) return;
     setManualReview((prev) => ({
       ...prev,
       decisionFor: questionId,
@@ -108,7 +108,7 @@ export default function ReviewSubmission() {
     try {
       const note = manualReview.notes[questionId] || "";
       const res = await api.patch(
-        `/v1/admin/results/${userId}/manual-review/${questionId}`,
+        `/v1/admin/results/${reportId}/manual-review/${questionId}`,
         { decision, note }
       );
       const data = res?.data?.data || {};
@@ -173,11 +173,11 @@ export default function ReviewSubmission() {
   };
 
   const handleFinalize = async () => {
-    if (!userId) return;
+    if (!reportId) return;
     setManualReview((prev) => ({ ...prev, finalizing: true, error: "" }));
     try {
       const res = await api.post(
-        `/v1/admin/results/${userId}/manual-review/complete`
+        `/v1/admin/results/${reportId}/manual-review/complete`
       );
       const data = res?.data?.data || {};
       setManualReview((prev) => ({
@@ -233,11 +233,11 @@ export default function ReviewSubmission() {
   );
 
   const handleApprove = async () => {
-    if (!userId) return;
+    if (!reportId) return;
     setError("");
     setApproving(true);
     try {
-      await api.patch(`/v1/admin/results/${userId}/approve`);
+      await api.patch(`/v1/admin/results/${reportId}/approve`);
       setDetail((prev) =>
         prev
           ? {
@@ -274,7 +274,7 @@ export default function ReviewSubmission() {
   };
 
   const handleDelete = async () => {
-    if (!detail?.actions?.canDelete || !userId) return;
+    if (!detail?.actions?.canDelete || !reportId) return;
     const confirmed = window.confirm(
       t("reviewSubmission.deleteConfirm")
     );
@@ -283,7 +283,7 @@ export default function ReviewSubmission() {
     setError("");
     setDeleting(true);
     try {
-      await api.delete(`/v1/admin/results/${userId}`);
+      await api.delete(`/v1/admin/results/${reportId}`);
       emitAdminNotificationsRefresh();
       navigate("/admin/testsubmissions");
     } catch (err) {
@@ -428,8 +428,19 @@ export default function ReviewSubmission() {
               </div>
               <div className="mt-4 space-y-3">
                 {(detail?.analysis?.reviewSummary?.observations || []).length ? (
-                  detail.analysis.reviewSummary.observations.map((item) => (
-                    <div key={item} className="rounded-[18px] bg-white px-4 py-3 text-sm leading-7 text-[#4E5D72] shadow-sm">
+                  detail.analysis.reviewSummary.observations.map((item, index) => (
+                    // Keyed by index + text, not text alone. The scorer used
+                    // to emit the "Estimated personality profile" line twice
+                    // (fixed at source in career500q.js), but the ~16 reports
+                    // stored before that fix still carry the duplicate and
+                    // aren't being backfilled — a bare string key makes React
+                    // drop one of them. The list is render-only: never
+                    // reordered, filtered, or edited, so an index-based key
+                    // is stable here.
+                    <div
+                      key={`${index}-${item}`}
+                      className="rounded-[18px] bg-white px-4 py-3 text-sm leading-7 text-[#4E5D72] shadow-sm"
+                    >
                       {item}
                     </div>
                   ))
@@ -682,16 +693,15 @@ export default function ReviewSubmission() {
           onApprove={handleApprove}
           onDelete={handleDelete}
           onBack={() => navigate("/admin/testsubmissions")}
-          // `userId` route param is the per-attempt assessmentReport _id
-          // (the admin route is keyed by it, despite the legacy name).
+          // `reportId` route param is the per-attempt assessmentReport _id.
           // The adminView flag routes StudentReport.jsx to the ungated
           // /v1/admin/results/:reportId/student-view endpoint so admin
           // sees the same payload the student will receive, regardless
           // of approval state.
           onViewStudentReport={
-            userId
+            reportId
               ? () =>
-                  window.open(`/result/${userId}?adminView=1`, "_blank", "noopener")
+                  window.open(`/result/${reportId}?adminView=1`, "_blank", "noopener")
               : undefined
           }
         />

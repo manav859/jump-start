@@ -43,28 +43,31 @@ const MBTI_ADJECTIVES = {
   P: "Adaptable",
 };
 
-// Gardner intelligence display config, keyed by the multipleIntelligences
-// map keys the scorer emits. letter = the chip shown in the fingerprint.
+// Gardner intelligence display config, keyed by the section-2 subsection
+// keys the scorer persists on sectionBreakdown. letter = the chip shown in
+// the fingerprint.
 const MI_DISPLAY = {
-  Linguistic: { letter: "V", name: "Linguistic-Verbal" },
-  Interpersonal: { letter: "P", name: "Interpersonal" },
-  "Bodily-Kinesthetic": { letter: "B", name: "Bodily-Kinesthetic" },
-  Naturalistic: { letter: "N", name: "Naturalistic" },
-  Spatial: { letter: "S", name: "Spatial-Visual" },
-  Musical: { letter: "M", name: "Musical-Rhythmic" },
-  Intrapersonal: { letter: "I", name: "Intrapersonal" },
-  "Logical-Math": { letter: "L", name: "Logical-Mathematical" },
+  logical_mathematical: { letter: "L", name: "Logical-Mathematical" },
+  linguistic_verbal: { letter: "V", name: "Linguistic-Verbal" },
+  spatial_visual: { letter: "S", name: "Spatial-Visual" },
+  musical_rhythmic: { letter: "M", name: "Musical-Rhythmic" },
+  bodily_kinesthetic: { letter: "B", name: "Bodily-Kinesthetic" },
+  interpersonal: { letter: "P", name: "Interpersonal" },
+  intrapersonal: { letter: "I", name: "Intrapersonal" },
+  naturalistic: { letter: "N", name: "Naturalistic" },
 };
 
 const MI_GUIDANCE = {
-  "Logical-Math": "Suited to analysis, research, and quantitative problem solving.",
-  Linguistic: "Well-suited to customer service, writing, and verbal-heavy professions.",
-  Spatial: "Supports design, visualisation, and hands-on technical work.",
-  Musical: "Supports pattern, rhythm, and creative auditory work.",
-  "Bodily-Kinesthetic": "Supports hands-on, practical, physically engaged roles.",
-  Interpersonal: "Supports customer-facing and team-based careers.",
-  Intrapersonal: "Supports reflective, self-directed, independent work.",
-  Naturalistic: "Supports work with systems, environments, and the natural world.",
+  logical_mathematical:
+    "Suited to analysis, research, and quantitative problem solving.",
+  linguistic_verbal:
+    "Well-suited to customer service, writing, and verbal-heavy professions.",
+  spatial_visual: "Supports design, visualisation, and hands-on technical work.",
+  musical_rhythmic: "Supports pattern, rhythm, and creative auditory work.",
+  bodily_kinesthetic: "Supports hands-on, practical, physically engaged roles.",
+  interpersonal: "Supports customer-facing and team-based careers.",
+  intrapersonal: "Supports reflective, self-directed, independent work.",
+  naturalistic: "Supports work with systems, environments, and the natural world.",
 };
 
 const RIASEC_DISPLAY = [
@@ -87,13 +90,26 @@ const APTITUDE_ORDER = [
   { key: "problem_solving", name: "Problem Solving" },
 ];
 
+// Section-5 subsection keys, in report order.
 const EQ_ORDER = [
-  "Self-Awareness",
-  "Self-Regulation",
-  "Motivation",
-  "Empathy",
-  "Social Skills",
+  { key: "self_awareness", name: "Self-Awareness" },
+  { key: "self_regulation", name: "Self-Regulation" },
+  { key: "motivation", name: "Motivation" },
+  { key: "empathy", name: "Empathy" },
+  { key: "social_skills", name: "Social Skills" },
 ];
+
+// sectionBreakdown entries carry `sectionId` + `title` — they have no `key`
+// (the persistence sanitize hook drops anything not in its whitelist). Match
+// on sectionId first, then fall back to the title so packages that number
+// their sections differently still resolve.
+const SECTION_MATCHERS = {
+  personality: { sectionId: 1, pattern: /personality/i },
+  multiple_intelligence: { sectionId: 2, pattern: /multiple\s*intelligence/i },
+  interest: { sectionId: 3, pattern: /interest/i },
+  aptitude: { sectionId: 4, pattern: /aptitude/i },
+  emotional_intelligence: { sectionId: 5, pattern: /emotional/i },
+};
 
 const APTITUDE_INTRO =
   "Aptitude measures your current, tested ability — not your ceiling. All aptitudes are developable with the right practice and environment.";
@@ -330,7 +346,16 @@ export default function StudentReport() {
   const sections = Array.isArray(report.sectionBreakdown)
     ? report.sectionBreakdown
     : [];
-  const findSection = (key) => sections.find((s) => s.key === key) || null;
+  const findSection = (key) => {
+    const matcher = SECTION_MATCHERS[key];
+    if (!matcher) return null;
+    return (
+      sections.find((s) => s.key === key) ||
+      sections.find((s) => Number(s.sectionId) === matcher.sectionId) ||
+      sections.find((s) => matcher.pattern.test(String(s.title || ""))) ||
+      null
+    );
+  };
   const sectionScore = (key) => round(findSection(key)?.percentage);
   const findSub = (sk, subk) =>
     findSection(sk)?.subsections?.find((x) => x.key === subk) || null;
@@ -377,10 +402,6 @@ export default function StudentReport() {
     .filter(Boolean);
 
   // ---- Section 01: OCEAN / HSPQ / work style ---------------------------
-  const oceanProfile = pp.oceanProfile || {};
-  const dominantTraits = new Set(
-    (oceanProfile.dominantTraits || []).map((x) => String(x).toLowerCase())
-  );
   const OCEAN = [
     { letter: "O", name: "Openness", key: "openness" },
     { letter: "C", name: "Conscientiousness", key: "conscientiousness" },
@@ -389,6 +410,20 @@ export default function StudentReport() {
     { letter: "N", name: "Neuroticism", key: "neuroticism" },
   ];
   const bigFiveSub = findSub("personality", "big_five_ocean");
+  // The trait scores live on the subsection's factorResults, keyed by trait
+  // name — `report.personalityProfile.oceanProfile` is never populated by the
+  // career500q scorer, so reading it always yielded dashes.
+  const oceanProfile = Object.fromEntries(
+    (bigFiveSub?.factorResults || []).map((f) => [f.key, f])
+  );
+  // "Dominant" = the two strongest measured traits, highlighted on the cards.
+  const dominantTraits = new Set(
+    (bigFiveSub?.factorResults || [])
+      .filter((f) => Number.isFinite(Number(f.average)))
+      .sort((a, b) => Number(b.average) - Number(a.average))
+      .slice(0, 2)
+      .map((f) => String(f.key).toLowerCase())
+  );
   const oceanAvgPct = round(bigFiveSub?.percentage);
 
   const hspqSub = findSub("personality", "hspq_factors");
@@ -400,12 +435,19 @@ export default function StudentReport() {
   const hspqTags = tagsFrom(hspqSub, 3);
 
   const leadershipSub = findSub("personality", "leadership_social_interaction");
-  const workStyle = pp.workStyle || {};
+  const workStyleSub = findSub("personality", "work_style_preferences");
   const workLeadPct = round(
     leadershipSub?.percentage != null
       ? leadershipSub.percentage
-      : workStyle.consistency
+      : workStyleSub?.percentage
   );
+  // Top leadership signals, rendered as bars alongside the narrative.
+  const leadershipFactors = (leadershipSub?.factorResults || [])
+    .filter((f) => Number.isFinite(Number(f.average)))
+    .sort((a, b) => Number(b.average) - Number(a.average));
+  const workStyleNote = [leadershipSub?.interpretation, workStyleSub?.interpretation]
+    .filter(Boolean)
+    .join(" ");
   const developingAreas = (leadershipSub?.factorResults || [])
     .filter((f) => Number.isFinite(Number(f.average)))
     .sort((a, b) => Number(a.average) - Number(b.average))
@@ -413,13 +455,20 @@ export default function StudentReport() {
     .map((f) => f.label);
 
   // ---- Section 02: Multiple Intelligence -------------------------------
-  const miMap = report.multipleIntelligences || {};
-  const miRows = Object.keys(MI_DISPLAY)
-    .map((key) => ({
-      key,
-      letter: MI_DISPLAY[key].letter,
-      name: MI_DISPLAY[key].name,
-      value: Number(miMap[key]),
+  // Each Gardner domain is its own subsection of section 2 (`percentage` is
+  // the 0-100 signal, `average` the raw x/5). `report.multipleIntelligences`
+  // is an internal career-matcher intermediate and is always {} on the
+  // persisted report, so it can't be the source here.
+  const miSubs = findSection("multiple_intelligence")?.subsections || [];
+  const miRows = miSubs
+    .map((sub) => ({
+      key: sub.key,
+      letter: MI_DISPLAY[sub.key]?.letter || String(sub.label || "?").trim()[0],
+      name: MI_DISPLAY[sub.key]?.name || String(sub.label || "").replace(/^[\d.]+\s*/, ""),
+      value: Number(sub.percentage),
+      average: sub.average,
+      interpretation: sub.interpretation || "",
+      careerImplication: sub.careerImplication || "",
     }))
     .filter((r) => Number.isFinite(r.value))
     .sort((a, b) => b.value - a.value);
@@ -442,12 +491,30 @@ export default function StudentReport() {
   const hollandPct = round(hollandSub?.percentage);
 
   const subjectSub = findSub("interest", "subject_preferences");
+  // Persisted reports carry no per-cluster breakdown for subject preferences
+  // (clusterResults is empty) — the ranked subject list is emitted in the
+  // interpretation string ("Top subject pull: A, B, and C."). Use the
+  // clusters when a scorer does supply them, else read the narrative.
   const subjectClusters = (subjectSub?.clusterResults || [])
     .filter((c) => Number.isFinite(Number(c.average)))
     .sort((a, b) => Number(b.average) - Number(a.average))
     .slice(0, 3);
-  const topSubjectLabel = subjectClusters[0]?.label || "";
-  const topSubjectPct = round(subjectClusters[0]?.percentage);
+  const subjectNames = subjectClusters.length
+    ? subjectClusters.map((c) => c.label)
+    : String(subjectSub?.interpretation || "")
+        .split(":")
+        .slice(1)
+        .join(":")
+        .replace(/\.\s*$/, "")
+        // Split on commas only — subject names themselves contain "and"
+        // ("Business and Economics"), so an "and" separator would shred them.
+        // The Oxford "and" before the last item is stripped per-item below.
+        .split(",")
+        .map((s) => s.replace(/^\s*and\s+/i, "").trim())
+        .filter(Boolean)
+        .slice(0, 3);
+  const topSubjectLabel = subjectSub?.band || subjectNames[0] || "";
+  const topSubjectPct = round(subjectSub?.percentage);
   const subjectBandLabels = ["Top", "High", "Mid"];
 
   const envSub = findSub("interest", "work_environment_preferences");
@@ -459,6 +526,16 @@ export default function StudentReport() {
     .filter(Boolean)
     .slice(0, 3));
   if (!envPills.length && envSub?.band) envPills.push(envSub.band);
+  if (envSub?.careerImplication) {
+    String(envSub.careerImplication)
+      .split(/[|,]/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .slice(0, 3)
+      .forEach((p) => {
+        if (!envPills.includes(p)) envPills.push(p);
+      });
+  }
   const activitySub = findSub("interest", "activity_preferences");
 
   // ---- Section 04: Aptitude --------------------------------------------
@@ -467,11 +544,20 @@ export default function StudentReport() {
   const aptitudeInterpretation = findSection("aptitude")?.interpretation || "";
 
   // ---- Section 05: Emotional Intelligence ------------------------------
-  const eqMap = report.eqProfile || {};
-  const eqRows = EQ_ORDER.map((name) => ({
-    name,
-    value: Number(eqMap[name]),
-  })).filter((r) => Number.isFinite(r.value));
+  // Same story as MI: each competency is a section-5 subsection.
+  // `report.eqProfile` is a career-matcher intermediate and is always {}.
+  const eqSubs = findSection("emotional_intelligence")?.subsections || [];
+  const eqByKey = Object.fromEntries(eqSubs.map((s) => [s.key, s]));
+  const eqRows = EQ_ORDER.map(({ key, name }) => {
+    const sub = eqByKey[key];
+    return {
+      key,
+      name,
+      value: Number(sub?.percentage),
+      average: sub?.average,
+      interpretation: sub?.interpretation || "",
+    };
+  }).filter((r) => Number.isFinite(r.value));
   const eqStrongest = eqRows.length
     ? eqRows.reduce((a, b) => (b.value > a.value ? b : a))
     : null;
@@ -679,7 +765,7 @@ export default function StudentReport() {
                   const isDominant =
                     dominantTraits.has(key) || dominantTraits.has(name.toLowerCase());
                   const display =
-                    isDominant && entry.average != null
+                    entry.average != null
                       ? `${entry.average} / 5`
                       : entry.band && entry.band !== "Not Measured"
                         ? entry.band
@@ -700,6 +786,11 @@ export default function StudentReport() {
                       <p className="mt-1.5 text-[12px] font-semibold text-[#0F1729]">
                         {display}
                       </p>
+                      {entry.band ? (
+                        <p className="mt-0.5 text-[10px] font-medium text-[#8A94A6]">
+                          {entry.band}
+                        </p>
+                      ) : null}
                     </div>
                   );
                 })}
@@ -753,10 +844,22 @@ export default function StudentReport() {
                   {workLeadPct != null ? <Pill>{workLeadPct}%</Pill> : null}
                 </div>
                 <p className="mt-4 text-[13px] leading-6 text-[#4E5D72]">
-                  {workStyle.description ||
-                    leadershipSub?.interpretation ||
+                  {workStyleNote ||
                     "Leadership and work-style signals will appear here when assessed."}
                 </p>
+                {leadershipFactors.length ? (
+                  <div className="mt-4 space-y-3.5">
+                    {leadershipFactors.map((f) => (
+                      <Bar
+                        key={f.key}
+                        label={f.label}
+                        value={f.average}
+                        max={5}
+                        display={`${f.average}`}
+                      />
+                    ))}
+                  </div>
+                ) : null}
                 {developingAreas.length ? (
                   <div className="mt-4 rounded-xl bg-[#F8FAFC] p-4">
                     <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#8A94A6]">
@@ -827,6 +930,8 @@ export default function StudentReport() {
                       </p>
                       <p className="mt-2 text-[12px] leading-5 text-[#4E5D72]">
                         {MI_GUIDANCE[row.key] ||
+                          row.careerImplication ||
+                          row.interpretation ||
                           "A developable capability in your profile."}
                       </p>
                     </Card>
@@ -884,10 +989,17 @@ export default function StudentReport() {
                         {name}
                       </p>
                       <p className="mt-1.5 text-[12px] font-semibold">
-                        {isTop && factor?.average != null
-                          ? `${factor.average}/5`
-                          : "—"}
+                        {factor?.average != null ? `${factor.average}/5` : "—"}
                       </p>
+                      {factor?.band ? (
+                        <p
+                          className={`mt-0.5 text-[9px] font-medium ${
+                            isTop ? "text-white/75" : "text-[#8A94A6]"
+                          }`}
+                        >
+                          {factor.band}
+                        </p>
+                      ) : null}
                     </div>
                   );
                 })}
@@ -924,12 +1036,31 @@ export default function StudentReport() {
                         }
                       />
                     ))
+                  ) : subjectSub?.average != null ? (
+                    <Bar
+                      label={`Overall subject pull${
+                        subjectSub.band ? ` · ${subjectSub.band}` : ""
+                      }`}
+                      value={subjectSub.average}
+                      max={5}
+                      display={`${subjectSub.average} / 5`}
+                    />
                   ) : (
                     <p className="text-[13px] text-[#8A94A6]">
                       Subject-preference data is not available.
                     </p>
                   )}
                 </div>
+                {!subjectClusters.length && subjectNames.length ? (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {subjectNames.map((name, i) => (
+                      <Pill key={name} tone={i === 0 ? "teal" : "muted"}>
+                        {subjectBandLabels[i] ? `${subjectBandLabels[i]} · ` : ""}
+                        {name}
+                      </Pill>
+                    ))}
+                  </div>
+                ) : null}
               </Card>
 
               <Card>
@@ -1107,8 +1238,8 @@ export default function StudentReport() {
                         {eqStrongest.name} · {round(eqStrongest.value)}%
                       </p>
                       <p className="mt-1.5">
-                        Your strongest emotional-intelligence signal — lead with it
-                        as you choose environments and roles.
+                        {eqStrongest.interpretation ||
+                          "Your strongest emotional-intelligence signal — lead with it as you choose environments and roles."}
                       </p>
                     </Callout>
                   ) : null}

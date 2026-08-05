@@ -11,6 +11,7 @@ import {
 } from "../utils/resultApproval.js";
 import {
   createAssessmentReportEntry,
+  CURRENT_NORM_VERSION,
   getLatestApprovedAssessmentReport,
   getStoredAssessmentReports,
   syncLegacyStateFromReports,
@@ -1688,6 +1689,15 @@ export const postTestSubmit = async (req, res) => {
       manualReviewItems: Array.isArray(profile?.manualReviewItems)
         ? profile.manualReviewItems
         : [],
+      // Snapshot the answer set onto the report NOW, in the same object
+      // that gets pushed and saved below. `user.testProgress` is reset to
+      // an empty buffer a few lines further down (and package-switch and
+      // purchase wipe it too), so a follow-up write would already be too
+      // late — the answers would be gone. This is what makes the report
+      // re-scoreable later.
+      rawAnswers: answers,
+      scoringVersion: profile?.metadata?.algorithmKey || "",
+      normVersion: CURRENT_NORM_VERSION,
     });
     nextReport.totalDurationMinutes = totalDurationMinutes;
     nextReport.sectionDurations = sectionDurations;

@@ -1,6 +1,7 @@
 // main.jsx (or App.jsx)
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import App from "./App";
 import { AuthProvider } from "./context/AuthContext";
 // Side-effect import: initialises i18next with en/gu resources and
@@ -13,5 +14,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <AuthProvider>
       <App />
     </AuthProvider>
+    <SpeedInsights />
   </React.StrictMode>
 );

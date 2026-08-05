@@ -117,7 +117,7 @@ const router = createBrowserRouter([
         element: withSuspense(<TestSubmissions />),
       },
       {
-        path: "testsubmissions/:userId",
+        path: "testsubmissions/:reportId",
         element: withSuspense(<ReviewSubmission />),
       },
       {

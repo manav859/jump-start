@@ -1043,7 +1043,7 @@ export const getAdminResults = async (req, res) => {
 // GET /api/v1/admin/submissions/:reportId
 export const getAdminSubmissionDetail = async (req, res) => {
   try {
-    const { userId: reportId } = req.params;
+    const { reportId } = req.params;
     const cfg = await AssessmentConfig.getOrCreateDefault();
     const packageMap = getConfigLookup(cfg);
     const { user } = await getUserByReportId({
@@ -1079,7 +1079,7 @@ export const approveAdminResult = async (req, res) => {
   try {
     if (!ensureAdmin(req, res)) return;
 
-    const { userId: reportId } = req.params;
+    const { reportId } = req.params;
     const { user, isLegacyFallback } = await getUserByReportId({
       reportId,
       select:
@@ -1158,7 +1158,7 @@ export const deleteAdminResult = async (req, res) => {
   try {
     if (!ensureAdmin(req, res)) return;
 
-    const { userId: reportId } = req.params;
+    const { reportId } = req.params;
     const { user, isLegacyFallback } = await getUserByReportId({
       reportId,
       select:

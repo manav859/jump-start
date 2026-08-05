@@ -247,7 +247,7 @@ Admin-only frontend routes include:
 
 - `/admin/dashboard`
 - `/admin/testsubmissions`
-- `/admin/testsubmissions/:userId`
+- `/admin/testsubmissions/:reportId`
 - `/admin/publishedresults`
 - `/admin/usermanagement`
 - `/admin/payments`

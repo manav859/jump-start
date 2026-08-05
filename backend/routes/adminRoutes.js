@@ -34,7 +34,7 @@ router.patch("/users/:userId", patchAdminUser);
 router.delete("/users/:userId", deleteAdminUser);
 router.get("/payments", getAdminPayments);
 router.get("/submissions", getAdminSubmissions);
-router.get("/submissions/:userId", getAdminSubmissionDetail);
+router.get("/submissions/:reportId", getAdminSubmissionDetail);
 router.get("/results", getAdminResults);
 // Admin-only "view the student-facing report" — bypasses the
 // publication-status gate that hides un-approved reports from the
@@ -43,8 +43,8 @@ router.get("/results", getAdminResults);
 // counsellors can see exactly what the student will receive once
 // the report is approved.
 router.get("/results/:reportId/student-view", getAdminStudentReportView);
-router.patch("/results/:userId/approve", approveAdminResult);
-router.delete("/results/:userId", deleteAdminResult);
+router.patch("/results/:reportId/approve", approveAdminResult);
+router.delete("/results/:reportId", deleteAdminResult);
 // Manual review queue for Section 4 image/diagram items. :reportId here is
 // the same value used by /submissions/:reportId and /results/:reportId — the
 // per-attempt assessmentReport sub-document id.

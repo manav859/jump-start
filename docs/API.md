@@ -111,10 +111,10 @@ They are documented as implemented, not as intended.
 | DELETE | `/api/v1/admin/users/:userId` | Yes | Admin |
 | GET | `/api/v1/admin/payments` | Yes | Admin |
 | GET | `/api/v1/admin/submissions` | Yes | Admin |
-| GET | `/api/v1/admin/submissions/:userId` | Yes | Admin |
+| GET | `/api/v1/admin/submissions/:reportId` | Yes | Admin |
 | GET | `/api/v1/admin/results` | Yes | Admin |
-| PATCH | `/api/v1/admin/results/:userId/approve` | Yes | Admin |
-| DELETE | `/api/v1/admin/results/:userId` | Yes | Admin |
+| PATCH | `/api/v1/admin/results/:reportId/approve` | Yes | Admin |
+| DELETE | `/api/v1/admin/results/:reportId` | Yes | Admin |
 | GET | `/api/v1/admin/analytics` | Yes | Admin |
 | GET | `/api/v1/admin/config` | No | Public / Intended Admin |
 | POST | `/api/v1/admin/packages` | No | Public / Intended Admin |
@@ -1132,7 +1132,7 @@ and `role = admin`.
 
 - `500` failed to load submissions
 
-### GET `/api/v1/admin/submissions/:userId`
+### GET `/api/v1/admin/submissions/:reportId`
 
 - **Description:** Fetch the full admin review payload for one submitted report
 - **Authentication required:** Yes
@@ -1181,7 +1181,7 @@ and `role = admin`.
 - `404` submission not found
 - `500` failed to load submission detail
 
-### PATCH `/api/v1/admin/results/:userId/approve`
+### PATCH `/api/v1/admin/results/:reportId/approve`
 
 - **Description:** Approve and publish a report
 - **Authentication required:** Yes
@@ -1242,7 +1242,7 @@ and `role = admin`.
 
 - `500` failed to load results
 
-### DELETE `/api/v1/admin/results/:userId`
+### DELETE `/api/v1/admin/results/:reportId`
 
 - **Description:** Delete a result report
 - **Authentication required:** Yes

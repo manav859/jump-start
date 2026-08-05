@@ -359,6 +359,16 @@ export const normalizeAssessmentReport = (report = {}, packageLookup) => {
     // queue and the flag can drift if an admin edits items directly.
     hasUnreviewedItems: computeHasUnreviewedItems(clonedManualReviewItems),
     manualReviewCompletedAt: report?.manualReviewCompletedAt || null,
+    // Read-path passthrough. This function rebuilds the report field by
+    // field and drops anything unlisted, and its output is written back to
+    // `user.resultProfile` via syncLegacyStateFromReports — so omitting
+    // these would make the snapshot invisible to every consumer.
+    rawAnswers:
+      report?.rawAnswers && typeof report.rawAnswers === "object"
+        ? report.rawAnswers
+        : {},
+    normVersion: report?.normVersion || "",
+    scoringVersion: report?.scoringVersion || "",
     createdAt: report?.createdAt || state.submittedAt || null,
     updatedAt: report?.updatedAt || state.approvedAt || state.submittedAt || null,
     isLegacyFallback: report?.isLegacyFallback === true,
@@ -423,6 +433,12 @@ export const computeHasUnreviewedItems = (items = []) =>
     (item) => item?.requiresManualReview && item?.adminDecision == null
   );
 
+// Banding/threshold vocabulary currently in force. Bump this when the band
+// tables change so stored reports record which rules produced their labels.
+// "raw" documents today's reality: bands are cut on raw score ratios, not
+// on any normed or percentile value.
+export const CURRENT_NORM_VERSION = "norm-v1-raw";
+
 export const createAssessmentReportEntry = ({
   user = {},
   packageId = "",
@@ -431,6 +447,9 @@ export const createAssessmentReportEntry = ({
   publication = {},
   isDemo = false,
   manualReviewItems = null,
+  rawAnswers = null,
+  normVersion = "",
+  scoringVersion = "",
 }) => {
   const previousAttempts = getStoredAssessmentReports(user).filter(
     (report) => String(report.packageId || "") === String(packageId || "")
@@ -456,6 +475,19 @@ export const createAssessmentReportEntry = ({
     manualReviewItems: clonedItems,
     hasUnreviewedItems: computeHasUnreviewedItems(clonedItems),
     manualReviewCompletedAt: null,
+    // Snapshot of the exact answer set scored above. Deep-cloned so the
+    // report can't alias the live testProgress buffer that the caller is
+    // about to clear.
+    rawAnswers:
+      rawAnswers && typeof rawAnswers === "object"
+        ? JSON.parse(JSON.stringify(rawAnswers))
+        : {},
+    normVersion: String(normVersion || CURRENT_NORM_VERSION),
+    // Fall back to the scorer's own provenance marker when the caller
+    // doesn't pass one explicitly.
+    scoringVersion: String(
+      scoringVersion || profile?.metadata?.algorithmKey || ""
+    ),
     createdAt: now,
     updatedAt: now,
   };
