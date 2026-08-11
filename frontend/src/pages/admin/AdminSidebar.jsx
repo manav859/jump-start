@@ -57,6 +57,8 @@ const AdminSidebar = ({ isOpen, onClose }) => {
           <img
             src={jumpstartIcon}
             alt="Jumpstart"
+            width="187"
+            height="187"
             className="w-10 h-10 mb-10"
           />
 

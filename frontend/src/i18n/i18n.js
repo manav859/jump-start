@@ -14,7 +14,12 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
 import enCommon from "./locales/en/common.json";
-import guCommon from "./locales/gu/common.json";
+// gu/common.json is NOT imported statically. It is 105 KB of JSON that,
+// with the language hard-locked to `en` below, can never be read at
+// runtime — but a static import still parks all 105 KB in the entry
+// chunk, parsed on every page load before React renders. It is loaded on
+// demand by setLanguage() instead, which keeps the toggle a one-line
+// change to re-enable while costing the default path nothing.
 
 export const SUPPORTED_LANGUAGES = ["en", "gu"];
 export const DEFAULT_LANGUAGE = "en";
@@ -48,7 +53,6 @@ try {
 i18n.use(initReactI18next).init({
   resources: {
     en: { common: enCommon },
-    gu: { common: guCommon },
   },
   lng: DEFAULT_LANGUAGE,
   fallbackLng: DEFAULT_LANGUAGE,
@@ -62,12 +66,32 @@ i18n.use(initReactI18next).init({
 
 syncHtmlLang(DEFAULT_LANGUAGE);
 
-// Kept exported so future code that imports it doesn't break, but the
-// function is a no-op while the site is English-only. If you want to
-// re-enable the toggle, restore the original body and wire the header
-// language switcher back on.
-export const setLanguage = (_lang) => {
-  // intentional no-op
+// Locale bundles other than the default are fetched on demand. Vite
+// code-splits the dynamic import into its own chunk, so a visitor who
+// never switches language never downloads it.
+const loaders = {
+  gu: () => import("./locales/gu/common.json"),
+};
+
+const loaded = new Set([DEFAULT_LANGUAGE]);
+
+// Switching is async now because the bundle has to arrive first. The
+// site is still English-only in the UI (no toggle is rendered), but this
+// is a working implementation rather than a no-op: wiring the header
+// switcher back on is the only remaining step.
+export const setLanguage = async (lang) => {
+  if (!SUPPORTED_LANGUAGES.includes(lang)) return;
+
+  if (!loaded.has(lang)) {
+    const mod = await loaders[lang]?.();
+    if (!mod) return;
+    // `default` because JSON modules expose the object as the default.
+    i18n.addResourceBundle(lang, "common", mod.default, true, true);
+    loaded.add(lang);
+  }
+
+  await i18n.changeLanguage(lang);
+  syncHtmlLang(lang);
 };
 
 export default i18n;

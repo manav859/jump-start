@@ -118,6 +118,9 @@ export default function Login() {
           <img
             src={jumpstartLogo}
             alt="Jumpstart"
+            width="333"
+            height="235"
+            fetchPriority="high"
             className="mb-6 h-12 w-auto"
           />
           <div className="inline-flex items-center gap-2 rounded-full bg-[#E8F9F8] px-4 py-2 text-sm font-semibold text-[#188B8B]">

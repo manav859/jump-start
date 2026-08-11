@@ -279,7 +279,7 @@ const AdminHeader = ({ isSidebarOpen, setIsSidebarOpen }) => {
         {/* Brand mark — icon-only on small screens, icon + wordmark on sm+.
             Mirrors the collapsed-sidebar icon for a consistent admin look. */}
         <div className="flex items-center gap-2">
-          <img src={jumpstartIcon} alt="Jumpstart" className="h-8 w-8" />
+          <img src={jumpstartIcon} alt="Jumpstart" width="187" height="187" className="h-8 w-8" />
           <span className="hidden text-lg font-bold tracking-tight text-[#0F1729] sm:block">
             Jumpstart
           </span>

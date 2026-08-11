@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Mail, MapPin, Phone } from "lucide-react";
-import api from "../api/api";
 import jumpstartIcon from "../assets/jumpstart-icon.png";
 import {
   fallbackSupportPages,
@@ -30,22 +29,42 @@ export default function Footer() {
   const { t } = useTranslation();
   const [supportPages, setSupportPages] = useState(fallbackSupportPages);
 
+  // The footer renders immediately from `fallbackSupportPages`; this
+  // request only refreshes those labels if an admin has customised them.
+  // Two deliberate deferrals:
+  //
+  //   1. `api` (and with it axios, ~15 KB gzip) is imported dynamically
+  //      rather than at module scope. Footer is mounted by MainLayout, so
+  //      a static import put axios in the initial bundle of every page
+  //      for a request that changes nothing 99% of the time.
+  //   2. The call is scheduled at idle, so it does not compete with the
+  //      LCP paint for bandwidth or main thread.
   useEffect(() => {
     let cancelled = false;
 
-    api
-      .get("/v1/public/support-pages")
-      .then((res) => {
-        if (cancelled) return;
-        setSupportPages(res?.data?.data?.pages || fallbackSupportPages);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setSupportPages(fallbackSupportPages);
-      });
+    const load = () => {
+      import("../api/api")
+        .then(({ default: api }) => api.get("/v1/public/support-pages"))
+        .then((res) => {
+          if (cancelled) return;
+          setSupportPages(res?.data?.data?.pages || fallbackSupportPages);
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setSupportPages(fallbackSupportPages);
+        });
+    };
+
+    // requestIdleCallback is unsupported in Safari <17; the timeout keeps
+    // the refresh happening there too, just off the critical path.
+    const idle = window.requestIdleCallback
+      ? window.requestIdleCallback(load, { timeout: 3000 })
+      : window.setTimeout(load, 1500);
 
     return () => {
       cancelled = true;
+      if (window.cancelIdleCallback) window.cancelIdleCallback(idle);
+      else window.clearTimeout(idle);
     };
   }, []);
 
@@ -80,6 +99,10 @@ export default function Footer() {
             <img
               src={jumpstartIcon}
               alt="Jumpstart"
+              width="187"
+              height="187"
+              loading="lazy"
+              decoding="async"
               className="h-10 w-10 shrink-0"
             />
             <h3 className="text-2xl font-bold">Jumpstart</h3>

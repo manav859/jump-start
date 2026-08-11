@@ -4,8 +4,7 @@ import { LogOut, Menu, UserRound, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { AuthContext } from "../context/AuthContext";
 import ConfirmDialog from "./ConfirmDialog";
-import jumpstartLogo from "../assets/jumpstart-logo.png";
-import jumpstartIcon from "../assets/jumpstart-icon.png";
+import AssetImage from "./AssetImage";
 
 // Nav items live by translation key now. The `to` path is preserved;
 // `labelKey` looks up the localized string under the `common.nav`
@@ -143,15 +142,27 @@ export default function Header() {
           <div className="flex items-center gap-10">
             <Link to="/" className="flex items-center" aria-label="Jumpstart home">
               {/* Full wordmark logo on sm+; icon-only mark on the narrowest
-                  screens where the wordmark would crowd the header bar. */}
-              <img
-                src={jumpstartLogo}
+                  screens where the wordmark would crowd the header bar.
+
+                  width/height carry the intrinsic aspect ratio so the
+                  browser reserves the right box before the file arrives.
+                  Without them `w-auto` resolves to 0 until decode, and the
+                  whole header row re-lays-out on load — a shift at the very
+                  top of the page that pushes every section below it. */}
+              <AssetImage
+                name="jumpstart-logo"
                 alt="Jumpstart"
+                width={333}
+                height={235}
+                priority
                 className="hidden h-11 w-auto sm:block"
               />
-              <img
-                src={jumpstartIcon}
+              <AssetImage
+                name="jumpstart-icon"
                 alt="Jumpstart"
+                width={187}
+                height={187}
+                priority
                 className="h-10 w-10 sm:hidden"
               />
             </Link>
@@ -225,7 +236,13 @@ export default function Header() {
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <img src={jumpstartLogo} alt="Jumpstart" className="h-10 w-auto" />
+              <AssetImage
+                name="jumpstart-logo"
+                alt="Jumpstart"
+                width={333}
+                height={235}
+                className="h-10 w-auto"
+              />
             </div>
             <button
               type="button"

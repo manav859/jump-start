@@ -636,6 +636,8 @@ export default function StudentReport() {
               <img
                 src={jumpstartLogo}
                 alt="Jumpstart"
+                width="333"
+                height="235"
                 className="report-print-logo h-9 w-auto"
               />
             </div>

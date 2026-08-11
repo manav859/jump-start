@@ -1,6 +1,15 @@
 // Shared Suspense fallback for lazy-loaded routes. The spinner uses
 // the Jumpstart teal so the loading state feels on-brand rather than
 // a default gray placeholder.
+//
+// Height note (CLS): this is min-h-screen rather than the 60vh it used
+// to be. Every route is lazy(), so this fallback is what paints first on
+// a cold load — and MainLayout renders the Footer directly beneath it.
+// At 60vh the footer landed *inside* the first viewport and was then
+// shoved down by a full page of content the moment the real chunk
+// resolved. That single swap was the largest contributor to the 0.52
+// desktop CLS. Reserving a viewport's worth of height keeps the footer
+// below the fold in both states, so the swap moves nothing visible.
 
 import { useTranslation } from "react-i18next";
 import jumpstartIcon from "../assets/jumpstart-icon.png";
@@ -12,7 +21,7 @@ export default function PageLoader() {
       role="status"
       aria-live="polite"
       aria-label={t("loading.page")}
-      className="flex min-h-[60vh] items-center justify-center px-6"
+      className="flex min-h-screen items-center justify-center px-6"
     >
       <div className="flex flex-col items-center gap-4">
         {/* Brand icon mark pulses, ringed by a teal spinner. */}
@@ -25,6 +34,8 @@ export default function PageLoader() {
             src={jumpstartIcon}
             alt=""
             aria-hidden="true"
+            width="187"
+            height="187"
             className="h-9 w-9 animate-pulse"
           />
         </div>

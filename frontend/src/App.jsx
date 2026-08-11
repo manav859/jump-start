@@ -3,7 +3,13 @@ import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom"
 import "./index.css";
 import MainLayout from "./layout/MainLayout";
 import BlankLayout from "./layout/BlankLayout";
-import AdminLayout from "./layout/AdminLayout";
+
+// AdminLayout is lazy for the same reason the admin *pages* are: it
+// pulls in AdminHeader and AdminSidebar, and through them the axios API
+// client. Imported statically it put all of that — plus axios itself —
+// into the entry chunk downloaded by every anonymous visitor to the
+// landing page, none of whom can reach an admin route.
+const AdminLayout = lazy(() => import("./layout/AdminLayout"));
 import ProtectedRoute from "./components/ProtectedRoute";
 import PageLoader from "./components/PageLoader";
 

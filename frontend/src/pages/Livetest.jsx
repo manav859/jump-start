@@ -165,6 +165,7 @@ function SpatialAssetFigure({
         src={normalizedSrc}
         alt=""
         aria-hidden="true"
+        decoding="async"
         onError={() => setFailedSrc(normalizedSrc)}
         className={imgClassName}
       />
@@ -1065,13 +1066,17 @@ export default function Livetest() {
                     </div>
                   ) : null}
 
-                  {/* ── Mechanical Reasoning stimulus (diagram above text options) ── */}
+                  {/* ── Mechanical Reasoning stimulus (diagram above text options) ──
+                       The figure's reserved min-h matches the image's max-h.
+                       At min-h-[180px] a taller diagram grew the box by up to
+                       120px on decode, shifting every option underneath it —
+                       once per question. */}
                   {isMechanicalImageQuestion && mechanicalStimulusSrc ? (
                     <div className="mt-5 rounded-2xl border border-[#E1E7EF] bg-[#FAFCFE] p-4 sm:p-5">
                       <SpatialAssetFigure
                         src={mechanicalStimulusSrc}
                         placeholderText={`[Image pending for Mechanical Q${numericQuestionId}]`}
-                        className="flex min-h-[180px] items-center justify-center"
+                        className="flex min-h-[300px] items-center justify-center"
                         imgClassName="mx-auto h-auto max-h-[300px] w-auto max-w-full object-contain"
                       />
                     </div>
@@ -1083,7 +1088,7 @@ export default function Livetest() {
                         <SpatialAssetFigure
                           src={spatialStimulusSrc}
                           placeholderText={`[Image pending for Q${spatialQuestionNumber} - Stimulus]`}
-                          className="flex min-h-[220px] items-center justify-center"
+                          className="flex min-h-[300px] items-center justify-center"
                           imgClassName="mx-auto h-auto max-h-[300px] w-auto max-w-full object-contain"
                         />
                       </div>

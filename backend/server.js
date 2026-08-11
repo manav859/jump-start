@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import compression from "compression";
 import connectDB from "./config/db.js";
 import { ensureRequiredEnv } from "./config/env.js";
 import { ensureAdminAccount } from "./utils/adminBootstrap.js";
@@ -45,6 +46,23 @@ const corsOptions = {
 };
 
 const app = express();
+
+// Trust the reverse proxy (Nginx/Caddy, then Cloudflare) so req.ip and
+// req.protocol reflect the real client rather than 127.0.0.1. Rate
+// limiting and secure-cookie decisions depend on this being right.
+app.set("trust proxy", 1);
+
+// gzip the JSON responses. Nginx compresses the static bundle, but API
+// payloads are produced here and some are large — a full 500-question
+// package or an assessment report is a few hundred KB of highly
+// repetitive JSON that compresses to a fraction of that. Assessment
+// fetches are on the critical path of the test experience, so this is a
+// direct TTFB/transfer win on the slowest requests in the app.
+//
+// Nginx is configured to pass through what we emit rather than
+// re-compressing (see deploy/nginx/jumpstart.conf).
+app.use(compression());
+
 app.use(cors(corsOptions));
 app.use(express.json());
 

@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run images:optimize && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "fonts:fetch": "node scripts/fetchFonts.mjs",
+    "images:optimize": "node scripts/optimizeImages.mjs"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
@@ -34,6 +36,7 @@
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
+    "fontkit": "^2.0.4",
     "globals": "^16.5.0",
     "sharp": "^0.34.5",
     "vite": "^7.2.2",

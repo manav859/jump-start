@@ -5,18 +5,35 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- index.css imports Inter + Poppins from Google Fonts. Preconnect
-         lets the browser open the TLS connection in parallel with HTML
-         parse, shaving ~200ms off the first font byte on cold loads. -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Gujarati script support — loaded once for both languages so
-         switching to Gujarati never shows a font-fallback flash. The
-         :lang(gu) selector in index.css scopes Noto Sans Gujarati to
-         the gu locale only; English continues to use Inter/Poppins. -->
+
+    <!-- Fonts are self-hosted (see scripts/fetchFonts.mjs). The two
+         render-blocking Google Fonts stylesheets that used to live here
+         are gone, along with their preconnects: nothing on the critical
+         path resolves off-origin any more.
+
+         Only the two faces the first screen actually paints in are
+         preloaded. Preloading is a priority claim, not a free win —
+         every extra preload competes with the JS bundle for bandwidth,
+         so the latin-ext and Gujarati faces are deliberately left to be
+         discovered from CSS:
+           - Inter 400..800  : all body copy
+           - Poppins 700     : the Home <h1>, which is the LCP element
+         crossorigin is required even same-origin; fonts are always
+         fetched in CORS mode and the preload must match or it's
+         downloaded twice. -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="/fonts/inter-latin-400-800var.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/poppins-latin-700.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
     <title>Jumpstart</title>
   </head>

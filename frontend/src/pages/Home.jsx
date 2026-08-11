@@ -168,9 +168,16 @@ export default function Home() {
                 {card.description}
               </p>
               <div className="mt-6 overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#E5FBFB_0%,#CDEEEE_100%)] p-4">
+                {/* h-64 already pins the height in CSS, so these do not
+                    shift — but they sit well below the fold, so defer them
+                    off the initial load path entirely. */}
                 <img
                   src={card.image}
                   alt={card.title}
+                  width="48"
+                  height="48"
+                  loading="lazy"
+                  decoding="async"
                   className="h-64 w-full rounded-[20px] object-cover transition duration-300 group-hover:scale-[1.02]"
                 />
               </div>

@@ -241,6 +241,10 @@ export default function TestCompleted() {
                   <img
                     src={resultsIllustration}
                     alt={t("testCompletedExtra.submissionImageAlt")}
+                    width="192"
+                    height="192"
+                    loading="lazy"
+                    decoding="async"
                     className="h-24 w-auto object-contain sm:h-28"
                   />
                 </div>

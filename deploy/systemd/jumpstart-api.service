@@ -1,0 +1,75 @@
+# Jumpstart API — systemd unit.
+#
+# Install:
+#   sudo cp deploy/systemd/jumpstart-api.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now jumpstart-api
+#   sudo systemctl status jumpstart-api
+#
+# systemd rather than PM2: the process supervision, restart policy, log
+# handling and boot ordering PM2 provides are all things systemd already
+# does on this box, and it removes a runtime dependency plus PM2's own
+# daemon from the critical path. A PM2 ecosystem file is included at
+# deploy/pm2/ecosystem.config.cjs for teams that prefer it — use one or
+# the other, never both, or two supervisors will fight over the port.
+#
+# Why a supervisor matters for the metrics: an unsupervised `node
+# server.js` that dies takes the API down until someone notices, and a
+# cold start means the first request after any restart pays Mongo
+# connection setup + admin bootstrap + the Gujarati seed check. Keeping
+# one warm process resident is what keeps TTFB flat, and TTFB is the
+# floor under every paint metric.
+
+[Unit]
+Description=Jumpstart API (Express)
+Documentation=https://github.com/Manav-p765/jumpstart
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=jumpstart
+Group=jumpstart
+WorkingDirectory=/var/www/jumpstart/backend
+
+# Secrets live in a root-owned env file, not in this unit — this file is
+# world-readable in /etc/systemd/system.
+#   sudo install -o jumpstart -g jumpstart -m 600 backend/.env \
+#        /etc/jumpstart/api.env
+EnvironmentFile=/etc/jumpstart/api.env
+Environment=NODE_ENV=production
+
+ExecStart=/usr/bin/node server.js
+
+# Always come back up, but back off so a crash loop does not spin the
+# CPU. StartLimit* below turns a persistent failure into a stopped unit
+# that alerting can catch rather than an infinite restart.
+Restart=always
+RestartSec=2
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+# Give in-flight requests a chance to drain on deploy.
+KillSignal=SIGTERM
+TimeoutStopSec=20
+
+# --- Hardening -----------------------------------------------------------
+# The API needs to read its own directory and write nothing outside it.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+# Report/PDF export scratch space is the only writable path required.
+ReadWritePaths=/var/www/jumpstart/backend/exports /var/www/jumpstart/backend/tmp-pdf
+
+# journald captures stdout/stderr: `journalctl -u jumpstart-api -f`
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=jumpstart-api
+
+[Install]
+WantedBy=multi-user.target
