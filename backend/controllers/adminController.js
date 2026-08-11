@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import AssessmentConfig from "../models/AssessmentConfig.js";
 import Coupon from "../models/Coupon.js";
+import WebVital, { METRIC_NAMES } from "../models/WebVital.js";
 import {
   getResultPublicationState,
   RESULT_PUBLICATION_STATUS,
@@ -1864,5 +1865,72 @@ export const deleteCoupon = async (req, res) => {
     return res
       .status(500)
       .json({ success: false, msg: err.message || "Failed to delete coupon" });
+  }
+};
+
+// GET /api/v1/admin/vitals/summary
+//
+// p75 per Core Web Vital over a trailing window. p75 rather than a mean
+// because that is the statistic Google scores CWV on — an average hides
+// exactly the slow tail that determines the grade.
+//
+// Samples are pushed into an in-memory array per metric so the percentile
+// can be indexed directly. That is bounded by this site's volume (a few
+// thousand samples a week); if it ever grows past comfort, swap the
+// $group for Mongo 7's $percentile accumulator, which does the same job
+// without materialising the values.
+export const getAdminVitalsSummary = async (req, res) => {
+  try {
+    const days = Math.min(Math.max(Number(req.query.days) || 7, 1), 90);
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+    const rows = await WebVital.aggregate([
+      { $match: { createdAt: { $gte: since } } },
+      // Sorting before the group means each `values` array arrives
+      // already ordered, so the percentile is a plain index lookup.
+      { $sort: { value: 1 } },
+      {
+        $group: {
+          _id: "$name",
+          values: { $push: "$value" },
+          count: { $sum: 1 },
+        },
+      },
+    ]).allowDiskUse(true);
+
+    const byName = new Map(rows.map((r) => [r._id, r]));
+
+    const metrics = METRIC_NAMES.map((name) => {
+      const row = byName.get(name);
+      if (!row || !row.count) {
+        return { name, p75: null, p50: null, count: 0 };
+      }
+
+      // Nearest-rank percentile: the smallest value at or below which at
+      // least P% of samples fall.
+      const at = (p) => row.values[Math.ceil((p / 100) * row.count) - 1];
+
+      // CLS is a unitless ratio and needs the decimals; the timing
+      // metrics are milliseconds where fractions are noise.
+      const round = (v) =>
+        name === "CLS" ? Number(v.toFixed(3)) : Math.round(v);
+
+      return {
+        name,
+        p75: round(at(75)),
+        p50: round(at(50)),
+        count: row.count,
+      };
+    });
+
+    return res.json({
+      success: true,
+      data: { windowDays: days, since, metrics },
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Failed to load vitals summary",
+    });
   }
 };

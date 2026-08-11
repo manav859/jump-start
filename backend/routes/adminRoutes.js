@@ -12,6 +12,7 @@ import {
   getAdminResults,
   getAdminStudentReportView,
   getAdminAnalytics,
+  getAdminVitalsSummary,
   approveAdminResult,
   deleteAdminResult,
   getManualReviewItems,
@@ -58,6 +59,10 @@ router.post(
   finalizeManualReview
 );
 router.get("/analytics", getAdminAnalytics);
+
+// Core Web Vitals p75, fed by the public POST /api/vitals beacon.
+// ?days=N (1-90, default 7) widens the window.
+router.get("/vitals/summary", getAdminVitalsSummary);
 
 // Coupons — admin-only CRUD. POST creates a new code, PATCH toggles
 // active/inactive, DELETE removes (only safe before redemptions; deleting

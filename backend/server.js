@@ -10,6 +10,7 @@ import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import configRoutes from "./routes/configRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import vitalsRoutes from "./routes/vitals.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -64,6 +65,13 @@ app.set("trust proxy", 1);
 app.use(compression());
 
 app.use(cors(corsOptions));
+
+// Mounted ahead of the global express.json() on purpose. The vitals
+// route enforces its own 2 KB body cap, and a parser only applies to a
+// body nothing upstream has already consumed — behind the global parser
+// the cap would silently be the global 100 KB instead.
+app.use("/api/vitals", vitalsRoutes);
+
 app.use(express.json());
 
 // Root – so visiting http://localhost:5000/ shows API is up
