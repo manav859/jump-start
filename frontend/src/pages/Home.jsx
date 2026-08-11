@@ -170,15 +170,21 @@ export default function Home() {
               <div className="mt-6 overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#E5FBFB_0%,#CDEEEE_100%)] p-4">
                 {/* h-64 already pins the height in CSS, so these do not
                     shift — but they sit well below the fold, so defer them
-                    off the initial load path entirely. */}
+                    off the initial load path entirely.
+
+                    object-contain, not object-cover: the artwork is 1:1 and
+                    the box is much wider than it is tall, so `cover` would
+                    scale to fill the width and crop the top and bottom off
+                    the icon. That went unnoticed while these were 48px
+                    sources upscaled into mush. */}
                 <img
                   src={card.image}
                   alt={card.title}
-                  width="48"
-                  height="48"
+                  width="1080"
+                  height="1080"
                   loading="lazy"
                   decoding="async"
-                  className="h-64 w-full rounded-[20px] object-cover transition duration-300 group-hover:scale-[1.02]"
+                  className="h-64 w-full rounded-[20px] object-contain transition duration-300 group-hover:scale-[1.02]"
                 />
               </div>
             </Link>
