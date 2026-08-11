@@ -7,6 +7,12 @@ import {
   fallbackSupportPages,
   supportPageDefinitions,
 } from "../data/supportPages";
+import {
+  company,
+  formattedAddress,
+  mailtoHref,
+  telHref,
+} from "../config/company";
 
 const quickLinks = [
   { labelKey: "nav.home", to: "/" },
@@ -149,22 +155,29 @@ export default function Footer() {
           <ul className="mt-5 space-y-4 text-sm text-white/80">
             <li className="flex items-center gap-3">
               <Mail className="h-4 w-4 text-[#34D3CB]" />
-              support@jumpstartedu.com
+              <a href={mailtoHref} className="hover:text-white">
+                {company.email}
+              </a>
             </li>
             <li className="flex items-center gap-3">
               <Phone className="h-4 w-4 text-[#34D3CB]" />
-              +1 (555) 123-4567
+              <a href={telHref} className="hover:text-white">
+                {company.phoneDisplay}
+              </a>
             </li>
             <li className="flex items-start gap-3">
-              <MapPin className="mt-0.5 h-4 w-4 text-[#34D3CB]" />
-              123 Education St, Learning City
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#34D3CB]" />
+              <address className="not-italic">{formattedAddress}</address>
             </li>
           </ul>
         </div>
       </div>
 
       <div className="mx-auto max-w-7xl border-t border-white/10 px-4 py-6 text-center text-sm text-white/55 sm:px-6 lg:px-8">
-        (c) 2026. Jumpstart Education. {t("footer.rights")}
+        {/* The registered entity, not the brand — this line is what ties
+            the site to the merchant record the payment gateway holds. */}
+        &copy; {new Date().getFullYear()} {company.legalName}.{" "}
+        {t("footer.rights")}
       </div>
     </footer>
   );
