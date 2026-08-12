@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run images:optimize && vite build",
+    "build": "npm run images:optimize && vite build && npm run verify:chunks",
     "lint": "eslint .",
     "preview": "vite preview",
     "fonts:fetch": "node scripts/fetchFonts.mjs",
-    "images:optimize": "node scripts/optimizeImages.mjs"
+    "images:optimize": "node scripts/optimizeImages.mjs",
+    "verify:chunks": "node scripts/check-chunk-cycles.mjs"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
