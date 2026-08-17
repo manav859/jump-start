@@ -11,6 +11,7 @@ import {
   formatStudentDate,
   normalizeStudentReportPayload,
 } from "../data/studentResults";
+import { getCareerDetailContent } from "../data/careerDetails";
 
 /* ------------------------------------------------------------------ *
  * Design tokens (from the mockup)
@@ -25,9 +26,6 @@ const round = (value) => {
   const n = Number(value);
   return Number.isFinite(n) ? Math.round(n) : null;
 };
-
-const firstNameOf = (name) =>
-  String(name || "Student").trim().split(/\s+/)[0] || "Student";
 
 // Short adjectives derived from the four MBTI poles. Lets the cover show
 // data-driven trait pills (e.g. ISTJ → Reserved / Practical / Analytical /
@@ -274,6 +272,20 @@ function Callout({ label, children, className = "" }) {
   );
 }
 
+// One labelled block inside a printed career profile (Career Overview,
+// Key Skills, Education Pathway, ...). Keeps the five repeated
+// label + body pairs readable.
+function ProfileBlock({ label, children }) {
+  return (
+    <div className="mt-4">
+      <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#8A94A6]">
+        {label}
+      </p>
+      <div className="mt-2 text-[13px] leading-6 text-[#4E5D72]">{children}</div>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 
 export default function StudentReport() {
@@ -371,7 +383,7 @@ export default function StudentReport() {
 
   // ---- Cover / identity -------------------------------------------------
   const student = report.student || {};
-  const first = firstNameOf(student.name);
+  const studentName = String(student.name || "").trim() || "Student";
   const reportDate = formatStudentDate(report.submittedAt || report.approvedAt);
   const reportDateValue = report.submittedAt || report.approvedAt;
   const parsedYear = reportDateValue
@@ -652,7 +664,7 @@ export default function StudentReport() {
                 Career Discovery &amp; Guidance Report{reportYear ? ` · ${reportYear}` : ""}
               </p>
               <h1 className="mt-2 text-4xl font-bold leading-tight text-[#0F1729] sm:text-5xl">
-                {first}
+                {studentName}
               </h1>
               {code || archetypeLine ? (
                 <p className="mt-2 text-lg font-semibold text-[#0d7a6f]">
@@ -1353,6 +1365,168 @@ export default function StudentReport() {
                   ))}
                 </div>
               </Card>
+            ) : null}
+
+            {/* Print-only per-career profiles — one full page per
+                recommended career. Hidden on screen via `report-print-only`;
+                revealed by @media print and by the body class the Download
+                button toggles. Each block carries `report-print-career-page`
+                so the printer breaks after it. Sits between the Section 06
+                summary and the CTA so the CTA stays last in the PDF. */}
+            {careers.length ? (
+              <div className="report-print-only report-print-page-break-before hidden">
+                <header className="mb-4">
+                  <h2 className="text-[22px] font-bold leading-8 text-[#0F1729]">
+                    {t("report.yourCareerProfiles")}
+                  </h2>
+                  <p className="mt-1 text-[13px] leading-6 text-[#65758B]">
+                    {t("report.yourCareerProfilesSubtitle")}
+                  </p>
+                </header>
+
+                {careers.map((career, index) => {
+                  const detail = getCareerDetailContent(career);
+                  const match = round(
+                    detail.score != null ? detail.score : detail.matchPercent
+                  );
+                  // Prefer the curated one-line environment sentence; fall back
+                  // to the employer list for careers missing from the table.
+                  const workEnvironment =
+                    detail.workEnvironment ||
+                    (detail.companies?.length
+                      ? `Common employers include ${detail.companies
+                          .slice(0, 5)
+                          .join(", ")}.`
+                      : "");
+                  const outlook = detail.outlook || {};
+                  const outlookRows = [
+                    { key: "marketDemand", label: t("report.marketDemand") },
+                    { key: "jobSatisfaction", label: t("report.jobSatisfaction") },
+                    { key: "workLifeBalance", label: t("report.workLifeBalance") },
+                  ]
+                    .map((row) => ({ ...row, value: round(outlook[row.key]) }))
+                    .filter((row) => row.value != null);
+                  // The scorer emits "" for signals it could not measure, so
+                  // filtering on the text also omits the whole block when a
+                  // career carries no match reasons at all.
+                  const reasons = detail.matchReasons || {};
+                  const reasonRows = [
+                    { key: "holland", label: t("result.matchReasonInterests") },
+                    {
+                      key: "intelligence",
+                      label: t("result.matchReasonIntelligence"),
+                    },
+                    { key: "aptitude", label: t("result.matchReasonAptitude") },
+                    { key: "eq", label: t("result.matchReasonEq") },
+                  ]
+                    .map((row) => ({
+                      ...row,
+                      text: String(reasons[row.key] || "").trim(),
+                    }))
+                    .filter((row) => row.text);
+
+                  return (
+                    <article
+                      key={`career-profile-${detail.title}-${index}`}
+                      className="report-print-career-page mb-4 rounded-2xl border border-[#E4EAF0] bg-white p-5 sm:p-6"
+                    >
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <h3 className="text-[18px] font-bold leading-7 text-[#0F1729]">
+                          {detail.title}
+                        </h3>
+                        {match == null ? null : (
+                          <span className="rounded-full bg-[#e8f5f3] px-2.5 py-0.5 text-[11px] font-semibold text-[#0d7a6f]">
+                            {match}% Match
+                          </span>
+                        )}
+                        {detail.category ? (
+                          <span className="rounded-full border border-[#D9E2E8] px-2.5 py-0.5 text-[11px] font-semibold text-[#4E5D72]">
+                            {detail.category}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      {match == null ? null : (
+                        <div className="mt-3 h-2 rounded-full bg-[#E6EEF0]">
+                          <div
+                            className="h-2 rounded-full bg-[#128678]"
+                            style={{
+                              width: `${Math.max(0, Math.min(100, match))}%`,
+                            }}
+                          />
+                        </div>
+                      )}
+
+                      {reasonRows.length ? (
+                        <ProfileBlock label={t("result.whyMatched")}>
+                          <ul className="space-y-1.5">
+                            {reasonRows.map((row) => (
+                              <li key={`${detail.title}-reason-${row.key}`}>
+                                <span className="font-semibold text-[#0F1729]">
+                                  {row.label}:
+                                </span>{" "}
+                                {row.text}
+                              </li>
+                            ))}
+                          </ul>
+                        </ProfileBlock>
+                      ) : null}
+
+                      <ProfileBlock label={t("report.careerOverview")}>
+                        {detail.overview}
+                      </ProfileBlock>
+
+                      {detail.skills?.length ? (
+                        <ProfileBlock label={t("report.keySkills")}>
+                          <div className="flex flex-wrap gap-1.5">
+                            {detail.skills.slice(0, 8).map((skill) => (
+                              <span
+                                key={`${detail.title}-skill-${skill}`}
+                                className="rounded-full bg-[#128678] px-2.5 py-0.5 text-[10px] font-semibold text-white"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </ProfileBlock>
+                      ) : null}
+
+                      {workEnvironment ? (
+                        <ProfileBlock label={t("report.workEnvironment")}>
+                          {workEnvironment}
+                        </ProfileBlock>
+                      ) : null}
+
+                      {detail.education?.length ? (
+                        <ProfileBlock label={t("report.educationPathway")}>
+                          <ul className="list-disc space-y-1.5 pl-5">
+                            {detail.education.map((line, eduIndex) => (
+                              <li key={`${detail.title}-edu-${eduIndex}`}>
+                                {line}
+                              </li>
+                            ))}
+                          </ul>
+                        </ProfileBlock>
+                      ) : null}
+
+                      {outlookRows.length ? (
+                        <ProfileBlock label={t("report.growthOutlook")}>
+                          <ul className="grid gap-2 text-[12px] sm:grid-cols-3">
+                            {outlookRows.map((row) => (
+                              <li key={`${detail.title}-${row.key}`}>
+                                <span className="font-semibold text-[#0F1729]">
+                                  {row.label}:
+                                </span>{" "}
+                                {row.value}%
+                              </li>
+                            ))}
+                          </ul>
+                        </ProfileBlock>
+                      ) : null}
+                    </article>
+                  );
+                })}
+              </div>
             ) : null}
 
             <Card>
