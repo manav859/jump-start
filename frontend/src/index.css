@@ -125,6 +125,23 @@ textarea {
   box-shadow: 0 16px 40px rgba(15, 23, 41, 0.06);
 }
 
+/* ---- Report display scale ------------------------------------------
+   End-readers are parents with age-related farsightedness, so the whole
+   report is scaled up proportionally. Tune ONE number: --report-scale.
+
+   Mechanism is `zoom`, not a root font-size bump: ~76% of the report's
+   type is hardcoded px (text-[13px], text-[11px], ...), and rem always
+   resolves against <html>, so a font-size change here would scale only
+   the handful of rem-based utilities and wreck the hierarchy. zoom
+   scales every length proportionally AND participates in layout (unlike
+   transform: scale), so pagination reflows rather than being visually
+   squashed. Percentage/auto widths re-resolve under zoom, so the root
+   still fits the sheet exactly. */
+.report-print-root {
+  --report-scale: 1.12;
+  zoom: var(--report-scale);
+}
+
 .jumpstart-report-print-mode {
   background: white !important;
 }
@@ -150,7 +167,8 @@ textarea {
      header/footer text), the page margin is recreated as padding here.
      box-sizing: border-box keeps it within the sheet, so no overflow. */
   max-width: none !important;
-  padding: 14mm 12mm !important;
+  padding: calc(14mm / var(--report-scale)) calc(12mm / var(--report-scale))
+    !important;
 }
 
 .jumpstart-report-print-mode .surface-card,
@@ -257,7 +275,8 @@ textarea {
     /* Page margin lives here now that @page margin is 0 (so no browser
        header/footer text). box-sizing: border-box keeps this within the
        page width, so no horizontal overflow. */
-    padding: 14mm 12mm !important;
+    padding: calc(14mm / var(--report-scale)) calc(12mm / var(--report-scale))
+    !important;
   }
 
   .surface-card,
