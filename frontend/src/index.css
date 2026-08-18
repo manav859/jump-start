@@ -182,6 +182,13 @@ textarea {
   display: block !important;
 }
 
+/* Keep the career pages' top offset identical in the on-screen print-mode
+   state (what the Download button toggles) and in @media print, so the
+   preview matches the PDF. Same 2rem as the sections' `mt-8`. */
+.jumpstart-report-print-mode .report-print-career-page {
+  padding-top: 2rem;
+}
+
 /* In print mode, force every collapsible/accordion content block to
    render. Two complementary rules:
    1. Our admin SectionBreakdownCard uses `data-state="closed"` +
@@ -286,6 +293,13 @@ textarea {
     page-break-after: always;
     break-inside: avoid-page;
     page-break-inside: avoid;
+    /* Match the 2rem top offset the numbered sections 01-06 carry via
+       their `mt-8` utility, so a career page starts at the same height as
+       the earlier pages instead of sitting flush against the sheet edge.
+       padding (not margin) because a top margin on the first box of a
+       forced-break page is dropped by print engines — which is exactly how
+       this collapsed to zero in the PDF. */
+    padding-top: 2rem;
   }
 
   .report-print-career-page:last-child {
