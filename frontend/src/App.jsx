@@ -126,6 +126,16 @@ const router = createBrowserRouter([
         path: "testsubmissions/:reportId",
         element: withSuspense(<ReviewSubmission />),
       },
+      // Admin-scoped view of the student report. Renders the same
+      // StudentReport component inside AdminLayout, so the sidebar/header
+      // stay put and browser Back returns to the review page instead of
+      // stranding the admin in the student shell. The ?adminView=1 query
+      // the admin arrives with still routes the fetch through the
+      // /v1/admin/results/:reportId/student-view endpoint.
+      {
+        path: "testsubmissions/:reportId/report",
+        element: withSuspense(<StudentReport />),
+      },
       {
         path: "publishedresults",
         element: withSuspense(<PublishedResult />),

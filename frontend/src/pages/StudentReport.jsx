@@ -612,12 +612,16 @@ export default function StudentReport() {
       <div className="report-print-root mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
         {/* Screen-only top bar (hidden in the PDF) */}
         <div className="report-print-hidden mb-6 flex items-center justify-between gap-4">
+          {/* Admin counsellor mode arrived here from the review page, so the
+              back link must return there rather than dumping the admin on the
+              student results page (which shows the ADMIN's own account and has
+              no route back to /admin). Student flow is unchanged. */}
           <Link
-            to="/result"
+            to={adminView ? `/admin/testsubmissions/${reportId}` : "/result"}
             className="inline-flex items-center gap-2 text-sm font-semibold text-[#4E5D72] hover:text-[#0d7a6f]"
           >
             <ArrowLeft className="h-4 w-4" />
-            {t("report.backToResults")}
+            {adminView ? "Back to Submission" : t("report.backToResults")}
           </Link>
           <button
             type="button"
@@ -1375,14 +1379,17 @@ export default function StudentReport() {
                 summary and the CTA so the CTA stays last in the PDF. */}
             {careers.length ? (
               <div className="report-print-only report-print-page-break-before hidden">
-                <header className="mb-4">
+                {/* Plain <div>, not <header>: the print rule hides bare
+                    `header` elements, which silently dropped this section's
+                    title and subtitle from the PDF. Spacing/classes unchanged. */}
+                <div className="mb-4">
                   <h2 className="text-[22px] font-bold leading-8 text-[#0F1729]">
                     {t("report.yourCareerProfiles")}
                   </h2>
                   <p className="mt-1 text-[13px] leading-6 text-[#65758B]">
                     {t("report.yourCareerProfilesSubtitle")}
                   </p>
-                </header>
+                </div>
 
                 {careers.map((career, index) => {
                   const detail = getCareerDetailContent(career);

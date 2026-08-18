@@ -60,12 +60,16 @@ export default function Header() {
   const navItems = useMemo(() => {
     if (!isAdmin) return defaultNavItems;
 
+    // Match on labelKey, not label: the items only define labelKey (the
+    // i18n migration renamed the field), so the old item.label checks
+    // compared against undefined and silently left admins pointed at the
+    // STUDENT /dashboard and /result pages.
     return defaultNavItems.map((item) => {
-      if (item.label === "Dashboard") {
+      if (item.labelKey === "nav.dashboard") {
         return { ...item, to: "/admin/dashboard" };
       }
 
-      if (item.label === "Results") {
+      if (item.labelKey === "nav.results") {
         return { ...item, to: "/admin/publishedresults" };
       }
 

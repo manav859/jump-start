@@ -41,14 +41,14 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       {/* ── Mobile overlay ── clicking outside closes the sidebar */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-10 bg-black/30 backdrop-blur-sm lg:hidden transition-opacity"
+          className="report-print-hidden fixed inset-0 z-10 bg-black/30 backdrop-blur-sm lg:hidden transition-opacity"
           onClick={onClose}
         />
       )}
 
       {/* ── Sidebar ── */}
       <aside
-        className={`fixed left-0 top-0 h-screen bg-white border-r border-gray-200 z-20
+        className={`report-print-hidden fixed left-0 top-0 h-screen bg-white border-r border-gray-200 z-20
         transition-all duration-300
         ${isOpen ? "w-20" : "w-0 overflow-hidden -translate-x-full"}`}
       >

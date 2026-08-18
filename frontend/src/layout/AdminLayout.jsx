@@ -14,7 +14,15 @@ export default function AdminLayout() {
       <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       {/* MAIN WRAPPER */}
-      <div className={`transition-all duration-300 ${isSidebarOpen ? "ml-20" : "ml-0"}`}>
+      {/* print:ml-0 collapses the sidebar gutter in the PDF — the sidebar
+          itself is hidden via report-print-hidden, so the report must not
+          keep its 5rem offset when an admin prints from the in-shell
+          report route. */}
+      <div
+        className={`transition-all duration-300 print:ml-0 ${
+          isSidebarOpen ? "ml-20" : "ml-0"
+        }`}
+      >
         
         {/* HEADER */}
         <AdminHeader
