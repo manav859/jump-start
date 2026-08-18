@@ -431,7 +431,7 @@ const AdminHeader = ({ isSidebarOpen, setIsSidebarOpen }) => {
               <div className="p-2">
                 <button
                   type="button"
-                  onClick={() => handleNavigate("/profile/edit")}
+                  onClick={() => handleNavigate("/admin/settings")}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors"
                 >
                   <User size={18} className="text-gray-400" />
