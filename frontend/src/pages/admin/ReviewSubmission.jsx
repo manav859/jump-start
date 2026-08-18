@@ -701,7 +701,12 @@ export default function ReviewSubmission() {
           onViewStudentReport={
             reportId
               ? () =>
-                  window.open(`/result/${reportId}?adminView=1`, "_blank", "noopener")
+                  // Same-tab navigate() into the admin-scoped report route,
+                  // NOT window.open to /result: the old new-tab jump landed
+                  // the admin in the student shell with no history entry to
+                  // return to, stranding them off /admin. ?adminView=1 still
+                  // selects the admin student-view endpoint.
+                  navigate(`/admin/testsubmissions/${reportId}/report?adminView=1`)
               : undefined
           }
         />
