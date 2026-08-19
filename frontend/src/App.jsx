@@ -11,6 +11,7 @@ import BlankLayout from "./layout/BlankLayout";
 // landing page, none of whom can reach an admin route.
 const AdminLayout = lazy(() => import("./layout/AdminLayout"));
 import ProtectedRoute from "./components/ProtectedRoute";
+import RequireStudent from "./components/RequireStudent";
 import PageLoader from "./components/PageLoader";
 
 const Home = lazy(() => import("./pages/Home"));
@@ -46,18 +47,31 @@ function withSuspense(element) {
   return <Suspense fallback={<PageLoader />}>{element}</Suspense>;
 }
 
+// Public pages that still belong to the student tree (Home, Tests).
+// Guarded but not auth-gated, so logged-out visitors still see them.
+const studentPage = (element) =>
+  withSuspense(<RequireStudent>{element}</RequireStudent>);
+
+// Every authenticated student page goes through here, so wrapping the guard
+// once covers the whole student tree rather than editing each route.
+// Deliberately NOT used by the /admin tree — see RequireStudent's note about
+// the admin report route.
 const protectedPage = (element) =>
-  withSuspense(<ProtectedRoute>{element}</ProtectedRoute>);
+  withSuspense(
+    <ProtectedRoute>
+      <RequireStudent>{element}</RequireStudent>
+    </ProtectedRoute>
+  );
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
     children: [
-      { path: "/", element: withSuspense(<Home />) },
+      { path: "/", element: studentPage(<Home />) },
       { path: "/login", element: withSuspense(<Auth />) },
       { path: "/signup", element: withSuspense(<Auth />) },
-      { path: "/test", element: withSuspense(<Test />) },
+      { path: "/test", element: studentPage(<Test />) },
       { path: "/pretest", element: protectedPage(<Pretest />) },
       { path: "/Pretest", element: protectedPage(<Pretest />) },
       {
