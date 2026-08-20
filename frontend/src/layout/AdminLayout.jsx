@@ -3,6 +3,7 @@ import { useState } from "react";
 import AdminHeader from "../pages/admin/AdminHeader";
 import AdminSidebar from "../pages/admin/AdminSidebar";
 import NavigationProgress from "../components/NavigationProgress";
+import ScrollToTop from "../components/ScrollToTop";
 
 export default function AdminLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -10,6 +11,7 @@ export default function AdminLayout() {
   return (
     <div className="min-h-screen bg-[#f9fafb]">
       <NavigationProgress />
+      <ScrollToTop />
       {/* FIXED SIDEBAR */}
       <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
