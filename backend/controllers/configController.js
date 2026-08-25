@@ -243,6 +243,16 @@ const toPublicSupportPages = (cfg) =>
     return acc;
   }, {});
 
+// Counselling settings, read-only, for the public config payload. Fee stays
+// in PAISE — the same unit every other amount in the API uses — so the
+// frontend divides by 100 exactly once, at render.
+const toPublicCounselling = (cfg) => ({
+  fee: Number(cfg?.counselling?.fee ?? 0),
+  currency: "INR",
+  durationMinutes: Number(cfg?.counselling?.durationMinutes ?? 50),
+  active: cfg?.counselling?.active !== false,
+});
+
 // GET /api/v1/public/config
 export const getPublicConfig = async (req, res) => {
   try {
@@ -260,6 +270,9 @@ export const getPublicConfig = async (req, res) => {
       data: {
         packages: packages.map(toPublicPackage),
         supportPages: toPublicSupportPages(cfg),
+        // Read-only counselling settings so the booking page can show the
+        // real configured fee instead of a hardcoded literal.
+        counselling: toPublicCounselling(cfg),
       },
     });
   } catch (err) {

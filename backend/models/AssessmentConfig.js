@@ -96,10 +96,29 @@ const supportPagesSchema = new mongoose.Schema(
   { _id: false }
 );
 
+
+// Site-level counselling settings. Lives on the singleton beside
+// supportPages (which is likewise site-wide, not package-scoped) rather than
+// in a new collection — there is exactly one config document, keyed
+// "default", and this is what it is for.
+const counsellingSchema = new mongoose.Schema(
+  {
+    // PAISE, matching how every Razorpay amount is handled elsewhere
+    // (Payment.amount, order.amount). 150000 = ₹1500, GST-inclusive.
+    fee: { type: Number, default: 150000, min: 0 },
+    durationMinutes: { type: Number, default: 50, min: 1 },
+    active: { type: Boolean, default: true },
+  },
+  { _id: false }
+);
 const assessmentConfigSchema = new mongoose.Schema(
   {
     key: { type: String, required: true, unique: true, default: "default" },
     packages: [packageSchema],
+    counselling: {
+      type: counsellingSchema,
+      default: () => ({}),
+    },
     supportPages: {
       type: supportPagesSchema,
       default: () => ({}),
@@ -624,6 +643,15 @@ assessmentConfigSchema.statics.getOrCreateDefault = async function getOrCreateDe
     changed =
       mergeSeededSupportPage(cfg.supportPages.faqs, supportPageSeeds.faqs, "faqs") ||
       changed;
+  }
+
+  // Backfill counselling settings onto config documents created before
+  // Tier 2 existed. Mongoose would apply the subdocument default on read
+  // anyway, but persisting it means the admin config editor sees a real
+  // stored value rather than a phantom one.
+  if (!cfg.counselling) {
+    cfg.counselling = {};
+    changed = true;
   }
 
   if (changed) {
