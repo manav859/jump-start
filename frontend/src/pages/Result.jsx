@@ -229,6 +229,15 @@ export default function Result() {
 
       navigate("/pretest/sections");
     } catch (err) {
+      // The profile gate is recoverable — send the student to the form
+      // rather than stranding them on an error banner. Matches Dashboard
+      // and Test; keyed off `error`, not the message text.
+      if (err?.response?.data?.error === "PROFILE_INCOMPLETE") {
+        navigate("/profile/student", {
+          state: { returnTo: "/result", pendingPackageId: test.packageId },
+        });
+        return;
+      }
       setError(
         err?.response?.data?.msg || "Unable to open this assessment right now."
       );

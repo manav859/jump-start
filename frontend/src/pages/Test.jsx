@@ -140,6 +140,12 @@ export default function Test() {
   const [loading, setLoading] = useState(true);
   const [openingPlanId, setOpeningPlanId] = useState("");
   const [loadError, setLoadError] = useState("");
+  // Mirrors Dashboard's `stats.student_profile_complete`. Comes free off the
+  // /v1/user/init payload we already fetch below, so the pre-flight check in
+  // handlePlanAction costs no extra request. Starts true so a logged-out or
+  // not-yet-loaded state never redirects on its own — selectPackage still
+  // enforces the gate server-side, and the catch below handles that.
+  const [profileComplete, setProfileComplete] = useState(true);
   const hasSinglePlan = plans.length === 1;
   const planContainerClassName = hasSinglePlan
     ? "mx-auto mt-12 max-w-xl"
@@ -177,6 +183,9 @@ export default function Test() {
 
     if (cachedConfig) {
       setPlans(composePlans(cachedConfig.packages, cachedInit?.purchased_packages));
+      if (cachedInit) {
+        setProfileComplete(Boolean(cachedInit.student_profile_complete));
+      }
       setLoading(false);
       // If we already have everything fresh, skip the network entirely.
       if (!token || cachedInit) return;
@@ -215,6 +224,9 @@ export default function Test() {
 
         setLoadError(configError);
         setPlans(composePlans(configData?.packages || [], initData?.purchased_packages || []));
+        if (initData) {
+          setProfileComplete(Boolean(initData.student_profile_complete));
+        }
       })
       .catch((err) => {
         console.error("Failed to load packages", err);
@@ -224,6 +236,15 @@ export default function Test() {
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  // Same destination and state shape Dashboard uses, so the profile form
+  // returns the student to where they came from and resumes the package
+  // they were trying to open.
+  const redirectToStudentProfile = (pendingPackageId) => {
+    navigate("/profile/student", {
+      state: { returnTo: "/test", pendingPackageId },
+    });
+  };
 
   const handlePlanAction = async (plan) => {
     const action = getPlanActionMeta(plan, t);
@@ -240,6 +261,14 @@ export default function Test() {
 
     if (action.mode === "results") {
       navigate(plan.publishedReportId ? `/result/${plan.publishedReportId}` : "/result");
+      return;
+    }
+
+    // Mandatory student-profile gate. selectPackage enforces this server-side
+    // for every package (including the demo); this client check just avoids a
+    // noisy round-trip, exactly as Dashboard does before its own select call.
+    if (!profileComplete) {
+      redirectToStudentProfile(plan.id);
       return;
     }
 
@@ -260,6 +289,13 @@ export default function Test() {
       invalidateApiCache("userInit");
       navigate("/pretest/sections", { replace: true });
     } catch (err) {
+      // The profile gate is recoverable, not an error: send the student to
+      // the form instead of a dead-end alert. Keyed off `error`, not the
+      // message text, so it survives a stale local profileComplete flag.
+      if (err?.response?.data?.error === "PROFILE_INCOMPLETE") {
+        redirectToStudentProfile(plan.id);
+        return;
+      }
       console.error("Failed to open package", err);
       window.alert(
         err?.response?.data?.msg || t("testCatalog.openFailed")

@@ -689,8 +689,11 @@ export const selectPackage = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: "PROFILE_INCOMPLETE",
-        message:
-          "Please complete your student profile before starting a test.",
+        // `msg`, not `message` — every other error in this file uses `msg`,
+        // and clients that follow that convention were silently dropping
+        // this one and falling back to a generic "couldn't open" alert.
+        // The `error` code stays: callers redirect off that, not the text.
+        msg: "Please complete your student profile before starting a test.",
       });
     }
 
