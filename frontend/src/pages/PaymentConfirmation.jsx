@@ -59,7 +59,6 @@ export default function PaymentConfirmation() {
   const [issuedAt, setIssuedAt] = useState(
     paymentState.paidAt || new Date().toISOString()
   );
-  const [method, setMethod] = useState(paymentState.method || "upi");
   const [fallbackSections, setFallbackSections] = useState([]);
 
   useEffect(() => {
@@ -123,7 +122,6 @@ export default function PaymentConfirmation() {
       `Customer: ${user?.name || "User"}`,
       `Email: ${user?.email || "Not available"}`,
       `Package: ${plan?.title || "Selected Package"}`,
-      `Payment Method: ${String(method).toUpperCase()}`,
       `Base price (excl. GST): INR ${subtotal}`,
       `GST (18%, included): INR ${gstAmount}`,
       `Total (incl. GST): INR ${total}`,
@@ -294,12 +292,6 @@ export default function PaymentConfirmation() {
               <div className="flex items-center justify-between gap-4">
                 <span className="text-[#65758B]">GST (18%, included)</span>
                 <span className="text-[#65758B]">{formatPrice(gstAmount)}</span>
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-[#65758B]">Payment method</span>
-                <span className="uppercase text-[#0F1729]">
-                  {String(method)}
-                </span>
               </div>
             </div>
 

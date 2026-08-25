@@ -341,6 +341,16 @@ const purchaseHistorySchema = new mongoose.Schema(
     originalAmount: { type: Number, default: null },
     purchasedAt: { type: Date, default: null },
     paymentMethod: { type: String, default: "Online" },
+    // Razorpay trail. Null on legacy / non-gateway purchases.
+    razorpayOrderId: { type: String, default: null },
+    // DEDUPE KEY. grantPackageEntitlement() treats a purchaseHistory
+    // record carrying this payment id as proof the entitlement was
+    // already granted, so verify and the webhook can both run safely
+    // for the same payment without double-writing.
+    razorpayPaymentId: { type: String, default: null },
+    // Only paid purchases are ever pushed onto purchaseHistory; failed
+    // and unpaid orders live in the Payment ledger instead.
+    status: { type: String, enum: ["paid"], default: "paid" },
   },
   { _id: false }
 );

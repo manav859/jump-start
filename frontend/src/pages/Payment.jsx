@@ -1,20 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
-import upiIcon from "../assets/upi.svg";
-import creditIcon from "../assets/credit.svg";
-import netIcon from "../assets/net.svg";
-import walletIcon from "../assets/wallet.svg";
 import secure from "../assets/secure.svg";
 import lck from "../assets/lck.svg";
 import { GST_RATE } from "../data/testPackages";
 import api from "../api/api";
+import { AuthContext } from "../context/AuthContext";
+import { invalidateApiCache } from "../utils/apiCache";
+import { loadRazorpayCheckout } from "../utils/loadRazorpay";
+
+// The site's primary teal, handed to Razorpay's modal so the checkout does
+// not look like a different product bolted on at the last step.
+const BRAND_COLOR = "#188B8B";
 
 const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [method, setMethod] = useState("upi");
+  const { user } = useContext(AuthContext);
   const [agree, setAgree] = useState(false);
+
+  // True from the moment the buy button is pressed until the flow reaches a
+  // terminal state. It covers the Razorpay modal being open too, so a second
+  // click cannot create a second order.
+  const [submitting, setSubmitting] = useState(false);
+  // { tone: "error" | "info", text } — rendered above the buy button.
+  const [checkoutNotice, setCheckoutNotice] = useState(null);
 
   // Coupon checkout state. `appliedCoupon` is the validated payload from
   // /v1/user/coupon/validate — null until the student successfully applies
@@ -89,34 +99,169 @@ const Payment = () => {
     setCouponInput("");
   };
 
-  const handleCompletePayment = () => {
-    if (!plan?.id) return;
-    // Pass the validated coupon code (if any) — backend re-validates and
-    // atomically increments usedCount, so we never trust the client's
-    // computed price.
+  // Everything the confirmation screen needs. `paidTotal` is passed in
+  // because the authoritative figure differs per path: the server's
+  // finalAmount for a Razorpay order, the locally computed total for a
+  // zero-rupee activation.
+  const buildConfirmationState = (paidTotal) => ({
+    plan,
+    subtotal,
+    discount,
+    couponCode: appliedCoupon?.code || null,
+    gstAmount,
+    total: paidTotal,
+    paidAt: new Date().toISOString(),
+  });
+
+  // A 100%-off coupon or a free package has nothing to charge. Razorpay
+  // cannot create a zero-amount order (the backend rejects it with 400 and
+  // points here), so these keep the original free-activation route.
+  const activateFreePackage = async () => {
     const payload = { packageId: plan.id };
     if (appliedCoupon?.code) payload.couponCode = appliedCoupon.code;
-    api
-      .post("/v1/user/package/purchase", payload)
-      .then(() =>
-        navigate("/payment-confirmation", {
-          replace: true,
-          state: {
-            plan,
-            subtotal,
-            discount,
-            couponCode: appliedCoupon?.code || null,
-            gstAmount,
-            total,
-            method,
-            paidAt: new Date().toISOString(),
-          },
-        })
-      )
-      .catch((err) => {
-        console.error("Purchase package failed", err);
-        alert(err?.response?.data?.msg || "Failed to activate package");
+
+    try {
+      await api.post("/v1/user/package/purchase", payload);
+      invalidateApiCache("userInit");
+      navigate("/payment-confirmation", {
+        replace: true,
+        state: buildConfirmationState(total),
       });
+    } catch (err) {
+      console.error("Free package activation failed", err);
+      setCheckoutNotice({
+        tone: "error",
+        text: err?.response?.data?.msg || "Failed to activate package.",
+      });
+      setSubmitting(false);
+    }
+  };
+
+  // Called from Razorpay's success handler. Note the failure branch: by the
+  // time this runs the money has already moved, and the webhook grants
+  // entitlement idempotently on its own. A failed /verify means we could not
+  // CONFIRM the payment, never that it failed — so we say so honestly and
+  // still send the student on, where the confirmation page's fallback
+  // re-fetches the current package from the server.
+  const verifyAndFinish = async (response, order) => {
+    const paidTotal = Number(order.finalAmount ?? total);
+
+    try {
+      await api.post("/v1/user/payment/verify", {
+        razorpay_order_id: response.razorpay_order_id,
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_signature: response.razorpay_signature,
+      });
+    } catch (err) {
+      console.error("Payment verification failed", err);
+      invalidateApiCache("userInit");
+      // Blocking on purpose: we are about to navigate away, and this is the
+      // one message the student must not miss.
+      window.alert(
+        "Payment received — confirming your access. If it doesn't unlock in a minute, refresh your dashboard."
+      );
+      navigate("/payment-confirmation", {
+        replace: true,
+        state: buildConfirmationState(paidTotal),
+      });
+      return;
+    }
+
+    invalidateApiCache("userInit");
+    navigate("/payment-confirmation", {
+      replace: true,
+      state: buildConfirmationState(paidTotal),
+    });
+  };
+
+  const handleCompletePayment = async () => {
+    if (!plan?.id || submitting) return;
+
+    setCheckoutNotice(null);
+    setSubmitting(true);
+
+    if (total <= 0) {
+      await activateFreePackage();
+      return;
+    }
+
+    // 1. The checkout widget, fetched on demand.
+    const sdkReady = await loadRazorpayCheckout();
+    if (!sdkReady) {
+      setCheckoutNotice({
+        tone: "error",
+        text: "Couldn't load the payment window. Check your connection and try again.",
+      });
+      setSubmitting(false);
+      return;
+    }
+
+    // 2. The order. The coupon code goes up as the student entered it; the
+    //    backend re-validates and re-prices, so the client total is display
+    //    only and is never trusted.
+    let order;
+    try {
+      const res = await api.post("/v1/user/payment/order", {
+        packageId: plan.id,
+        couponCode: appliedCoupon?.code || undefined,
+      });
+      order = res?.data?.data;
+      if (!order?.orderId || !order?.keyId) {
+        throw new Error("Incomplete order response");
+      }
+    } catch (err) {
+      console.error("Create payment order failed", err);
+      const status = err?.response?.status;
+
+      if (status === 409) {
+        // Already owned — nothing to pay for. Send them where the package is.
+        invalidateApiCache("userInit");
+        setSubmitting(false);
+        navigate("/dashboard", { replace: true });
+        return;
+      }
+
+      setCheckoutNotice({
+        tone: "error",
+        text:
+          status === 503
+            ? "Payments are temporarily unavailable. Please try again shortly."
+            : err?.response?.data?.msg ||
+              "Could not start the payment. Please try again.",
+      });
+      setSubmitting(false);
+      return;
+    }
+
+    // 3. Hand over to Razorpay. `submitting` deliberately stays true while
+    //    the modal is open so the button underneath cannot fire again.
+    const checkout = new window.Razorpay({
+      key: order.keyId,
+      order_id: order.orderId,
+      amount: order.amount,
+      currency: order.currency,
+      name: "Jumpstart",
+      description: order.packageTitle || plan.title,
+      prefill: {
+        name: user?.name || "",
+        email: user?.email || "",
+      },
+      theme: { color: BRAND_COLOR },
+      handler: (response) => {
+        verifyAndFinish(response, order);
+      },
+      modal: {
+        ondismiss: () => {
+          setSubmitting(false);
+          setCheckoutNotice({
+            tone: "info",
+            text: "Payment cancelled. You can try again whenever you're ready.",
+          });
+        },
+      },
+    });
+
+    checkout.open();
   };
 
   if (!plan || !plan.id) {
@@ -224,62 +369,6 @@ const Payment = () => {
                   />
                 </div>
               </div>
-            </div>
-
-            {/* Payment Method */}
-            <div className="bg-white rounded-2xl p-8 border border-[#E6ECF5]">
-              <h3 className="text-2xl text-[#0F1729] font-semibold">
-                Select Payment Method
-              </h3>
-              <p className="!text-sm text-[#65758B] mt-1 mb-8">
-                Choose your preferred payment option
-              </p>
-
-              <div className="space-y-3">
-                {[{ id: "upi", label: "UPI (PhonePe, Google Pay, Paytm)", icon: upiIcon },{ id: "card", label: "Credit / Debit Card", icon: creditIcon },{ id: "net", label: "Net Banking", icon: netIcon },{ id: "wallet", label: "Wallet", icon: walletIcon }].map((item) => (
-                  <button
-                    type="button"
-                    key={item.id}
-                    onClick={() => setMethod(item.id)}
-                    className={`w-full h-[52px] rounded-2xl px-5 flex items-center gap-4 border transition text-sm ${
-                      method === item.id
-                        ? "border-teal-400 bg-teal-50"
-                        : "border-[#E1E7EF] bg-white"
-                    }`}
-                  >
-                    {/* Radio */}
-                    <span
-                      className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                        method === item.id
-                          ? "border-teal-600"
-                          : "border-slate-300"
-                      }`}
-                    >
-                      {method === item.id && (
-                        <span className="w-2 h-2 rounded-full bg-teal-600" />
-                      )}
-                    </span>
-
-                    {/* Icon */}
-                    <img src={item.icon} alt="" className="w-5 h-5" />
-
-                    {/* Label */}
-                    <span className="text-[#0F1729] font-inter font-medium text-left">{item.label}</span>
-                  </button>
-                ))}
-              </div>
-
-              {method === "upi" && (
-                <div className="mt-5">
-                  <label className="block text-sm font-medium font-inter text-[#0F1729] mb-2">
-                    UPI ID
-                  </label>
-                  <input
-                    className="w-full h-[46px] rounded-[14px] border border-[#E1E7EF] bg-[#FAFAFA] px-4 text-sm outline-none"
-                    placeholder="yourname@upi"
-                  />
-                </div>
-              )}
             </div>
           </div>
 
@@ -414,12 +503,25 @@ const Payment = () => {
               </span>
             </label>
 
+            {checkoutNotice ? (
+              <div
+                role="status"
+                className={`mb-4 rounded-[14px] border px-4 py-3 text-sm font-medium ${
+                  checkoutNotice.tone === "error"
+                    ? "border-red-200 bg-red-50 text-red-700"
+                    : "border-slate-200 bg-slate-50 text-[#65758B]"
+                }`}
+              >
+                {checkoutNotice.text}
+              </div>
+            ) : null}
+
             <button
               type="button"
-              disabled={!agree}
+              disabled={!agree || submitting}
               onClick={handleCompletePayment}
               className={`group w-full h-[48px] rounded-xl font-semibold flex items-center justify-center gap-1 transition-all duration-200 ${
-                agree
+                agree && !submitting
                   ? "bg-[#F59F0A] text-[#0F1729] shadow-[0_10px_24px_rgba(245,159,10,0.22)] hover:-translate-y-0.5 hover:bg-[#E89206] hover:shadow-[0_14px_30px_rgba(245,159,10,0.32)] active:translate-y-0 active:shadow-[0_8px_18px_rgba(245,159,10,0.24)] cursor-pointer"
                   : "bg-[#facf84] text-[#0f172994] cursor-not-allowed"
               }`}
@@ -428,11 +530,13 @@ const Payment = () => {
                 src={lck}
                 alt="secure"
                 className={`w-4 h-4 transition-transform duration-200 ${
-                  agree ? "group-hover:scale-110" : "opacity-60"
+                  agree && !submitting ? "group-hover:scale-110" : "opacity-60"
                 }`}
-                style={{ filter: agree ? "none" : "grayscale(100%)" }}
+                style={{
+                  filter: agree && !submitting ? "none" : "grayscale(100%)",
+                }}
               />
-              Complete Payment
+              {submitting ? "Processing…" : "Complete Payment"}
             </button>
 
             <p className="!text-xs text-slate-400 text-center mt-4 flex items-center justify-center gap-1">

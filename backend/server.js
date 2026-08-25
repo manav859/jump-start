@@ -5,11 +5,15 @@ import compression from "compression";
 import connectDB from "./config/db.js";
 import { ensureRequiredEnv } from "./config/env.js";
 import { ensureAdminAccount } from "./utils/adminBootstrap.js";
+import { isRazorpayConfigured } from "./config/razorpay.js";
 import { seedGujaratiPackage } from "./scripts/seedGujaratiPackage.mjs";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import configRoutes from "./routes/configRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+import paymentWebhookRoutes from "./routes/paymentWebhookRoutes.js";
+import counsellingRoutes from "./routes/counsellingRoutes.js";
 import vitalsRoutes from "./routes/vitals.js";
 
 const PORT = process.env.PORT || 5000;
@@ -72,6 +76,15 @@ app.use(cors(corsOptions));
 // the cap would silently be the global 100 KB instead.
 app.use("/api/vitals", vitalsRoutes);
 
+// Also mounted ahead of the global express.json(), for a different but
+// related reason: Razorpay signs the exact bytes it sends, so the webhook's
+// HMAC must be computed over the RAW body. Behind the global parser the
+// stream is already consumed and re-serialising it yields a different
+// digest, so every signature check would fail. The router applies its own
+// express.raw(). /order and /verify are ordinary JSON routes and stay
+// mounted after the parser, below.
+app.use("/api/v1/user/payment/webhook", paymentWebhookRoutes);
+
 app.use(express.json());
 
 // Root – so visiting http://localhost:5000/ shows API is up
@@ -96,6 +109,10 @@ app.get("/api/health", (req, res) => {
 
 // Mount routes under /api/v1/user
 app.use("/api/v1/user/auth", authRoutes);
+app.use("/api/v1/user/payment", paymentRoutes);
+// Mounted BEFORE the generic /api/v1/user router, matching how paymentRoutes
+// is ordered — a more specific prefix has to win before the broad one.
+app.use("/api/v1/user/counselling", counsellingRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1", configRoutes);
 app.use("/api/v1/admin", adminRoutes);
@@ -111,6 +128,34 @@ app.use((err, req, res, next) => {
 
 const startServer = async () => {
   await connectDB();
+
+  // Razorpay keys are intentionally NOT in config/env.js REQUIRED_ENV_VARS —
+  // dev and staging boot without them and use ALLOW_FREE_PURCHASE instead.
+  // Warn (never crash) when neither is configured, because that combination
+  // means nobody can buy anything.
+  if (
+    process.env.ALLOW_FREE_PURCHASE !== "true" &&
+    !isRazorpayConfigured()
+  ) {
+    console.warn(
+      "[payments] RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET are not set and " +
+        "ALLOW_FREE_PURCHASE is not \"true\" — package purchases will fail."
+    );
+  }
+
+  // Separate check: the webhook secret is a DIFFERENT value from
+  // RAZORPAY_KEY_SECRET (it is set in the Razorpay dashboard). Without it
+  // the webhook rejects every delivery, so entitlement would depend solely
+  // on the browser returning to /verify.
+  if (
+    process.env.ALLOW_FREE_PURCHASE !== "true" &&
+    !String(process.env.RAZORPAY_WEBHOOK_SECRET || "").trim()
+  ) {
+    console.warn(
+      "[payments] RAZORPAY_WEBHOOK_SECRET is not set — Razorpay webhooks " +
+        "will be rejected. It differs from RAZORPAY_KEY_SECRET."
+    );
+  }
   const adminStatus = await ensureAdminAccount();
   console.log(
     `Admin account ready for ${adminStatus.email}${

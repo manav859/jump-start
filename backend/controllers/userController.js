@@ -20,6 +20,20 @@ import {
 const isDemoPackageId = (id = "") =>
   String(id || "").trim() === DEMO_PACKAGE_ID;
 
+// Does this user actually own `packageId`?
+//
+// Deliberately identical to the check selectPackage runs before it will set
+// selectedPackageId (see below): the demo is free for every logged-in user,
+// everything else must appear in purchasedPackages. Selection alone is NOT
+// entitlement — the test routes call this so a user who selected a package
+// and then abandoned checkout cannot reach them by hitting the API directly.
+const hasPackageEntitlement = (user, packageId) => {
+  if (isDemoPackageId(packageId)) return true;
+  return Array.isArray(user?.purchasedPackages)
+    ? user.purchasedPackages.includes(packageId)
+    : false;
+};
+
 const STUDENT_PROFILE_GENDER_VALUES = [
   "Male",
   "Female",
@@ -153,7 +167,7 @@ const getQuestionCount = (pkg) =>
     0
   );
 
-const getActivePackages = (cfg) =>
+export const getActivePackages = (cfg) =>
   (cfg.packages || [])
     .filter((p) => p.active !== false && getQuestionCount(p) > 0)
     .sort((a, b) => a.sortOrder - b.sortOrder);
@@ -734,6 +748,28 @@ export const purchasePackage = async (req, res) => {
     if (!user) return res.status(404).json({ success: false, msg: "User not found" });
     const pkg = getActivePackages(cfg).find((p) => p.id === packageId);
     if (!pkg) return res.status(404).json({ success: false, msg: "Package not found or inactive" });
+
+    // TEMPORARY payment guard — remove once Razorpay verification lands.
+    //
+    // This endpoint grants the paid entitlement outright: it writes
+    // purchasedPackages / purchaseHistory with a hardcoded
+    // paymentMethod: "Online" and never talks to a gateway. Until an order
+    // is created and its signature verified server-side, any authenticated
+    // user could POST here and unlock a paid package for free. Gated behind
+    // an env flag rather than deleted, so dev/staging can still exercise the
+    // flow and so this is a one-line revert.
+    //
+    // The free demo is carved out deliberately: Test.jsx routes every
+    // zero-amount package through this same endpoint (mode "unlock" fires
+    // when plan.amount <= 0), so a blanket 503 would break the demo, which
+    // has no payment to protect.
+    const paymentsBypass = process.env.ALLOW_FREE_PURCHASE === "true";
+    if (!paymentsBypass && !isDemoPackageId(pkg.id)) {
+      return res.status(503).json({
+        success: false,
+        msg: "Payments are being set up. Purchases are temporarily unavailable.",
+      });
+    }
 
     if (Array.isArray(user.purchasedPackages) && user.purchasedPackages.includes(pkg.id)) {
       return res.status(409).json({
@@ -1472,8 +1508,18 @@ export const updateResults = async (req, res) => {
 // GET /api/v1/user/test-progress
 export const getTestProgress = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("testProgress selectedPackageId").lean();
+    const user = await User.findById(req.user.id).select("testProgress selectedPackageId purchasedPackages").lean();
     if (!user) return res.status(404).json({ success: false, msg: "User not found" });
+
+    // Entitlement, not just authentication. selectedPackageId records which
+    // package the student picked; it does not prove they paid for it, so a
+    // checkout abandoned after selection must not reach test data.
+    if (!hasPackageEntitlement(user, user.selectedPackageId)) {
+      return res.status(403).json({
+        success: false,
+        msg: "Purchase this package before continuing.",
+      });
+    }
     const p = user.testProgress || {};
     return res.status(200).json({
       success: true,
@@ -1502,9 +1548,19 @@ export const patchTestProgress = async (req, res) => {
     // section), so we fetch the user first instead of using a blind
     // $set. The hot path (typing an answer, ticking a timer) still
     // resolves in a single round-trip.
-    const user = await User.findById(req.user.id).select("testProgress testsInProgress");
+    const user = await User.findById(req.user.id).select("testProgress testsInProgress selectedPackageId purchasedPackages");
     if (!user) {
       return res.status(404).json({ success: false, msg: "User not found" });
+    }
+
+    // Entitlement, not just authentication. selectedPackageId records which
+    // package the student picked; it does not prove they paid for it, so a
+    // checkout abandoned after selection must not reach test data.
+    if (!hasPackageEntitlement(user, user.selectedPackageId)) {
+      return res.status(403).json({
+        success: false,
+        msg: "Purchase this package before continuing.",
+      });
     }
 
     if (sectionId !== undefined) user.testProgress.sectionId = sectionId;
@@ -1585,6 +1641,16 @@ export const postTestSubmit = async (req, res) => {
   try {
     const [cfg, user] = await Promise.all([AssessmentConfig.getOrCreateDefault(), User.findById(req.user.id)]);
     if (!user) return res.status(404).json({ success: false, msg: "User not found" });
+
+    // Entitlement, not just authentication. selectedPackageId records which
+    // package the student picked; it does not prove they paid for it, so a
+    // checkout abandoned after selection must not reach test data.
+    if (!hasPackageEntitlement(user, user.selectedPackageId)) {
+      return res.status(403).json({
+        success: false,
+        msg: "Purchase this package before continuing.",
+      });
+    }
     const pkg = getSelectedPackage(cfg, user);
     if (!pkg) return res.status(400).json({ success: false, msg: "No purchased package selected" });
     const sections = getEnabledSections(pkg);
