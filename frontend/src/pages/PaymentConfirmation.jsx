@@ -14,6 +14,17 @@ import { GST_RATE } from "../data/testPackages";
 
 const formatPrice = (amount) => `₹ ${Number(amount || 0).toLocaleString("en-IN")}`;
 
+// Paise -> displayed rupees, at the display edge only. Two decimals always:
+// these figures come off the ledger, where the GST split is exact to the
+// paisa, and the invoice prints the same numbers. Whole-rupee rounding here
+// is what previously let the screen and the invoice disagree by up to 50p,
+// so ₹1,524.58 is shown in full and a round amount reads "₹ 1,799.00".
+const formatPaise = (paise) =>
+  `₹ ${(Number(paise || 0) / 100).toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+
 const formatDate = (isoString) => {
   const value = new Date(isoString);
   if (Number.isNaN(value.getTime())) return "";
@@ -103,13 +114,43 @@ export default function PaymentConfirmation() {
     };
   }, [navigate, paymentState.plan]);
 
-  // Prices are GST-INCLUSIVE: `total` is the amount actually paid, and the
-  // GST shown is back-calculated as already-included (base + GST = total).
-  // Nothing is added on top.
-  const total = paymentState.total ?? plan?.amount ?? 0;
-  const subtotal =
-    paymentState.subtotal ?? Math.round(total / (1 + GST_RATE));
-  const gstAmount = paymentState.gstAmount ?? total - subtotal;
+  // Prices are GST-INCLUSIVE: the total is the amount actually paid, and the
+  // GST is back-calculated as already-included (base + GST = total). Nothing
+  // is added on top.
+  //
+  // TWO SOURCES, in priority order:
+  //
+  //   1. `paymentState.money` — the paise block from /verify, read straight
+  //      off the Payment ledger row. Authoritative, and the same numbers the
+  //      invoice prints, so screen and invoice agree to the paisa. Used
+  //      VERBATIM: re-deriving here is exactly what caused the drift.
+  //
+  //   2. Rupee fallback — free activations (no gateway order, so no ledger
+  //      split), a failed /verify, and direct navigation with no state.
+  //      Derived the same way as the payment page, in whole rupees.
+  //
+  // `isPaise` drives the formatter, since the two sources carry different
+  // units and one of them needs two decimals.
+  const money = paymentState.money || null;
+  const isPaise = Boolean(money);
+  const fmt = isPaise ? formatPaise : formatPrice;
+
+  const fallbackTotal = paymentState.total ?? plan?.amount ?? 0;
+  const total = isPaise ? money.amount : fallbackTotal;
+  const subtotal = isPaise
+    ? money.base
+    : Math.round(fallbackTotal / (1 + GST_RATE));
+  const gstAmount = isPaise ? money.gst : fallbackTotal - subtotal;
+
+  // List price and coupon, for the "how we got to this price" group. Both
+  // are informational — the split above is already net of the discount.
+  const discount = isPaise
+    ? money.discountAmount || 0
+    : paymentState.discount || 0;
+  const couponCode = (isPaise ? money.couponCode : paymentState.couponCode) || null;
+  const listPrice = isPaise
+    ? money.originalAmount || money.amount
+    : paymentState.plan?.amount ?? plan?.amount ?? fallbackTotal;
   const validityEnd = useMemo(() => addDays(issuedAt, 15), [issuedAt]);
   const features = plan?.features?.length
     ? plan.features.slice(0, 4)
@@ -122,9 +163,15 @@ export default function PaymentConfirmation() {
       `Customer: ${user?.name || "User"}`,
       `Email: ${user?.email || "Not available"}`,
       `Package: ${plan?.title || "Selected Package"}`,
-      `Base price (excl. GST): INR ${subtotal}`,
-      `GST (18%, included): INR ${gstAmount}`,
-      `Total (incl. GST): INR ${total}`,
+      // Same figures and same formatter as the rows on screen, so the
+      // downloaded text and the confirmation card cannot disagree.
+      `List price: ${fmt(listPrice)}`,
+      ...(discount
+        ? [`Discount${couponCode ? ` (${couponCode})` : ""}: -${fmt(discount)}`]
+        : []),
+      `Taxable value: ${fmt(subtotal)}`,
+      `GST (18%, included): ${fmt(gstAmount)}`,
+      `Total (incl. GST): ${fmt(total)}`,
       `Valid Until: ${formatDate(validityEnd)}`,
     ];
 
@@ -282,16 +329,32 @@ export default function PaymentConfirmation() {
               </div>
             </div>
 
+            {/* Same two reconciling groups as the payment page:
+                  list − discount = total, and base + GST = total. */}
             <div className="mt-6 space-y-3 text-sm">
               <div className="flex items-center justify-between gap-4">
                 <span className="text-[#65758B]">{plan.title}</span>
                 <span className="font-semibold text-[#0F1729]">
-                  {formatPrice(subtotal)}
+                  {fmt(listPrice)}
                 </span>
+              </div>
+              {discount ? (
+                <div className="flex items-center justify-between gap-4 text-emerald-700">
+                  <span className="font-medium">
+                    {couponCode ? `Coupon (${couponCode})` : "Discount"}
+                  </span>
+                  <span className="font-semibold">
+                    − {fmt(discount)}
+                  </span>
+                </div>
+              ) : null}
+              <div className="flex items-center justify-between gap-4 pt-3 border-t border-[#EEF2F5]">
+                <span className="text-[#65758B]">Taxable value</span>
+                <span className="text-[#65758B]">{fmt(subtotal)}</span>
               </div>
               <div className="flex items-center justify-between gap-4">
                 <span className="text-[#65758B]">GST (18%, included)</span>
-                <span className="text-[#65758B]">{formatPrice(gstAmount)}</span>
+                <span className="text-[#65758B]">{fmt(gstAmount)}</span>
               </div>
             </div>
 
@@ -300,7 +363,7 @@ export default function PaymentConfirmation() {
             <div className="flex items-center justify-between gap-4">
               <span className="font-semibold text-[#0F1729]">Total Amount</span>
               <span className="text-3xl font-bold text-[#0F1729]">
-                {formatPrice(total)}
+                {fmt(total)}
               </span>
             </div>
             <p className="mt-1 text-[11px] text-[#65758B]">

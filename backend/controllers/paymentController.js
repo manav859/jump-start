@@ -20,6 +20,7 @@ import Payment from "../models/Payment.js";
 import { getActivePackages } from "./userController.js";
 import { getRazorpayClient, getRazorpayKeyId } from "../config/razorpay.js";
 import { grantPackageEntitlement } from "../services/entitlementService.js";
+import { GST_RATE, splitInclusiveGST } from "../utils/money.js";
 import Booking from "../models/Booking.js";
 import { COUNSELLING_NOTE_TYPE } from "../config/counselling.js";
 import {
@@ -39,18 +40,85 @@ const buildReceipt = () =>
 // Rupees -> paise. Razorpay takes currency subunits: 1999 => 199900.
 const toPaise = (rupees) => Math.round(Number(rupees || 0) * 100);
 
+// Billing normalisation + validation.
+//
+// This is the security boundary, not the form. The client gate in
+// Payment.jsx is a courtesy to the student; anything can POST here, so the
+// same rules are re-applied to the raw body and nothing reaches the ledger
+// until they pass.
+//
+// Returns { ok: true, billing } with trimmed values, or { ok: false }.
+const asTrimmedString = (value) =>
+  typeof value === "string" ? value.trim() : "";
+
+const validateBilling = (raw) => {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    return { ok: false };
+  }
+
+  const billing = {
+    fullName: asTrimmedString(raw.fullName),
+    email: asTrimmedString(raw.email),
+    phone: asTrimmedString(raw.phone),
+    address: asTrimmedString(raw.address),
+    city: asTrimmedString(raw.city),
+    pincode: asTrimmedString(raw.pincode),
+    gstNumber: asTrimmedString(raw.gstNumber),
+  };
+
+  // Non-empty after trim.
+  if (!billing.fullName || !billing.address || !billing.city) {
+    return { ok: false };
+  }
+
+  // "@" with a "." somewhere after it.
+  const at = billing.email.indexOf("@");
+  if (at < 1 || billing.email.indexOf(".", at) <= at + 1) {
+    return { ok: false };
+  }
+
+  // Exactly 10 digits once every non-digit is stripped. Matches the client,
+  // which also tolerates a +91/0 prefix — strip that here too so a number
+  // the form accepted is not rejected server-side.
+  const phoneDigits = billing.phone
+    .replace(/\D/g, "")
+    .replace(/^(?:91|0)(?=\d{10}$)/, "");
+  if (!/^\d{10}$/.test(phoneDigits)) {
+    return { ok: false };
+  }
+
+  if (!/^\d{6}$/.test(billing.pincode)) {
+    return { ok: false };
+  }
+
+  // gstNumber is optional and unchecked — format varies and a wrong
+  // rejection here blocks a sale for no benefit.
+  return { ok: true, billing };
+};
+
 /**
  * POST /api/v1/user/payment/order
- * Body: { packageId, couponCode? }
+ * Body: { packageId, couponCode?, billing }
  */
 export const createOrder = async (req, res) => {
   try {
-    const { packageId, couponCode } = req.body || {};
+    const { packageId, couponCode, billing: billingInput } = req.body || {};
     if (!packageId) {
       return res
         .status(400)
         .json({ success: false, msg: "packageId is required" });
     }
+
+    // Before any lookup, pricing or gateway call: an invalid payload must
+    // not cost us a Razorpay order or a ledger row.
+    const billingCheck = validateBilling(billingInput);
+    if (!billingCheck.ok) {
+      return res.status(400).json({
+        success: false,
+        msg: "Billing information is incomplete or invalid",
+      });
+    }
+    const billing = billingCheck.billing;
 
     const [cfg, user] = await Promise.all([
       AssessmentConfig.getOrCreateDefault(),
@@ -113,11 +181,24 @@ export const createOrder = async (req, res) => {
       });
     }
 
+    // GST split of the amount ACTUALLY CHARGED. Deliberately derived from
+    // amountPaise (post-discount), not originalAmount: tax is owed on the
+    // consideration received, so splitting the list price would overstate it
+    // by the tax inside the discount whenever a coupon applies.
+    const { base: basePaise, gst: gstPaise, gstRate } =
+      splitInclusiveGST(amountPaise);
+
     const receipt = buildReceipt();
     const notes = {
       userId: String(user._id),
       packageId: pkg.id,
       couponCode: appliedCouponCode || "",
+      // Three billing fields only, for at-a-glance identification in the
+      // Razorpay dashboard. Notes are a capped key/value bag, not a store —
+      // the full record lives on the Payment row below.
+      billingName: billing.fullName,
+      billingPhone: billing.phone,
+      billingPincode: billing.pincode,
     };
 
     const razorpay = getRazorpayClient();
@@ -142,6 +223,13 @@ export const createOrder = async (req, res) => {
       discountAmount,
       receipt,
       notes,
+      // Snapshot of what the student entered at checkout. Read by the
+      // invoice renderer later; nothing reads it today.
+      billing,
+      // Split of `amount` above (post-discount). base + gst === amount.
+      base: basePaise,
+      gst: gstPaise,
+      gstRate,
     });
 
     return res.status(200).json({
@@ -289,6 +377,28 @@ export const verifyPayment = async (req, res) => {
       await payment.save();
     }
 
+    // --- Authoritative money figures, in PAISE -----------------------------
+    // The confirmation screen renders these verbatim rather than re-deriving
+    // in rupees, so what the student sees on screen and what the invoice
+    // prints off this same ledger row agree to the paisa.
+    //
+    // Historical rows (orders placed before base/gst were stored) carry no
+    // split. Recompute it from the authoritative `amount` so the response
+    // shape is identical for every order and no caller has to branch.
+    const amountPaise = Number(payment.amount || 0);
+    const hasStoredSplit =
+      Number.isFinite(payment.base) && Number.isFinite(payment.gst);
+    const money = hasStoredSplit
+      ? {
+          base: payment.base,
+          gst: payment.gst,
+          gstRate: payment.gstRate ?? GST_RATE,
+        }
+      : (() => {
+          const s = splitInclusiveGST(amountPaise);
+          return { base: s.base, gst: s.gst, gstRate: s.gstRate };
+        })();
+
     return res.status(200).json({
       success: true,
       data: {
@@ -297,6 +407,21 @@ export const verifyPayment = async (req, res) => {
         razorpayOrderId: orderId,
         razorpayPaymentId: paymentId,
         alreadyGranted: result.alreadyGranted,
+        // EVERY money field below is integer PAISE. amount === base + gst.
+        //
+        // originalAmount/discountAmount are converted here: on the ledger
+        // they are stored in RUPEES (see createOrder — pkg.amount and
+        // coupon.applyToAmount both work in rupees) while amount/base/gst
+        // are paise. Emitting that split-brain to the client invites a 100x
+        // formatting bug, so the response is uniform even though the
+        // documents it reads are not.
+        amount: amountPaise,
+        base: money.base,
+        gst: money.gst,
+        gstRate: money.gstRate,
+        originalAmount: toPaise(payment.originalAmount ?? 0),
+        discountAmount: toPaise(payment.discountAmount ?? 0),
+        couponCode: payment.couponCode || null,
       },
     });
   } catch (err) {

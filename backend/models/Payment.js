@@ -67,8 +67,41 @@ const paymentSchema = new mongoose.Schema(
     originalAmount: { type: Number, default: null },
     discountAmount: { type: Number, default: null },
 
+    // GST decomposition of `amount` — the post-discount figure actually
+    // charged, in PAISE. base + gst === amount exactly, by construction
+    // (see utils/money.js: gst is the remainder, never rounded separately).
+    //
+    // Stored rather than derived at read time so a future rate change does
+    // not silently rewrite the tax on historical invoices: gstRate is frozen
+    // here as it stood when the order was placed.
+    //
+    // No required:true — rows created before this existed have none, and
+    // verifyPayment and the webhook both re-save those documents.
+    base: { type: Number },
+    gst: { type: Number },
+    gstRate: { type: Number },
+
     // Our own idempotency handle, echoed back by Razorpay. Max 40 chars.
     receipt: { type: String, required: true, unique: true, index: true },
+
+    // Billing details as given by the student at checkout, snapshotted here
+    // so a later invoice reproduces what was on screen at the time — not
+    // whatever the profile says when the invoice is downloaded months on.
+    //
+    // Deliberately NO required:true on any field. Orders created before this
+    // existed have no `billing` at all, and a schema-level requirement would
+    // make those rows throw on save (verifyPayment and the webhook both
+    // re-save existing documents). The real gate is in createOrder, which
+    // rejects an invalid payload with 400 before any order is created.
+    billing: {
+      fullName: { type: String, trim: true },
+      email: { type: String, trim: true },
+      phone: { type: String, trim: true },
+      address: { type: String, trim: true },
+      city: { type: String, trim: true },
+      pincode: { type: String, trim: true },
+      gstNumber: { type: String, trim: true, default: "" },
+    },
 
     // Whatever was sent as Razorpay `notes` (userId, packageId, couponCode).
     // The webhook will need these, since it arrives with no session.
